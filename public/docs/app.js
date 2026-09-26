@@ -128,32 +128,6 @@ PHORVA_PAGES["commitments"] = `
 </ul>
 `;
 
-PHORVA_PAGES["trading"] = `
-<div class="eyebrow">USE CASES / TRADING</div>
-<h1>Autonomous trading</h1>
-<p>
-  Phorva can act as the verification layer for trading agents that
-  execute strategies against blockchain protocols.
-</p>
-
-<h2>Controls</h2>
-<ul>
-  <li>Maximum trade size</li>
-  <li>Daily or rolling exposure limits</li>
-  <li>Token restrictions</li>
-  <li>Protocol and contract allowlists</li>
-  <li>Slippage constraints</li>
-  <li>Position limits</li>
-  <li>Multi-step execution verification</li>
-</ul>
-
-<p>
-  The trading system remains responsible for strategy decisions.
-  Phorva verifies whether the resulting execution satisfies the configured
-  authorization conditions.
-</p>
-`;
-
 PHORVA_PAGES["projects"] = `
 <div class="eyebrow">DEVELOPER / PROJECTS</div>
 <h1>Projects</h1>
@@ -359,6 +333,153 @@ PHORVA_PAGES["status"] = `
 </div>
 `;
 
+
+
+PHORVA_PAGES["trading"] = `
+<div class="eyebrow">USE CASES / TRADING</div>
+<h1>Autonomous trading</h1>
+<p>Trading agents execute swaps, routes, and multi-step strategies. Phorva verifies that what actually runs matches declared intent and policy.</p>
+<div class="notice"><strong>Boundary</strong><p>Strategy stays with the agent. Phorva does not choose trades — it verifies authorization of the resulting execution.</p></div>
+<h2>What Phorva verifies</h2>
+<div class="cards">
+  <div class="card"><h3>Trade size</h3><p>Amount within max trade and exposure limits.</p></div>
+  <div class="card"><h3>Assets</h3><p>Only allowed tokens.</p></div>
+  <div class="card"><h3>Venues</h3><p>Only allowlisted protocols and contracts.</p></div>
+  <div class="card"><h3>Intent match</h3><p>Calldata matches declared trade intent.</p></div>
+  <div class="card"><h3>Slippage</h3><p>Within configured bounds where supplied.</p></div>
+  <div class="card"><h3>Multi-step paths</h3><p>Approve → swap → settle verified as a graph.</p></div>
+</div>
+<h2>Typical controls</h2>
+<ul>
+  <li>Maximum trade size</li>
+  <li>Daily or rolling exposure limits</li>
+  <li>Token allowlists / denylists</li>
+  <li>Protocol and contract allowlists</li>
+  <li>Slippage constraints</li>
+  <li>Chain restrictions</li>
+</ul>
+<h2>Example intent</h2>
+<pre><code>{
+  "type": "swap",
+  "tokenIn": "USDC",
+  "tokenOut": "ETH",
+  "amount": "300",
+  "protocol": "Uniswap",
+  "chain": "baseSepolia"
+}</code></pre>
+<div class="notice"><strong>Status</strong><p>Supported in current development/testnet for swap-style and multi-step patterns. Production depends on the infrastructure roadmap.</p></div>
+`;
+
+PHORVA_PAGES["autonomous-trading"] = PHORVA_PAGES["trading"];
+
+
+PHORVA_PAGES["prediction-markets"] = `
+<div class="eyebrow">USE CASES / PREDICTION MARKETS</div>
+<h1>Prediction markets</h1>
+<p>Agents can trade outcome shares, provide liquidity, and manage positions. Phorva verifies those actions against intent and policy.</p>
+<div class="notice"><strong>Boundary</strong><p>Market strategy stays with the agent. Phorva verifies whether the market action is authorized.</p></div>
+<h2>What Phorva verifies</h2>
+<div class="cards">
+  <div class="card"><h3>Position size</h3><p>Amounts within configured limits.</p></div>
+  <div class="card"><h3>Market scope</h3><p>Only allowed markets/contracts.</p></div>
+  <div class="card"><h3>Action type</h3><p>Trade, mint, redeem, or LP matches intent.</p></div>
+  <div class="card"><h3>Collateral path</h3><p>Collateral and outcome tokens match authorization.</p></div>
+</div>
+<ul>
+  <li>Max notional per trade</li>
+  <li>Per-market exposure limits</li>
+  <li>Allowed market/contract lists</li>
+  <li>Allowed collateral assets</li>
+  <li>Chain restrictions</li>
+</ul>
+<pre><code>{
+  "type": "prediction_trade",
+  "market": "election-2026",
+  "side": "yes",
+  "amount": "100",
+  "collateral": "USDC",
+  "chain": "baseSepolia"
+}</code></pre>
+`;
+
+PHORVA_PAGES["agent-payments"] = `
+<div class="eyebrow">USE CASES / AGENT PAYMENTS</div>
+<h1>Agent payments</h1>
+<p>Machine-to-machine payments need hard limits. Phorva verifies that payment execution matches the agent’s authorized payment intent and policy.</p>
+<div class="notice"><strong>Boundary</strong><p>Phorva is not a payment rail or wallet. It verifies whether a payment action is authorized.</p></div>
+<div class="cards">
+  <div class="card"><h3>Amount</h3><p>Payment within max and period limits.</p></div>
+  <div class="card"><h3>Recipient</h3><p>Destination matches allowlist where required.</p></div>
+  <div class="card"><h3>Asset</h3><p>Only permitted tokens.</p></div>
+  <div class="card"><h3>Intent match</h3><p>Actual transfer matches declared payment intent.</p></div>
+</div>
+<ul>
+  <li>Per-payment maximum</li>
+  <li>Daily/monthly spend caps</li>
+  <li>Recipient allowlists</li>
+  <li>Token allowlists</li>
+  <li>Chain restrictions</li>
+</ul>
+<pre><code>{
+  "type": "transfer",
+  "token": "USDC",
+  "amount": "50",
+  "recipient": "0x...",
+  "chain": "baseSepolia"
+}</code></pre>
+`;
+
+PHORVA_PAGES["daos-treasuries"] = `
+<div class="eyebrow">USE CASES / DAOS & TREASURIES</div>
+<h1>DAOs & treasuries</h1>
+<p>Treasury agents can move capital under governance constraints. Phorva verifies that treasury execution matches authorized intent and policy.</p>
+<div class="notice"><strong>Boundary</strong><p>Governance remains with the DAO. Phorva verifies whether a treasury action is consistent with declared authorization conditions.</p></div>
+<div class="cards">
+  <div class="card"><h3>Amount</h3><p>Within treasury spending limits.</p></div>
+  <div class="card"><h3>Destination</h3><p>Recipient/protocol matches policy.</p></div>
+  <div class="card"><h3>Action type</h3><p>Transfer, swap, or allocation matches intent.</p></div>
+  <div class="card"><h3>Multi-step paths</h3><p>Complex treasury routes verified as a graph.</p></div>
+</div>
+<ul>
+  <li>Max transfer size</li>
+  <li>Recipient allowlists</li>
+  <li>Protocol allowlists</li>
+  <li>Role/agent-scoped limits</li>
+</ul>
+`;
+
+PHORVA_PAGES["onchain-automation"] = `
+<div class="eyebrow">USE CASES / ON-CHAIN AUTOMATION</div>
+<h1>On-chain automation</h1>
+<p>Automation agents trigger recurring or conditional on-chain actions. Phorva verifies each execution attempt against intent and policy.</p>
+<div class="notice"><strong>Boundary</strong><p>Schedulers and keepers still trigger work. Phorva verifies whether each triggered execution is authorized.</p></div>
+<div class="cards">
+  <div class="card"><h3>Action scope</h3><p>Only allowed automated action types.</p></div>
+  <div class="card"><h3>Size limits</h3><p>Within configured operational limits.</p></div>
+  <div class="card"><h3>Targets</h3><p>Only allowlisted contracts/protocols.</p></div>
+  <div class="card"><h3>Intent match</h3><p>Each run matches the authorized automation intent.</p></div>
+</div>
+<ul>
+  <li>Allowed action types</li>
+  <li>Per-run amount limits</li>
+  <li>Contract allowlists</li>
+  <li>Chain restrictions</li>
+</ul>
+`;
+
+PHORVA_PAGES["virtual-cards"] = `
+<div class="eyebrow">USE CASES / VIRTUAL CARDS</div>
+<h1>Virtual cards</h1>
+<p>Virtual cards can be a future execution rail for agent spend. Phorva’s role remains verification — not card issuance.</p>
+<div class="notice"><strong>Boundary</strong><p>Phorva is not a card issuer. If card rails are connected later, Phorva verifies whether the spend action matches intent and policy.</p></div>
+<div class="cards">
+  <div class="card"><h3>Spend amount</h3><p>Within configured caps.</p></div>
+  <div class="card"><h3>Merchant / category</h3><p>Where policy provides restrictions.</p></div>
+  <div class="card"><h3>Agent scope</h3><p>Spend attributed to the correct agent policy.</p></div>
+  <div class="card"><h3>Evidence</h3><p>Verification record for auditability.</p></div>
+</div>
+<div class="notice"><strong>Status</strong><p>Virtual Card is on the longer-term roadmap. It is not a current Phorva product.</p></div>
+`;
 
 const PHORVA_ROUTES = {
 
