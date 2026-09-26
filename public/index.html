@@ -3892,47 +3892,30 @@ body{
     <div class="phorva-nav-dropdown">
       <button type="button">Product <span>⌄</span></button>
       <div class="phorva-nav-menu">
-        <a href="/docs/verification">Verification</a>
-        <a href="/docs/verification/policy">Policy Engine</a>
-        <a href="/docs/verification/risk">Risk Engine</a>
-        <a href="/docs/verification/authorization">Authorization</a>
-        <a href="/docs/verification/execution-graph">Execution Graph</a>
-        <a href="/docs/verification/proof">Evidence &amp; Receipts</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#developer-integration">Live verification</a>
+        <a href="/docs/what-is">What Phorva is</a>
+        <a href="/docs/architecture">Architecture</a>
       </div>
     </div>
 
     <div class="phorva-nav-dropdown">
       <button type="button">Developers <span>⌄</span></button>
       <div class="phorva-nav-menu">
+        <a href="/docs/quickstart">Quickstart</a>
         <a href="/docs/developer/api">API</a>
         <a href="/docs/developer/sdk">SDK</a>
         <a href="/docs/developer/api-keys">API Keys</a>
-        <a href="/docs/quickstart">Quickstart</a>
-        <a href="/docs/connect">Integrations</a>
-        <a href="/docs">MCP</a>
       </div>
     </div>
 
     <div class="phorva-nav-dropdown">
       <button type="button">Use Cases <span>⌄</span></button>
       <div class="phorva-nav-menu">
+        <a href="/docs/use-cases">Overview</a>
         <a href="/docs/use-cases/defi">DeFi</a>
-        <a href="/docs/use-cases/autonomous-trading">Trading</a>
-        <a href="/docs/use-cases/prediction-markets">Prediction Markets</a>
+        <a href="/docs/use-cases/trading">Trading</a>
         <a href="/docs/use-cases/agent-payments">Agent Payments</a>
-        <a href="/docs/use-cases/gaming">Gaming</a>
-        <a href="/docs/use-cases/agent-wallets">Agent Wallets</a>
-        <a href="/docs/use-cases/daos-treasuries">DAOs &amp; Treasuries</a>
-      </div>
-    </div>
-
-    <div class="phorva-nav-dropdown">
-      <button type="button">Resources <span>⌄</span></button>
-      <div class="phorva-nav-menu">
-        <a href="/docs">Docs</a>
-        <a href="/docs/architecture">Architecture</a>
-        <a href="/docs/infrastructure/security">Security</a>
-        <a href="/docs/roadmap">Roadmap</a>
       </div>
     </div>
 
@@ -3940,127 +3923,8 @@ body{
 
   <div class="phorva-nav-utility">
     <a href="/docs">Docs</a>
-    <button type="button" id="phorva-navigator-toggle">Navigator</button>
   </div>
 </nav>
-
-<div id="phorva-navigator-panel">
-  <div class="phorva-nav-head">
-    <div>
-      <strong>PHORVA NAVIGATOR</strong>
-      <div style="margin-top:4px;color:#68758b;font-size:8px">
-        Product architecture & developer documentation
-      </div>
-    </div>
-    <button type="button" id="phorva-navigator-close"
-      style="border:0;background:transparent;color:#68758b;cursor:pointer;font-size:16px">×</button>
-  </div>
-
-  <div class="phorva-nav-group">
-    <div class="phorva-nav-group-title">OVERVIEW</div>
-    <div class="phorva-nav-grid">
-      <a href="/docs">Introduction</a>
-      <a href="/docs/architecture">Architecture</a>
-      <a href="/docs/core-concepts">Core Concepts</a>
-      <a href="/docs/what-is">What Phorva Is / Isn't</a>
-      <a href="/docs/phorva-vs-infrastructure">Infrastructure Boundaries</a>
-    </div>
-  </div>
-
-  <div class="phorva-nav-group">
-    <div class="phorva-nav-group-title">GET STARTED</div>
-    <div class="phorva-nav-grid">
-      <a href="/docs/quickstart">Quickstart</a>
-      <a href="/docs/sdk">SDK</a>
-      <a href="/docs/api">API</a>
-      <a href="/docs/authentication">Authentication</a>
-      <a href="/docs/connect">How to Connect</a>
-    </div>
-  </div>
-
-  <div class="phorva-nav-group">
-    <div class="phorva-nav-group-title">VERIFICATION</div>
-    <div class="phorva-nav-grid">
-      <a href="/docs/verification/intent">Intent</a>
-      <a href="/docs/verification/policy">Policy</a>
-      <a href="/docs/verification/risk">Risk</a>
-      <a href="/docs/verification/authorization">Authorization</a>
-      <a href="/docs/verification/transaction">Transaction</a>
-      <a href="/docs/verification/execution-graph">Execution Graph</a>
-      <a href="/docs/verification/final-state">Final-State</a>
-      <a href="/docs/verification/trace">Trace</a>
-      <a href="/docs/verification/proof">Proof / Evidence</a>
-      <a href="/docs/verification/receipts">Receipts</a>
-    </div>
-  </div>
-
-  <div class="phorva-nav-group">
-    <div class="phorva-nav-group-title">ACTIONS</div>
-    <div class="phorva-nav-grid">
-      <a href="/docs/actions/transfers">Transfers</a>
-      <a href="/docs/actions/approvals">Approvals</a>
-      <a href="/docs/actions/swaps">Swaps</a>
-      <a href="/docs/actions/withdrawals">Withdrawals</a>
-      <a href="/docs/actions/defi">DeFi</a>
-      <a href="/docs/actions/bridges">Bridges</a>
-      <a href="/docs/actions/custom-calls">Custom Calls</a>
-      <a href="/docs/actions/multi-step">Multi-Step</a>
-    </div>
-  </div>
-
-  <div class="phorva-nav-group">
-    <div class="phorva-nav-group-title">USE CASES</div>
-    <div class="phorva-nav-grid">
-      <a href="/docs/use-cases">Overview</a>
-      <a href="/docs/use-cases/defi">DeFi</a>
-      <a href="/docs/use-cases/prediction-markets">Prediction Markets</a>
-      <a href="/docs/use-cases/autonomous-trading">Autonomous Trading</a>
-      <a href="/docs/use-cases/agent-payments">Agent Payments</a>
-      <a href="/docs/use-cases/virtual-cards">Virtual Cards</a>
-      <a href="/docs/use-cases/gaming">Gaming</a>
-      <a href="/docs/use-cases/agent-wallets">Agent Wallets</a>
-      <a href="/docs/use-cases/daos-treasuries">DAOs & Treasuries</a>
-      <a href="/docs/use-cases/onchain-automation">On-chain Automation</a>
-    </div>
-  </div>
-  <div class="phorva-nav-group">
-    <div class="phorva-nav-group-title">INFRASTRUCTURE</div>
-    <div class="phorva-nav-grid">
-      <a href="/docs/infrastructure/chains">Chains</a>
-      <a href="/docs/infrastructure/protocols">Protocol Integrations</a>
-      <a href="/docs/infrastructure/providers">Providers</a>
-      <a href="/docs/infrastructure/security">Security Model</a>
-    </div>
-  </div>
-
-  <div class="phorva-nav-group">
-    <div class="phorva-nav-group-title">DEVELOPER</div>
-    <div class="phorva-nav-grid">
-      <a href="/docs/developer/sdk">SDK</a>
-      <a href="/docs/developer/api">API Reference</a>
-      <a href="/docs/developer/api-keys">API Keys</a>
-      <a href="/docs/developer/integration">Integration</a>
-      <a href="/docs/developer/errors">Errors</a>
-    </div>
-  </div>
-
-  <div class="phorva-nav-group">
-    <div class="phorva-nav-group-title">SECURITY</div>
-    <div class="phorva-nav-grid">
-      <a href="/docs/security/threat-model">Threat Model</a>
-      <a href="/docs/security/architecture">Security Architecture</a>
-      <a href="/docs/security/verification-integrity">Verification Integrity</a>
-      <a href="/docs/security/auditability">Auditability</a>
-    </div>
-  </div>
-
-  <div class="phorva-nav-group">
-    <div class="phorva-nav-group-title">ROADMAP</div>
-    <div class="phorva-nav-grid">
-      <a href="/docs/roadmap">Current → Production → Ecosystem</a>
-    </div>
-  </div>
-</div>
 
 <section class="hero investor-hero phorva-product-hero">
 
