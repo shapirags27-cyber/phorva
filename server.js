@@ -41,11 +41,24 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-const knownERC20Contracts = {
+app.get("/api/chains", (req, res) => {
+  res.json(
+    Object.entries(chains).map(([key, chain]) => ({
+      key,
+      name: chain.name,
+      chainId: chain.chainId
+    }))
+  );
+});
+
+
+const knownAssets = {
   baseSepolia: {
     "0x5555555555555555555555555555555555555555": {
+      type: "erc20",
       name: "AgentGuard Test USDC",
-      protocol: "ERC20"
+      symbol: "USDC",
+      protocol: null
     }
   }
 };
@@ -96,6 +109,51 @@ const knownContracts = {
     }
   }
 };
+
+app.get("/api/protocols", (req, res) => {
+  const result = {};
+
+  for (const [chainKey, contracts] of Object.entries(knownContracts)) {
+    const protocols = [...new Set(
+      Object.values(contracts)
+        .map(contract => contract.protocol)
+        .filter(Boolean)
+    )];
+
+    result[chainKey] = protocols;
+  }
+
+  res.json(result);
+});
+
+app.get("/api/assets", (req, res) => {
+  const result = {};
+
+  for (const [chainKey, chain] of Object.entries(chains)) {
+    const registeredAssets = Object.entries(
+      knownAssets[chainKey] || {}
+    ).map(([address, asset]) => ({
+      address,
+      type: asset.type,
+      name: asset.name,
+      symbol: asset.symbol || null,
+      protocol: asset.protocol || null
+    }));
+
+    result[chainKey] = [
+      {
+        address: null,
+        type: "native",
+        name: chain.name + " Native Asset",
+        symbol: null,
+        protocol: null
+      },
+      ...registeredAssets
+    ];
+  }
+
+  res.json(result);
+});
 
 const functionSelectors = {
   "0x3593564c": {
@@ -173,7 +231,7 @@ function resolveKnownContract(tx) {
 
   return (
     knownContracts[chainKey]?.[address] ??
-    knownERC20Contracts[chainKey]?.[address] ??
+    knownAssets[chainKey]?.[address] ??
     null
   );
 }
@@ -1138,6 +1196,13 @@ function verifyExecutionType(intent, analysis) {
     return decodedFunction.category === "approval";
   }
 
+  if (intent?.type === "send") {
+    return (
+      decodedFunction.category === "nativeTransfer" &&
+      decodedParameters.valid === true
+    );
+  }
+
   if (intent?.type === "transfer") {
     return (
       decodedFunction.category === "transfer" &&
@@ -1162,11 +1227,36 @@ function analyzeTransaction(tx, intent) {
       decodedFunction.category
     );
 
+  const isNativeTransfer =
+    intent?.type === "send" &&
+    (!tx.calldata || tx.calldata === "0x") &&
+    tx.to &&
+    tx.value !== undefined &&
+    tx.value !== null &&
+    String(tx.value) !== "0";
+
+  if (isNativeTransfer) {
+    decodedFunction.category = "nativeTransfer";
+    decodedFunction.name = "native transfer";
+
+    decodedParameters.valid = true;
+    decodedParameters.recipient = tx.to;
+    decodedParameters.actualAmount = Number(tx.value);
+    decodedParameters.nativeValue = String(tx.value);
+  }
+
   const normalizedAction =
-    normalizeDecodedAction(
-      decodedFunction,
-      decodedParameters
-    );
+    isNativeTransfer
+      ? {
+          action: "send",
+          amount: Number(tx.value),
+          recipient: tx.to,
+          protocolAction: "native transfer"
+        }
+      : normalizeDecodedAction(
+          decodedFunction,
+          decodedParameters
+        );
 
   if (
     decodedFunction.category === "universalRouter" &&
@@ -1191,11 +1281,16 @@ function analyzeTransaction(tx, intent) {
     decodedParameters.rawWords?.[0] ??
     null;
 
-  if (!contract) {
+  if (
+    !contract &&
+    decodedFunction.category !== "nativeTransfer"
+  ) {
     securityFlags.push("Unknown contract");
   }
 
-  if (decodedFunction.category === "unknown") {
+  if (
+    decodedFunction.category === "unknown"
+  ) {
     securityFlags.push("Unknown contract function");
   }
 
@@ -1278,7 +1373,9 @@ function analyzeTransaction(tx, intent) {
     protocol:
       decodedFunction.category === "universalRouter"
         ? "Uniswap"
-        : (contract ? contract.protocol : "Unknown"),
+        : decodedFunction.category === "nativeTransfer"
+          ? "Native"
+          : (contract ? contract.protocol : "Unknown"),
 
     decodedFunction,
 
@@ -6967,6 +7064,14 @@ const phorvaDocsRoutes = [
 
 app.get(phorvaDocsRoutes, (req, res) => {
   res.sendFile(path.join(__dirname, "public", "docs", "index.html"));
+});
+
+app.get("/dashboard", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "dashboard.html"));
+});
+
+app.get("/investor-mvp", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "investor-mvp.html"));
 });
 
 app.listen(PORT, () => {
