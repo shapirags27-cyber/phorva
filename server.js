@@ -1290,6 +1290,36 @@ function verifyExecutionType(intent, analysis) {
   return false;
 }
 
+const EXECUTION_ADAPTERS = {
+  send: "nativeTransfer",
+  transfer: "erc20Transfer",
+  approve: "erc20Approval",
+  approval: "erc20Approval",
+  swap: "verifiedSwap"
+};
+
+function getExecutionAdapter(actionType) {
+  const normalized =
+    String(actionType || "").toLowerCase();
+
+  const adapter =
+    EXECUTION_ADAPTERS[normalized];
+
+  if (!adapter) {
+    return {
+      supported: false,
+      actionType: normalized,
+      adapter: null
+    };
+  }
+
+  return {
+    supported: true,
+    actionType: normalized,
+    adapter
+  };
+}
+
 function buildExecutionTransaction({
   intent,
   transaction
@@ -1297,7 +1327,16 @@ function buildExecutionTransaction({
   const actionType =
     String(intent?.type || "").toLowerCase();
 
-  if (actionType === "send") {
+  const executionAdapter =
+    getExecutionAdapter(actionType);
+
+  if (!executionAdapter.supported) {
+    throw new Error(
+      `Execution construction is not yet supported for action type: ${actionType || "unknown"}`
+    );
+  }
+
+  if (executionAdapter.adapter === "nativeTransfer") {
     const recipient =
       transaction?.to ||
       intent?.recipient ||
@@ -1343,7 +1382,7 @@ function buildExecutionTransaction({
     };
   }
 
-  if (actionType === "transfer") {
+  if (executionAdapter.adapter === "erc20Transfer") {
     const token =
       intent?.asset?.address ||
       intent?.token ||
@@ -1413,10 +1452,7 @@ function buildExecutionTransaction({
     };
   }
 
-  if (
-    actionType === "approval" ||
-    actionType === "approve"
-  ) {
+  if (executionAdapter.adapter === "erc20Approval") {
     const token =
       intent?.asset?.address ||
       intent?.token ||
@@ -1486,22 +1522,194 @@ function buildExecutionTransaction({
     };
   }
 
-  if (actionType === "swap") {
-    const target =
-      transaction?.to ||
-      intent?.target ||
+  if (executionAdapter.adapter === "verifiedSwap") {
+    const chainKey =
+      intent?.chain ||
+      transaction?.chain ||
       null;
 
-    const calldata =
-      transaction?.calldata ||
-      intent?.calldata ||
-      null;
+    const chainContracts =
+      knownContracts[chainKey] || {};
 
-    if (!target || !calldata) {
+    const universalRouter =
+      Object.entries(chainContracts).find(
+        ([, contract]) =>
+          contract?.name === "Uniswap Universal Router"
+      );
+
+    if (!universalRouter) {
       throw new Error(
-        "Swap execution requires a verified protocol target and calldata."
+        `Verified Uniswap Universal Router is not configured for chain: ${chainKey || "unknown"}`
       );
     }
+
+    const target =
+      universalRouter[0];
+
+    const tokenIn =
+      intent?.tokenIn ||
+      null;
+
+    const tokenOut =
+      intent?.tokenOut ||
+      null;
+
+    const amountIn =
+      intent?.amount ??
+      null;
+
+    const amountOutMin =
+      intent?.amountOutMin ??
+      0;
+
+    const recipient =
+      intent?.recipient ||
+      intent?.wallet ||
+      null;
+
+    if (!tokenIn || !tokenOut) {
+      throw new Error(
+        "Swap requires tokenIn and tokenOut addresses."
+      );
+    }
+
+    if (!recipient) {
+      throw new Error(
+        "Swap requires a recipient."
+      );
+    }
+
+    if (
+      amountIn === null ||
+      amountIn === undefined
+    ) {
+      throw new Error(
+        "Swap requires an input amount."
+      );
+    }
+
+    const addressWord = value => {
+      const normalized =
+        String(value)
+          .toLowerCase()
+          .replace(/^0x/, "");
+
+      if (!/^[0-9a-f]{40}$/.test(normalized)) {
+        throw new Error(
+          `Invalid address: ${value}`
+        );
+      }
+
+      return normalized.padStart(64, "0");
+    };
+
+    const uintWord = (value, label) => {
+      try {
+        const parsed =
+          BigInt(String(value));
+
+        if (parsed < 0n) {
+          throw new Error();
+        }
+
+        return parsed
+          .toString(16)
+          .padStart(64, "0");
+      } catch {
+        throw new Error(
+          `Invalid ${label}.`
+        );
+      }
+    };
+
+    const recipientWord =
+      addressWord(recipient);
+
+    const amountInWord =
+      uintWord(amountIn, "swap input amount");
+
+    const amountOutMinWord =
+      uintWord(
+        amountOutMin,
+        "minimum output amount"
+      );
+
+    const path =
+      addressWord(tokenIn) +
+      addressWord(tokenOut);
+
+    const pathBytesLength =
+      (path.length / 2)
+        .toString(16)
+        .padStart(64, "0");
+
+    const pathPadded =
+      path.padEnd(
+        Math.ceil(path.length / 64) * 64,
+        "0"
+      );
+
+    const payerIsUserWord =
+      "1".padStart(64, "0");
+
+    const swapInput =
+      recipientWord +
+      amountInWord +
+      amountOutMinWord +
+      "a0".padStart(64, "0") +
+      payerIsUserWord +
+      pathBytesLength +
+      pathPadded;
+
+    const commands =
+      "08";
+
+    /*
+     * execute(bytes commands, bytes[] inputs)
+     *
+     * The two dynamic offsets are measured from the start
+     * of the ABI argument block.
+     */
+    const commandsOffset =
+      64n;
+
+    const commandsData =
+      "01".padStart(64, "0") +
+      commands.padEnd(64, "0");
+
+    const inputsOffset =
+      commandsOffset +
+      BigInt(commandsData.length / 2);
+
+    const inputOffset =
+      32n;
+
+    const swapInputLength =
+      (swapInput.length / 2)
+        .toString(16)
+        .padStart(64, "0");
+
+    const inputData =
+      swapInputLength +
+      swapInput;
+
+    const inputsData =
+      "01".padStart(64, "0") +
+      inputOffset
+        .toString(16)
+        .padStart(64, "0") +
+      inputData;
+
+    const calldata =
+      "0x3593564c" +
+      commandsOffset
+        .toString(16)
+        .padStart(64, "0") +
+      inputsOffset
+        .toString(16)
+        .padStart(64, "0") +
+      commandsData +
+      inputsData;
 
     return {
       type: "swap",
