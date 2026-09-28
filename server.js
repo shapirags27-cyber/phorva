@@ -1168,6 +1168,44 @@ function normalizeDecodedAction(decodedFunction, decodedParameters) {
  * Uses the completed transaction analysis object so this
  * helper does not depend on route-local decoder variables.
  */
+const VERIFIED_EXECUTION_TYPES = {
+  swap: ["swap", "universalRouter"],
+  approval: ["approval"],
+  send: ["nativeTransfer"],
+  transfer: ["transfer"]
+};
+
+function getVerifiedExecutionCapability(actionType) {
+  const aliases = {
+    approve: "approval",
+    approval: "approval",
+    send: "send",
+    transfer: "transfer",
+    swap: "swap"
+  };
+
+  const canonicalType =
+    aliases[String(actionType || "").toLowerCase()] ||
+    String(actionType || "").toLowerCase();
+
+  const categories =
+    VERIFIED_EXECUTION_TYPES[canonicalType];
+
+  if (!categories) {
+    return {
+      supported: false,
+      type: canonicalType,
+      categories: []
+    };
+  }
+
+  return {
+    supported: true,
+    type: canonicalType,
+    categories: [...categories]
+  };
+}
+
 function verifyExecutionType(intent, analysis) {
   const decodedFunction =
     analysis?.decodedFunction || {};
@@ -1175,13 +1213,41 @@ function verifyExecutionType(intent, analysis) {
   const decodedParameters =
     analysis?.decodedParameters || {};
 
-  if (intent?.type === "swap") {
+  const aliases = {
+    approve: "approval",
+    approval: "approval",
+    send: "send",
+    transfer: "transfer",
+    swap: "swap"
+  };
+
+  const requestedType =
+    String(intent?.type || "").toLowerCase();
+
+  const canonicalType =
+    aliases[requestedType] || requestedType;
+
+  const capability =
+    getVerifiedExecutionCapability(canonicalType);
+
+  if (!capability.supported) {
+    return false;
+  }
+
+  if (canonicalType === "swap") {
     if (decodedFunction.category === "swap") {
-      return true;
+      return (
+        VERIFIED_EXECUTION_TYPES.swap.includes(
+          decodedFunction.category
+        ) &&
+        decodedParameters.valid !== false
+      );
     }
 
     if (
-      decodedFunction.category === "universalRouter" &&
+      VERIFIED_EXECUTION_TYPES.swap.includes(
+        decodedFunction.category
+      ) &&
       decodedParameters.valid === true &&
       decodedParameters.commandType === 0x08 &&
       decodedParameters.allowRevert === false
@@ -1192,20 +1258,28 @@ function verifyExecutionType(intent, analysis) {
     return false;
   }
 
-  if (intent?.type === "approval") {
-    return decodedFunction.category === "approval";
+  if (canonicalType === "approval") {
+    return (
+      VERIFIED_EXECUTION_TYPES.approval.includes(
+        decodedFunction.category
+      )
+    );
   }
 
-  if (intent?.type === "send") {
+  if (canonicalType === "send") {
     return (
-      decodedFunction.category === "nativeTransfer" &&
+      VERIFIED_EXECUTION_TYPES.send.includes(
+        decodedFunction.category
+      ) &&
       decodedParameters.valid === true
     );
   }
 
-  if (intent?.type === "transfer") {
+  if (canonicalType === "transfer") {
     return (
-      decodedFunction.category === "transfer" &&
+      VERIFIED_EXECUTION_TYPES.transfer.includes(
+        decodedFunction.category
+      ) &&
       (
         decodedFunction.selector === "0xa9059cbb" ||
         decodedFunction.selector === "0x23b872dd"
@@ -1215,6 +1289,7 @@ function verifyExecutionType(intent, analysis) {
 
   return false;
 }
+
 function analyzeTransaction(tx, intent) {
   const securityFlags = [];
   const parameterFlags = [];
@@ -1967,6 +2042,9 @@ function verifyExecutionAuthorization({
             )
     );
 
+  const executionCapability =
+    getVerifiedExecutionCapability(intent.type);
+
   const executionTypeMatched =
     verifyExecutionType(intent, analysis);
 
@@ -1998,6 +2076,7 @@ function verifyExecutionAuthorization({
     intentMatched,
     parameterMatched,
     executionTypeMatched,
+    executionCapability,
     nativeValueMatched,
     protocolMatched,
     transactionSecuritySafe,
