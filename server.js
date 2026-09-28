@@ -1290,6 +1290,245 @@ function verifyExecutionType(intent, analysis) {
   return false;
 }
 
+function buildExecutionTransaction({
+  intent,
+  transaction
+}) {
+  const actionType =
+    String(intent?.type || "").toLowerCase();
+
+  if (actionType === "send") {
+    const recipient =
+      transaction?.to ||
+      intent?.recipient ||
+      null;
+
+    const value =
+      transaction?.value ??
+      intent?.nativeValue ??
+      intent?.value ??
+      "0";
+
+    if (!recipient) {
+      throw new Error(
+        "Native send requires a recipient."
+      );
+    }
+
+    if (
+      value === null ||
+      value === undefined ||
+      String(value) === "0"
+    ) {
+      throw new Error(
+        "Native send requires a non-zero native value."
+      );
+    }
+
+    return {
+      type: "send",
+      transaction: {
+        chainId:
+          transaction?.chainId ??
+          intent?.chainId ??
+          null,
+        from:
+          transaction?.from ??
+          intent?.wallet ??
+          null,
+        to: recipient,
+        value: String(value),
+        calldata: "0x"
+      }
+    };
+  }
+
+  if (actionType === "transfer") {
+    const token =
+      intent?.asset?.address ||
+      intent?.token ||
+      transaction?.token ||
+      null;
+
+    const recipient =
+      intent?.recipient ||
+      transaction?.recipient ||
+      null;
+
+    const amount =
+      intent?.amount ??
+      intent?.value ??
+      null;
+
+    if (!token) {
+      throw new Error(
+        "ERC-20 transfer requires a token contract."
+      );
+    }
+
+    if (!recipient) {
+      throw new Error(
+        "ERC-20 transfer requires a recipient."
+      );
+    }
+
+    if (
+      amount === null ||
+      amount === undefined
+    ) {
+      throw new Error(
+        "ERC-20 transfer requires an amount."
+      );
+    }
+
+    const recipientWord =
+      String(recipient)
+        .toLowerCase()
+        .replace(/^0x/, "")
+        .padStart(64, "0");
+
+    const amountWord =
+      BigInt(String(amount))
+        .toString(16)
+        .padStart(64, "0");
+
+    return {
+      type: "transfer",
+      transaction: {
+        chainId:
+          transaction?.chainId ??
+          intent?.chainId ??
+          null,
+        from:
+          transaction?.from ??
+          intent?.wallet ??
+          null,
+        to: token,
+        value: "0",
+        calldata:
+          "0xa9059cbb" +
+          recipientWord +
+          amountWord
+      }
+    };
+  }
+
+  if (
+    actionType === "approval" ||
+    actionType === "approve"
+  ) {
+    const token =
+      intent?.asset?.address ||
+      intent?.token ||
+      transaction?.token ||
+      null;
+
+    const spender =
+      intent?.spender ||
+      transaction?.spender ||
+      null;
+
+    const allowance =
+      intent?.amount ??
+      intent?.allowance ??
+      null;
+
+    if (!token) {
+      throw new Error(
+        "Approval requires a token contract."
+      );
+    }
+
+    if (!spender) {
+      throw new Error(
+        "Approval requires a spender."
+      );
+    }
+
+    if (
+      allowance === null ||
+      allowance === undefined
+    ) {
+      throw new Error(
+        "Approval requires an allowance."
+      );
+    }
+
+    const spenderWord =
+      String(spender)
+        .toLowerCase()
+        .replace(/^0x/, "")
+        .padStart(64, "0");
+
+    const allowanceWord =
+      BigInt(String(allowance))
+        .toString(16)
+        .padStart(64, "0");
+
+    return {
+      type: "approval",
+      transaction: {
+        chainId:
+          transaction?.chainId ??
+          intent?.chainId ??
+          null,
+        from:
+          transaction?.from ??
+          intent?.wallet ??
+          null,
+        to: token,
+        value: "0",
+        calldata:
+          "0x095ea7b3" +
+          spenderWord +
+          allowanceWord
+      }
+    };
+  }
+
+  if (actionType === "swap") {
+    const target =
+      transaction?.to ||
+      intent?.target ||
+      null;
+
+    const calldata =
+      transaction?.calldata ||
+      intent?.calldata ||
+      null;
+
+    if (!target || !calldata) {
+      throw new Error(
+        "Swap execution requires a verified protocol target and calldata."
+      );
+    }
+
+    return {
+      type: "swap",
+      transaction: {
+        chainId:
+          transaction?.chainId ??
+          intent?.chainId ??
+          null,
+        from:
+          transaction?.from ??
+          intent?.wallet ??
+          null,
+        to: target,
+        value:
+          transaction?.value ??
+          intent?.nativeValue ??
+          "0",
+        calldata
+      }
+    };
+  }
+
+  throw new Error(
+    `Execution construction is not yet supported for action type: ${actionType || "unknown"}`
+  );
+}
+
 function analyzeTransaction(tx, intent) {
   const securityFlags = [];
   const parameterFlags = [];
