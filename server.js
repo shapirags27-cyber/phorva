@@ -2140,7 +2140,12 @@ function analyzeTransaction(tx, intent) {
         ? "Uniswap"
         : decodedFunction.category === "nativeTransfer"
           ? "Native"
-          : (contract ? contract.protocol : "Unknown"),
+          : (
+              decodedFunction.category === "approval" ||
+              decodedFunction.category === "transfer"
+            )
+            ? "ERC20"
+            : (contract ? contract.protocol : "Unknown"),
 
     decodedFunction,
 
@@ -2711,18 +2716,25 @@ function verifyExecutionAuthorization({
     actualTransactionAmount <= maximum &&
     actualTransactionAmount <= dailyLimit;
 
+  const hasRegisteredCapabilities =
+    Array.isArray(agent.capabilities);
+
   const registeredCapabilities =
-    Array.isArray(agent.capabilities)
+    hasRegisteredCapabilities
       ? agent.capabilities.map(
           value => String(value || "").toLowerCase()
         )
       : [];
 
   const capabilityAllowed =
-    isAgentCapabilityAllowed(intent.type) &&
-    registeredCapabilities.includes(
-      String(intent.type || "").toLowerCase()
-    );
+    hasRegisteredCapabilities
+      ? (
+          isAgentCapabilityAllowed(intent.type) &&
+          registeredCapabilities.includes(
+            String(intent.type || "").toLowerCase()
+          )
+        )
+      : isAgentCapabilityAllowed(intent.type);
 
   const targetAllowed =
     isPolicyTargetAllowed(
@@ -2752,8 +2764,149 @@ function verifyExecutionAuthorization({
   const protocolMatched =
     analysis.protocol === intent.protocol;
 
-  const transactionSecuritySafe =
-    analysis.transactionSecuritySafe;
+  const normalizeVerifierAddress = value =>
+    typeof value === "string"
+      ? value.toLowerCase()
+      : value;
+
+  const expectedRecipient =
+    intent.recipient ??
+    intent.destination;
+
+  const actualRecipient =
+    decodedParameters.recipient ??
+    normalizedAction.recipient ??
+    null;
+
+  const recipientMatched =
+    expectedRecipient === undefined ||
+    expectedRecipient === null ||
+    expectedRecipient === "" ||
+    (
+      actualRecipient &&
+      normalizeVerifierAddress(actualRecipient) ===
+        normalizeVerifierAddress(expectedRecipient)
+    );
+
+  const expectedPath =
+    Array.isArray(intent.path)
+      ? intent.path.map(normalizeVerifierAddress)
+      : null;
+
+  const actualPath =
+    Array.isArray(decodedParameters.path)
+      ? decodedParameters.path.map(normalizeVerifierAddress)
+      : (
+          Array.isArray(normalizedAction.path)
+            ? normalizedAction.path.map(normalizeVerifierAddress)
+            : null
+        );
+
+  const pathMatched =
+    expectedPath === null ||
+    (
+      actualPath &&
+      actualPath.length === expectedPath.length &&
+      actualPath.every(
+        (address, index) =>
+          address === expectedPath[index]
+      )
+    );
+
+  const expectedAssetAddress =
+    intent.assetAddress;
+
+  const actualAssetAddress =
+    action.type === "approval" ||
+    action.type === "transfer"
+      ? transaction.to
+      : (
+          Array.isArray(decodedParameters.path) &&
+          decodedParameters.path.length > 0
+            ? decodedParameters.path[0]
+            : (
+                decodedParameters.tokenIn ??
+                decodedParameters.assetAddress ??
+                normalizedAction.assetAddress ??
+                normalizedAction.tokenIn ??
+                null
+              )
+        );
+
+  const assetAddressMatched =
+    expectedAssetAddress === undefined ||
+    expectedAssetAddress === null ||
+    expectedAssetAddress === "" ||
+    (
+      actualAssetAddress &&
+      normalizeVerifierAddress(actualAssetAddress) ===
+        normalizeVerifierAddress(expectedAssetAddress)
+    );
+
+  const expectedSpender =
+    intent.spender;
+
+  const actualSpender =
+    decodedParameters.spender ??
+    normalizedAction.spender ??
+    null;
+
+  const spenderMatched =
+    expectedSpender === undefined ||
+    expectedSpender === null ||
+    expectedSpender === "" ||
+    (
+      actualSpender &&
+      normalizeVerifierAddress(actualSpender) ===
+        normalizeVerifierAddress(expectedSpender)
+    );
+
+  const expectedAmountOutMin =
+    intent.amountOutMin;
+
+  const actualAmountOutMin =
+    decodedParameters.amountOutMin ??
+    normalizedAction.amountOutMin;
+
+  const amountOutMinMatched =
+    expectedAmountOutMin === undefined ||
+    expectedAmountOutMin === null ||
+    (
+      actualAmountOutMin !== undefined &&
+      actualAmountOutMin !== null &&
+      Number(actualAmountOutMin) ===
+        Number(expectedAmountOutMin)
+    );
+
+  const expectedPayerIsUser =
+    intent.payerIsUser;
+
+  const actualPayerIsUser =
+    decodedParameters.payerIsUser ??
+    normalizedAction.payerIsUser;
+
+  const payerIsUserMatched =
+    expectedPayerIsUser === undefined ||
+    expectedPayerIsUser === null ||
+    actualPayerIsUser === expectedPayerIsUser;
+
+  const expectedAllowRevert =
+    intent.allowRevert;
+
+  const actualAllowRevert =
+    decodedParameters.allowRevert ??
+    normalizedAction.allowRevert;
+
+  const allowRevertMatched =
+    expectedAllowRevert === undefined ||
+    expectedAllowRevert === null ||
+    actualAllowRevert === expectedAllowRevert;
+
+  const isApprovalAction =
+    action.type === "approval";
+
+  const isTransferAction =
+    action.type === "transfer";
 
   const decodedParameterAmount =
     Number(
@@ -2768,6 +2921,30 @@ function verifyExecutionAuthorization({
     Number.isFinite(decodedParameterAmount) &&
     Number.isFinite(intentParameterAmount) &&
     decodedParameterAmount === intentParameterAmount;
+
+  const parameterMatched =
+    amountParameterMatched &&
+    assetAddressMatched &&
+    (
+      isApprovalAction
+        ? spenderMatched
+        : isTransferAction
+          ? recipientMatched
+          : (
+              spenderMatched &&
+              recipientMatched &&
+              pathMatched &&
+              amountOutMinMatched &&
+              payerIsUserMatched &&
+              allowRevertMatched
+            )
+    );
+
+  const transactionSecuritySafe =
+    analysis.transactionSecuritySafe;
+
+  const executionCapability =
+    getVerifiedExecutionCapability(intent.type);
 
   const executionTypeMatched =
     verifyExecutionType(intent, analysis);
