@@ -7,8 +7,10 @@ require("dotenv").config();
 const { createProductionApi } = require("./api/production-api");
 const db = require("./api/database");
 const { createApiKeyStore } = require("./api/api-keys");
+const { createAgentStore } = require("./api/agents");
 
 const apiKeyStore = createApiKeyStore(db);
+const agentStore = createAgentStore(db);
 
 const chains = {
   baseSepolia: {
@@ -1290,6 +1292,162 @@ function verifyExecutionType(intent, analysis) {
   return false;
 }
 
+const AGENT_CAPABILITIES = new Set([
+  "send",
+  "transfer",
+  "approve",
+  "approval",
+  "swap",
+  "permit",
+  "bridge",
+  "deposit",
+  "withdraw",
+  "supply",
+  "redeem",
+  "lend",
+  "borrow",
+  "repay",
+  "stake",
+  "unstake",
+  "lp-add",
+  "lp-remove",
+  "claim",
+  "mint",
+  "burn",
+  "liquidate",
+  "rebalance",
+  "contract-call",
+  "contractCall",
+  "custom-action",
+  "customAction",
+
+  "buy-position",
+  "sell-position",
+  "add-position",
+  "reduce-position",
+  "close-position",
+  "deposit-collateral",
+  "withdraw-collateral",
+  "claim-winnings",
+  "redeem-position",
+  "split-position",
+  "merge-position",
+  "trade",
+
+  "purchase",
+  "sell",
+  "upgrade",
+  "craft",
+  "equip",
+  "unequip",
+  "marketplace-listing",
+  "marketplace-bid",
+  "marketplace-offer",
+
+  "delegate",
+  "undelegate",
+  "propose",
+  "vote",
+  "queue",
+  "execute",
+  "cancel-proposal",
+  "stream",
+  "create-grant",
+  "fund-grant",
+
+  "pay",
+  "request-payment",
+  "split-payment",
+  "recurring-payment",
+  "refund",
+
+  "authorize",
+  "capture",
+  "void",
+  "partial-refund",
+  "payment",
+  "fund-card",
+  "withdraw-card-balance",
+  "deploy"
+]);
+
+function isAgentCapabilityAllowed(actionType) {
+  const normalized =
+    String(actionType || "").toLowerCase();
+
+  return AGENT_CAPABILITIES.has(normalized);
+}
+
+function isPolicyCapabilityAllowed(actionType, policy) {
+  const normalized =
+    String(actionType || "").toLowerCase();
+
+  const capabilities =
+    Array.isArray(policy?.capabilities)
+      ? policy.capabilities.map(
+          value => String(value || "").toLowerCase()
+        )
+      : null;
+
+  if (!capabilities) {
+    return isAgentCapabilityAllowed(normalized);
+  }
+
+  return (
+    isAgentCapabilityAllowed(normalized) &&
+    capabilities.includes(normalized)
+  );
+}
+
+function isPolicyTargetAllowed(transaction, policy) {
+  const allowedTargets =
+    Array.isArray(policy?.allowedTargets)
+      ? policy.allowedTargets
+          .map(value =>
+            String(value || "").toLowerCase()
+          )
+      : null;
+
+  if (!allowedTargets) {
+    return true;
+  }
+
+  const target =
+    String(transaction?.to || "").toLowerCase();
+
+  return (
+    target !== "" &&
+    allowedTargets.includes(target)
+  );
+}
+
+function isPolicySelectorAllowed(transaction, policy) {
+  const allowedSelectors =
+    Array.isArray(policy?.allowedSelectors)
+      ? policy.allowedSelectors
+          .map(value =>
+            String(value || "").toLowerCase()
+          )
+      : null;
+
+  if (!allowedSelectors) {
+    return true;
+  }
+
+  const calldata =
+    String(transaction?.calldata || "").toLowerCase();
+
+  const selector =
+    calldata.length >= 10
+      ? calldata.slice(0, 10)
+      : "";
+
+  return (
+    selector !== "" &&
+    allowedSelectors.includes(selector)
+  );
+}
+
 const EXECUTION_ADAPTERS = {
   send: "nativeTransfer",
   transfer: "erc20Transfer",
@@ -1320,6 +1478,75 @@ function getExecutionAdapter(actionType) {
   };
 }
 
+function isPolicyApprovalAllowed(decodedFunction, decodedParameters, policy) {
+  if (decodedFunction?.category !== "approval") {
+    return true;
+  }
+
+  const allowedSpenders =
+    Array.isArray(policy?.allowedSpenders)
+      ? policy.allowedSpenders
+          .map(value => String(value || "").toLowerCase())
+      : null;
+
+  const spender =
+    decodedParameters?.spender ??
+    decodedParameters?.operator ??
+    null;
+
+  if (
+    allowedSpenders &&
+    (
+      !spender ||
+      !allowedSpenders.includes(
+        String(spender).toLowerCase()
+      )
+    )
+  ) {
+    return false;
+  }
+
+  const approved =
+    decodedParameters?.approved === true;
+
+  const unlimited =
+    decodedParameters?.unlimited === true;
+
+  if (
+    (approved || unlimited) &&
+    policy?.allowUnlimitedApprovals === false
+  ) {
+    return false;
+  }
+
+  const maxApprovalRaw =
+    policy?.maxApprovalAmount;
+
+  if (
+    maxApprovalRaw !== undefined &&
+    maxApprovalRaw !== null &&
+    maxApprovalRaw !== ""
+  ) {
+    const maxApproval =
+      BigInt(String(maxApprovalRaw));
+
+    const amount =
+      decodedParameters?.amount;
+
+    if (
+      amount !== undefined &&
+      amount !== null &&
+      amount !== "MAX_UINT256" &&
+      BigInt(String(amount)) > maxApproval
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
 function buildExecutionTransaction({
   intent,
   transaction
@@ -1327,12 +1554,24 @@ function buildExecutionTransaction({
   const actionType =
     String(intent?.type || "").toLowerCase();
 
+  if (!isAgentCapabilityAllowed(actionType)) {
+    throw new Error(
+      `Agent capability is not authorized for action type: ${actionType || "unknown"}`
+    );
+  }
+
   const executionAdapter =
     getExecutionAdapter(actionType);
 
-  if (!executionAdapter.supported) {
+  const verifiedExecution =
+    getVerifiedExecutionCapability(actionType);
+
+  if (
+    !executionAdapter.supported ||
+    !verifiedExecution.supported
+  ) {
     throw new Error(
-      `Execution construction is not yet supported for action type: ${actionType || "unknown"}`
+      `Execution construction is not yet verified for action type: ${actionType || "unknown"}`
     );
   }
 
@@ -1818,7 +2057,11 @@ function analyzeTransaction(tx, intent) {
 
   if (
     decodedFunction.category === "approval" &&
-    decodedAmount === "MAX_UINT256"
+    (
+      decodedAmount === "MAX_UINT256" ||
+      decodedParameters.unlimited === true ||
+      decodedParameters.approved === true
+    )
   ) {
     securityFlags.push("Dangerous token approval");
   }
@@ -2067,6 +2310,15 @@ function buildAuthorizationProofSpec({
       policyPassed:
         decision.policyPassed === true,
 
+      approvalAllowed:
+        decision.approvalAllowed === true,
+
+      velocityAllowed:
+        decision.velocityAllowed === true,
+
+      quarantineAllowed:
+        decision.quarantineAllowed === true,
+
       intentMatched:
         decision.intentMatched === true,
 
@@ -2254,6 +2506,62 @@ function buildExecutionNode({
  * No verification receipt is consumed here.
  */
 
+const AGENT_EXECUTION_WINDOWS = new Map();
+
+function getAgentExecutionWindow(agentId, windowMs) {
+  const now = Date.now();
+  const key = String(agentId || "unknown");
+  const existing = AGENT_EXECUTION_WINDOWS.get(key);
+
+  if (
+    !existing ||
+    existing.windowMs !== windowMs ||
+    now - existing.startedAt >= windowMs
+  ) {
+    const window = {
+      startedAt: now,
+      windowMs,
+      count: 0,
+      totalValue: 0
+    };
+
+    AGENT_EXECUTION_WINDOWS.set(key, window);
+    return window;
+  }
+
+  return existing;
+}
+
+
+const AGENT_QUARANTINES = new Map();
+
+function getAgentQuarantine(agentId) {
+  const key = String(agentId || "unknown");
+  return AGENT_QUARANTINES.get(key) || {
+    quarantined: false,
+    reason: null,
+    triggeredAt: null
+  };
+}
+
+function quarantineAgent(agentId, reason) {
+  const key = String(agentId || "unknown");
+
+  const state = {
+    quarantined: true,
+    reason: String(reason || "Security policy violation"),
+    triggeredAt: Date.now()
+  };
+
+  AGENT_QUARANTINES.set(key, state);
+  return state;
+}
+
+function clearAgentQuarantine(agentId) {
+  const key = String(agentId || "unknown");
+  AGENT_QUARANTINES.delete(key);
+}
+
 function verifyExecutionAuthorization({
   agent,
   action,
@@ -2266,6 +2574,18 @@ function verifyExecutionAuthorization({
       "agent, action, intent, policy and transaction are required"
     );
   }
+
+  const agentId =
+    agent.id ?? agent.agentId ?? agent.name;
+
+  if (agent.revoked_at) {
+    throw new Error(
+      "Agent is revoked"
+    );
+  }
+
+  const quarantineState =
+    getAgentQuarantine(agentId);
 
   const analysis = analyzeTransaction(transaction, intent);
   const decodedParameters = analysis.decodedParameters || {};
@@ -2295,11 +2615,133 @@ function verifyExecutionAuthorization({
       ? Infinity
       : Number(dailyLimitRaw);
 
+  const maxTransactionsPerWindowRaw =
+    policy.maxTransactionsPerWindow;
+
+  const maxTransactionsPerWindow =
+    maxTransactionsPerWindowRaw === undefined ||
+    maxTransactionsPerWindowRaw === null ||
+    maxTransactionsPerWindowRaw === ""
+      ? Infinity
+      : Number(maxTransactionsPerWindowRaw);
+
+  const maxValuePerWindowRaw =
+    policy.maxValuePerWindow;
+
+  const maxValuePerWindow =
+    maxValuePerWindowRaw === undefined ||
+    maxValuePerWindowRaw === null ||
+    maxValuePerWindowRaw === ""
+      ? Infinity
+      : Number(maxValuePerWindowRaw);
+
+  const velocityWindowMsRaw =
+    policy.velocityWindowMs;
+
+  const velocityWindowMs =
+    velocityWindowMsRaw === undefined ||
+    velocityWindowMsRaw === null ||
+    velocityWindowMsRaw === ""
+      ? 60000
+      : Number(velocityWindowMsRaw);
+
+  const velocityConfigured =
+    (
+      Number.isFinite(maxTransactionsPerWindow) &&
+      maxTransactionsPerWindow !== Infinity
+    ) ||
+    (
+      Number.isFinite(maxValuePerWindow) &&
+      maxValuePerWindow !== Infinity
+    );
+
+  const executionWindow =
+    velocityConfigured &&
+    Number.isFinite(velocityWindowMs) &&
+    velocityWindowMs > 0
+      ? getAgentExecutionWindow(
+          agent.id ?? agent.agentId ?? agent.name,
+          velocityWindowMs
+        )
+      : null;
+
+  const velocityValueAllowed =
+    !executionWindow ||
+    !Number.isFinite(maxValuePerWindow) ||
+    (
+      Number.isFinite(actualTransactionAmount) &&
+      executionWindow.totalValue + actualTransactionAmount <=
+        maxValuePerWindow
+    );
+
+  const velocityAllowed =
+    (!executionWindow ||
+      executionWindow.count < maxTransactionsPerWindow) &&
+    velocityValueAllowed;
+
+  const quarantineOnVelocityViolation =
+    policy.quarantineOnVelocityViolation === true;
+
+  if (
+    quarantineOnVelocityViolation &&
+    !velocityAllowed
+  ) {
+    quarantineAgent(
+      agentId,
+      "Velocity policy violation"
+    );
+  }
+
+  const quarantineOnCriticalRisk =
+    policy.quarantineOnCriticalRisk === true;
+
+  if (
+    quarantineOnCriticalRisk &&
+    analysis.risk === "CRITICAL"
+  ) {
+    quarantineAgent(
+      agentId,
+      "Critical transaction risk"
+    );
+  }
+
   const policyPassed =
     Number.isFinite(actualTransactionAmount) &&
     Number.isFinite(maximum) &&
     actualTransactionAmount <= maximum &&
     actualTransactionAmount <= dailyLimit;
+
+  const registeredCapabilities =
+    Array.isArray(agent.capabilities)
+      ? agent.capabilities.map(
+          value => String(value || "").toLowerCase()
+        )
+      : [];
+
+  const capabilityAllowed =
+    isAgentCapabilityAllowed(intent.type) &&
+    registeredCapabilities.includes(
+      String(intent.type || "").toLowerCase()
+    );
+
+  const targetAllowed =
+    isPolicyTargetAllowed(
+      transaction,
+      policy
+    );
+
+  const selectorAllowed =
+    isPolicySelectorAllowed(
+      transaction,
+      policy
+    );
+
+  const approvalAllowed =
+    isPolicyApprovalAllowed(
+      analysis.decodedFunction,
+      decodedParameters,
+      policy
+    );
 
   const intentMatched =
     action.type === intent.type &&
@@ -2327,171 +2769,6 @@ function verifyExecutionAuthorization({
     Number.isFinite(intentParameterAmount) &&
     decodedParameterAmount === intentParameterAmount;
 
-  const normalizeVerifierAddress = value =>
-    typeof value === "string"
-      ? value.toLowerCase()
-      : value;
-
-  const expectedRecipient =
-    intent.recipient ??
-    intent.destination;
-
-  const actualRecipient =
-    decodedParameters.recipient ??
-    normalizedAction.recipient ??
-    null;
-
-  const recipientMatched =
-    expectedRecipient === undefined ||
-    expectedRecipient === null ||
-    expectedRecipient === "" ||
-    (
-      actualRecipient &&
-      normalizeVerifierAddress(actualRecipient) ===
-        normalizeVerifierAddress(expectedRecipient)
-    );
-
-  const expectedPath =
-    Array.isArray(intent.path)
-      ? intent.path.map(normalizeVerifierAddress)
-      : null;
-
-  const actualPath =
-    Array.isArray(decodedParameters.path)
-      ? decodedParameters.path.map(normalizeVerifierAddress)
-      : (
-          Array.isArray(normalizedAction.path)
-            ? normalizedAction.path.map(normalizeVerifierAddress)
-            : null
-        );
-
-  const pathMatched =
-    expectedPath === null ||
-    (
-      actualPath &&
-      actualPath.length === expectedPath.length &&
-      actualPath.every(
-        (address, index) =>
-          address === expectedPath[index]
-      )
-    );
-
-  const expectedAssetAddress =
-    intent.assetAddress;
-
-  const actualAssetAddress =
-    action.type === "approval" ||
-    action.type === "transfer"
-      ? transaction.to
-      : (
-          Array.isArray(decodedParameters.path) &&
-          decodedParameters.path.length > 0
-            ? decodedParameters.path[0]
-            : (
-                decodedParameters.tokenIn ??
-                decodedParameters.assetAddress ??
-                normalizedAction.assetAddress ??
-                normalizedAction.tokenIn ??
-                null
-              )
-        );
-
-  const assetAddressMatched =
-    expectedAssetAddress === undefined ||
-    expectedAssetAddress === null ||
-    expectedAssetAddress === "" ||
-    (
-      actualAssetAddress &&
-      normalizeVerifierAddress(actualAssetAddress) ===
-        normalizeVerifierAddress(expectedAssetAddress)
-    );
-
-  const expectedSpender =
-    intent.spender;
-
-  const actualSpender =
-    decodedParameters.spender ??
-    normalizedAction.spender ??
-    null;
-
-  const spenderMatched =
-    expectedSpender === undefined ||
-    expectedSpender === null ||
-    expectedSpender === "" ||
-    (
-      actualSpender &&
-      normalizeVerifierAddress(actualSpender) ===
-        normalizeVerifierAddress(expectedSpender)
-    );
-
-  const expectedAmountOutMin =
-    intent.amountOutMin;
-
-  const actualAmountOutMin =
-    decodedParameters.amountOutMin ??
-    normalizedAction.amountOutMin;
-
-  const amountOutMinMatched =
-    expectedAmountOutMin === undefined ||
-    expectedAmountOutMin === null ||
-    (
-      actualAmountOutMin !== undefined &&
-      actualAmountOutMin !== null &&
-      Number(actualAmountOutMin) ===
-        Number(expectedAmountOutMin)
-    );
-
-  const expectedPayerIsUser =
-    intent.payerIsUser;
-
-  const actualPayerIsUser =
-    decodedParameters.payerIsUser ??
-    normalizedAction.payerIsUser;
-
-  const payerIsUserMatched =
-    expectedPayerIsUser === undefined ||
-    expectedPayerIsUser === null ||
-    actualPayerIsUser === expectedPayerIsUser;
-
-  const expectedAllowRevert =
-    intent.allowRevert;
-
-  const actualAllowRevert =
-    decodedParameters.allowRevert ??
-    normalizedAction.allowRevert;
-
-  const allowRevertMatched =
-    expectedAllowRevert === undefined ||
-    expectedAllowRevert === null ||
-    actualAllowRevert === expectedAllowRevert;
-
-  const isApprovalAction =
-    action.type === "approval";
-
-  const isTransferAction =
-    action.type === "transfer";
-
-  const parameterMatched =
-    amountParameterMatched &&
-    assetAddressMatched &&
-    (
-      isApprovalAction
-        ? spenderMatched
-        : isTransferAction
-          ? recipientMatched
-          : (
-              spenderMatched &&
-              recipientMatched &&
-              pathMatched &&
-              amountOutMinMatched &&
-              payerIsUserMatched &&
-              allowRevertMatched
-            )
-    );
-
-  const executionCapability =
-    getVerifiedExecutionCapability(intent.type);
-
   const executionTypeMatched =
     verifyExecutionType(intent, analysis);
 
@@ -2508,8 +2785,17 @@ function verifyExecutionAuthorization({
   const nativeValueMatched =
     actualNativeValue === expectedNativeValue;
 
+  const quarantineAllowed =
+    quarantineState.quarantined !== true;
+
   const authorized =
     policyPassed &&
+    velocityAllowed &&
+    quarantineAllowed &&
+    capabilityAllowed &&
+    targetAllowed &&
+    selectorAllowed &&
+    approvalAllowed &&
     intentMatched &&
     parameterMatched &&
     executionTypeMatched &&
@@ -2517,9 +2803,21 @@ function verifyExecutionAuthorization({
     protocolMatched &&
     transactionSecuritySafe;
 
+  if (authorized && executionWindow) {
+    executionWindow.count += 1;
+    executionWindow.totalValue += actualTransactionAmount;
+  }
+
   return {
     authorized,
     policyPassed,
+    velocityAllowed,
+    quarantineAllowed,
+    quarantineState,
+    capabilityAllowed,
+    targetAllowed,
+    selectorAllowed,
+    approvalAllowed,
     intentMatched,
     parameterMatched,
     executionTypeMatched,
@@ -2552,7 +2850,6 @@ function verifyExecutionAuthorization({
       actualAssetAddress ?? null
   };
 }
-
 
 function buildVerificationTrace({
   verification
@@ -3044,6 +3341,15 @@ function buildProofClaims(proofStatement) {
 
     policySatisfied:
       proofStatement.security.policyPassed,
+
+    approvalSatisfied:
+      proofStatement.security.approvalAllowed,
+
+    velocitySatisfied:
+      proofStatement.security.velocityAllowed === true,
+
+    quarantineSatisfied:
+      proofStatement.security.quarantineAllowed === true,
 
     intentSatisfied:
       proofStatement.security.intentMatched,
@@ -6512,6 +6818,21 @@ app.post("/execution-graph", (req, res) => {
       policyPassed:
         verification.policyPassed,
 
+      capabilityAllowed:
+        verification.capabilityAllowed,
+
+      targetAllowed:
+        verification.targetAllowed,
+
+      selectorAllowed:
+        verification.selectorAllowed,
+
+      approvalAllowed:
+        verification.approvalAllowed,
+
+      velocityAllowed:
+        verification.velocityAllowed,
+
       intentMatched:
         verification.intentMatched,
 
@@ -6663,6 +6984,13 @@ app.post("/execution-graph", (req, res) => {
 
         allExecutionsAuthorized:
           allAuthorized,
+
+        quarantineAllowed:
+          allAuthorized &&
+          executions.every(
+            execution =>
+              execution?.authorization?.quarantineAllowed !== false
+          ),
 
         sequenceValid,
 
@@ -7469,19 +7797,52 @@ app.post("/v1/api-keys/:id/revoke", (req, res) => {
 
 const productionApi = createProductionApi({
   express,
+  agentStore,
 
   verify: async ({
     agent,
     action,
     intent,
     policy,
-    transaction
+    transaction,
+    phorvaIdentity
   }) => {
+    const projectId =
+      phorvaIdentity?.projectId;
+
+    if (!projectId) {
+      throw new Error(
+        "Authenticated Phorva project identity is required"
+      );
+    }
+
+    const agentId =
+      agent?.id ??
+      agent?.agentId;
+
+    const registeredAgent =
+      agentStore.getAgent(
+        projectId,
+        agentId
+      );
+
+    if (!registeredAgent) {
+      throw new Error(
+        "Agent is not registered to the authenticated Phorva project"
+      );
+    }
+
+    if (registeredAgent.revoked_at) {
+      throw new Error(
+        "Agent is revoked"
+      );
+    }
+
     return verifyExecutionAuthorization({
-      agent,
+      agent: registeredAgent,
       action,
       intent,
-      policy,
+      policy: registeredAgent.policy,
       transaction
     });
   },

@@ -17,16 +17,20 @@ function validateVerifyRequest(body) {
     return "agent is required";
   }
 
+  const agentId =
+    body.agent.id ??
+    body.agent.agentId;
+
+  if (!agentId || typeof agentId !== "string") {
+    return "agent.id is required";
+  }
+
   if (!body.action || typeof body.action !== "object") {
     return "action is required";
   }
 
   if (!body.intent || typeof body.intent !== "object") {
     return "intent is required";
-  }
-
-  if (!body.policy || typeof body.policy !== "object") {
-    return "policy is required";
   }
 
   if (!body.transaction || typeof body.transaction !== "object") {
@@ -139,7 +143,8 @@ function createProductionApi({
   express,
   verify,
   getHealth,
-  authenticate
+  authenticate,
+  agentStore
 }) {
   const router = express.Router();
 
@@ -198,6 +203,216 @@ function createProductionApi({
     }
   });
 
+  router.post("/agents", async (req, res) => {
+    try {
+      const projectId =
+        req.phorvaIdentity?.projectId;
+
+      if (!projectId) {
+        return res.status(401).json({
+          error: {
+            code: "UNAUTHORIZED",
+            message: "Authenticated project is required"
+          }
+        });
+      }
+
+      const name =
+        typeof req.body?.name === "string"
+          ? req.body.name.trim()
+          : "";
+
+      if (!name) {
+        return res.status(400).json({
+          error: {
+            code: "INVALID_REQUEST",
+            message: "Agent name is required"
+          }
+        });
+      }
+
+      const agent =
+        agentStore.createAgent({
+          projectId,
+          name,
+          capabilities:
+            Array.isArray(req.body?.capabilities)
+              ? req.body.capabilities
+              : [],
+          policy:
+            req.body?.policy &&
+            typeof req.body.policy === "object"
+              ? req.body.policy
+              : {}
+        });
+
+      return res.status(201).json({
+        agent
+      });
+    } catch (error) {
+      return res.status(400).json({
+        error: {
+          code: "AGENT_REGISTRATION_FAILED",
+          message: error.message
+        }
+      });
+    }
+  });
+
+  router.get("/agents", async (req, res) => {
+    const projectId =
+      req.phorvaIdentity?.projectId;
+
+    if (!projectId) {
+      return res.status(401).json({
+        error: {
+          code: "UNAUTHORIZED",
+          message: "Authenticated project is required"
+        }
+      });
+    }
+
+    return res.json({
+      agents: agentStore.list(projectId)
+    });
+  });
+
+  router.patch("/agents/:id/capabilities", async (req, res) => {
+    const projectId =
+      req.phorvaIdentity?.projectId;
+
+    if (!projectId) {
+      return res.status(401).json({
+        error: {
+          code: "UNAUTHORIZED",
+          message: "Authenticated project is required"
+        }
+      });
+    }
+
+    const agent =
+      agentStore.getAgent(
+        projectId,
+        req.params.id
+      );
+
+    if (!agent) {
+      return res.status(404).json({
+        error: {
+          code: "AGENT_NOT_FOUND",
+          message: "Agent not found or revoked"
+        }
+      });
+    }
+
+    if (!Array.isArray(req.body?.capabilities)) {
+      return res.status(400).json({
+        error: {
+          code: "INVALID_REQUEST",
+          message: "capabilities must be an array"
+        }
+      });
+    }
+
+    const updated =
+      agentStore.updateCapabilities(
+        projectId,
+        req.params.id,
+        req.body.capabilities
+      );
+
+    return res.json({
+      agent: updated
+    });
+  });
+
+  router.patch("/agents/:id/policy", async (req, res) => {
+    const projectId =
+      req.phorvaIdentity?.projectId;
+
+    if (!projectId) {
+      return res.status(401).json({
+        error: {
+          code: "UNAUTHORIZED",
+          message: "Authenticated project is required"
+        }
+      });
+    }
+
+    const agent =
+      agentStore.getAgent(
+        projectId,
+        req.params.id
+      );
+
+    if (!agent) {
+      return res.status(404).json({
+        error: {
+          code: "AGENT_NOT_FOUND",
+          message: "Agent not found or revoked"
+        }
+      });
+    }
+
+    if (
+      !req.body?.policy ||
+      typeof req.body.policy !== "object" ||
+      Array.isArray(req.body.policy)
+    ) {
+      return res.status(400).json({
+        error: {
+          code: "INVALID_REQUEST",
+          message: "policy must be an object"
+        }
+      });
+    }
+
+    const updated =
+      agentStore.updatePolicy(
+        projectId,
+        req.params.id,
+        req.body.policy
+      );
+
+    return res.json({
+      agent: updated
+    });
+  });
+
+  router.post("/agents/:id/revoke", async (req, res) => {
+    const projectId =
+      req.phorvaIdentity?.projectId;
+
+    if (!projectId) {
+      return res.status(401).json({
+        error: {
+          code: "UNAUTHORIZED",
+          message: "Authenticated project is required"
+        }
+      });
+    }
+
+    const revoked =
+      agentStore.revoke(
+        projectId,
+        req.params.id
+      );
+
+    if (!revoked) {
+      return res.status(404).json({
+        error: {
+          code: "AGENT_NOT_FOUND",
+          message: "Agent not found or already revoked"
+        }
+      });
+    }
+
+    return res.json({
+      revoked: true,
+      id: req.params.id
+    });
+  });
+
   router.post("/verify", async (req, res) => {
     const requestId = createRequestId();
     const verificationId = createVerificationId();
@@ -229,7 +444,10 @@ function createProductionApi({
     }
 
     try {
-      const result = await verify(req.body);
+      const result = await verify({
+        ...req.body,
+        phorvaIdentity: req.phorvaIdentity
+      });
 
       return res.status(200).json({
         requestId,
