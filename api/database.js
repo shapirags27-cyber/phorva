@@ -99,22 +99,46 @@ function save(data) {
   const tempPath =
     `${dataPath}.tmp`;
 
-  fs.writeFileSync(
-    tempPath,
+  const serialized =
     JSON.stringify(
       data,
       null,
       2
-    ),
-    {
-      mode: 0o600
-    }
-  );
+    );
 
-  fs.renameSync(
-    tempPath,
-    dataPath
-  );
+  try {
+    fs.writeFileSync(
+      tempPath,
+      serialized,
+      {
+        mode: 0o600
+      }
+    );
+
+    // Ensure an existing temp file cannot retain weaker permissions.
+    fs.chmodSync(
+      tempPath,
+      0o600
+    );
+
+    // Atomically replace the live database.
+    fs.renameSync(
+      tempPath,
+      dataPath
+    );
+  } catch (error) {
+    try {
+      if (fs.existsSync(tempPath)) {
+        fs.unlinkSync(tempPath);
+      }
+    } catch {
+      // Preserve the original database-write error.
+    }
+
+    throw new Error(
+      `Failed to write Phorva database: ${error.message}`
+    );
+  }
 }
 
 function getDataPath() {
