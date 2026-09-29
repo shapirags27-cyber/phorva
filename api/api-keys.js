@@ -1,6 +1,10 @@
 const crypto = require("crypto");
 
 function generateApiKey(environment = "live") {
+  if (environment !== "test" && environment !== "live") {
+    throw new Error("Invalid API key environment");
+  }
+
   const prefix =
     environment === "test"
       ? "pk_test_"
@@ -32,28 +36,103 @@ function hashApiKey(apiKey) {
 }
 
 function createApiKeyStore(db) {
-  function createProject(name) {
-    if (!name || typeof name !== "string") {
+  function createProject({
+    name,
+    developerId
+  }) {
+    if (
+      typeof name !== "string" ||
+      !name.trim()
+    ) {
       throw new Error("Project name is required");
+    }
+
+    if (
+      typeof developerId !== "string" ||
+      !developerId.trim()
+    ) {
+      throw new Error("developerId is required");
     }
 
     const projectId =
       `proj_${crypto.randomUUID()}`;
 
+    const now =
+      new Date().toISOString();
+
     const project = {
       id: projectId,
+      developer_id: developerId,
       name: name.trim(),
-      created_at: new Date().toISOString()
+      created_at: now,
+      updated_at: now
     };
 
     db.withData((data) => {
+      if (!Array.isArray(data.projects)) {
+        data.projects = [];
+      }
+
       data.projects.push(project);
     });
 
     return {
       id: project.id,
-      name: project.name
+      name: project.name,
+      developerId: project.developer_id,
+      createdAt: project.created_at
     };
+  }
+
+  function getProject(projectId) {
+    if (!projectId) {
+      return null;
+    }
+
+    const data = db.load();
+
+    return (
+      data.projects.find(
+        project =>
+          project.id === projectId
+      ) || null
+    );
+  }
+
+  function listProjects(developerId) {
+    const data = db.load();
+
+    return data.projects
+      .filter(
+        project =>
+          project.developer_id === developerId
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.created_at) -
+          new Date(a.created_at)
+      )
+      .map(project => ({
+        id: project.id,
+        name: project.name,
+        createdAt: project.created_at,
+        updatedAt:
+          project.updated_at ||
+          project.created_at
+      }));
+  }
+
+  function developerOwnsProject(
+    developerId,
+    projectId
+  ) {
+    const project =
+      getProject(projectId);
+
+    return Boolean(
+      project &&
+      project.developer_id === developerId
+    );
   }
 
   function createKey({
@@ -63,6 +142,13 @@ function createApiKeyStore(db) {
   }) {
     if (!projectId) {
       throw new Error("projectId is required");
+    }
+
+    if (
+      environment !== "test" &&
+      environment !== "live"
+    ) {
+      throw new Error("Invalid API key environment");
     }
 
     const generated =
@@ -77,21 +163,33 @@ function createApiKeyStore(db) {
     let projectExists = false;
 
     db.withData((data) => {
-      projectExists = data.projects.some(
-        (project) =>
-          project.id === projectId
-      );
+      projectExists =
+        Array.isArray(data.projects) &&
+        data.projects.some(
+          project =>
+            project.id === projectId
+        );
 
       if (!projectExists) {
         return;
       }
 
+      if (!Array.isArray(data.apiKeys)) {
+        data.apiKeys = [];
+      }
+
       data.apiKeys.push({
         id: keyId,
         project_id: projectId,
-        name,
-        key_prefix: generated.keyPrefix,
-        key_hash: generated.keyHash,
+        name:
+          typeof name === "string" &&
+          name.trim()
+            ? name.trim()
+            : "Default",
+        key_prefix:
+          generated.keyPrefix,
+        key_hash:
+          generated.keyHash,
         environment,
         created_at: createdAt,
         last_used_at: null,
@@ -100,23 +198,43 @@ function createApiKeyStore(db) {
     });
 
     if (!projectExists) {
-      throw new Error(
-        "Project not found"
-      );
+      throw new Error("Project not found");
     }
 
     return {
       id: keyId,
       projectId,
-      name,
+      name:
+        typeof name === "string" &&
+        name.trim()
+          ? name.trim()
+          : "Default",
       environment,
       apiKey: generated.apiKey,
-      keyPrefix: generated.keyPrefix
+      keyPrefix:
+        generated.keyPrefix
     };
   }
 
+  function getKey(id) {
+    if (!id) {
+      return null;
+    }
+
+    const data = db.load();
+
+    return (
+      data.apiKeys.find(
+        key => key.id === id
+      ) || null
+    );
+  }
+
   function authenticate(apiKey) {
-    if (!apiKey) {
+    if (
+      typeof apiKey !== "string" ||
+      !apiKey
+    ) {
       return null;
     }
 
@@ -127,15 +245,30 @@ function createApiKeyStore(db) {
 
     const record =
       data.apiKeys.find(
-        (key) =>
+        key =>
           key.key_hash === keyHash
       );
 
-    if (!record) {
+    if (
+      !record ||
+      record.revoked_at
+    ) {
       return null;
     }
 
-    if (record.revoked_at) {
+    const expectedPrefix =
+      record.environment === "test"
+        ? "pk_test_"
+        : record.environment === "live"
+          ? "pk_live_"
+          : null;
+
+    if (
+      !expectedPrefix ||
+      !apiKey.startsWith(expectedPrefix) ||
+      record.key_prefix !==
+        apiKey.slice(0, 16)
+    ) {
       return null;
     }
 
@@ -145,7 +278,7 @@ function createApiKeyStore(db) {
     db.withData((current) => {
       const key =
         current.apiKeys.find(
-          (item) =>
+          item =>
             item.id === record.id
         );
 
@@ -156,10 +289,13 @@ function createApiKeyStore(db) {
 
     return {
       id: record.id,
-      projectId: record.project_id,
+      projectId:
+        record.project_id,
       name: record.name,
-      environment: record.environment,
-      keyPrefix: record.key_prefix
+      environment:
+        record.environment,
+      keyPrefix:
+        record.key_prefix
     };
   }
 
@@ -169,10 +305,13 @@ function createApiKeyStore(db) {
     db.withData((data) => {
       const record =
         data.apiKeys.find(
-          (key) => key.id === id
+          key => key.id === id
         );
 
-      if (!record || record.revoked_at) {
+      if (
+        !record ||
+        record.revoked_at
+      ) {
         return;
       }
 
@@ -190,7 +329,7 @@ function createApiKeyStore(db) {
 
     return data.apiKeys
       .filter(
-        (key) =>
+        key =>
           key.project_id === projectId
       )
       .sort(
@@ -198,21 +337,31 @@ function createApiKeyStore(db) {
           new Date(b.created_at) -
           new Date(a.created_at)
       )
-      .map((key) => ({
+      .map(key => ({
         id: key.id,
-        project_id: key.project_id,
+        project_id:
+          key.project_id,
         name: key.name,
-        key_prefix: key.key_prefix,
-        environment: key.environment,
-        created_at: key.created_at,
-        last_used_at: key.last_used_at,
-        revoked_at: key.revoked_at
+        key_prefix:
+          key.key_prefix,
+        environment:
+          key.environment,
+        created_at:
+          key.created_at,
+        last_used_at:
+          key.last_used_at,
+        revoked_at:
+          key.revoked_at
       }));
   }
 
   return {
     createProject,
+    getProject,
+    listProjects,
+    developerOwnsProject,
     createKey,
+    getKey,
     authenticate,
     revoke,
     list

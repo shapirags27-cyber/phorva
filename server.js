@@ -8,9 +8,18 @@ const { createProductionApi } = require("./api/production-api");
 const db = require("./api/database");
 const { createApiKeyStore } = require("./api/api-keys");
 const { createAgentStore } = require("./api/agents");
+const { createDeveloperStore } = require("./api/developers");
+const {
+  corsOrigin,
+  createDeveloperRateLimiter,
+  createAuthRateLimiter,
+  createApiRateLimiter,
+  requireTrustedOrigin
+} = require("./api/security");
 
 const apiKeyStore = createApiKeyStore(db);
 const agentStore = createAgentStore(db);
+const developerStore = createDeveloperStore(db);
 
 const chains = {
   baseSepolia: {
@@ -37,10 +46,44 @@ const chains = {
 };
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(
+  process.env.PORT || 3000
+);
 
-app.use(cors());
-app.use(express.json());
+app.disable("x-powered-by");
+
+app.use(
+  require("helmet")({
+    contentSecurityPolicy: false
+  })
+);
+
+app.use(
+  cors({
+    origin: corsOrigin,
+    credentials: true,
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS"
+    ],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With"
+    ]
+  })
+);
+
+app.use(
+  express.json({
+    limit: "1mb"
+  })
+);
+
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/api/chains", (req, res) => {
@@ -7828,141 +7871,716 @@ app.get("/health", (req, res) => {
 
 
 /*
- * Phorva Project / API Key Management
+ * Phorva Developer Authentication / Management
  *
- * Temporary bootstrap management endpoints.
- * These will later be protected by dashboard/admin
- * authentication.
+ * Human developer authentication is intentionally
+ * separate from project API-key authentication.
+ *
+ * Developer session:
+ *   Browser dashboard -> developer session cookie
+ *
+ * Project API key:
+ *   Agent/application -> pk_test_/pk_live_ -> /v1/*
+ *
+ * Project management always verifies ownership against
+ * the authenticated developer identity.
  */
 
-app.post("/v1/projects", (req, res) => {
-  try {
+const DEVELOPER_SESSION_COOKIE =
+  "phorva_developer_session";
+
+const DEVELOPER_SESSION_SECURE =
+  process.env.NODE_ENV === "production";
+
+function parseCookies(req) {
+  const header = req.headers.cookie;
+
+  if (
+    typeof header !== "string" ||
+    !header
+  ) {
+    return {};
+  }
+
+  const cookies = {};
+
+  for (const part of header.split(";")) {
+    const index = part.indexOf("=");
+
+    if (index === -1) {
+      continue;
+    }
+
     const name =
-      typeof req.body?.name === "string"
-        ? req.body.name.trim()
-        : "";
+      part.slice(0, index).trim();
+
+    const value =
+      part.slice(index + 1).trim();
 
     if (!name) {
-      return res.status(400).json({
-        error: {
-          code: "INVALID_REQUEST",
-          message: "Project name is required"
-        }
-      });
+      continue;
     }
 
-    if (name.length > 100) {
-      return res.status(400).json({
-        error: {
-          code: "INVALID_REQUEST",
-          message: "Project name must be 100 characters or less"
-        }
-      });
+    try {
+      cookies[name] =
+        decodeURIComponent(value);
+    } catch {
+      cookies[name] = value;
     }
+  }
 
-    const project =
-      apiKeyStore.createProject(name);
+  return cookies;
+}
 
-    return res.status(201).json({
-      project
-    });
-  } catch (error) {
-    console.error("Project creation error:", error);
+function getDeveloperSession(req) {
+  const cookies =
+    parseCookies(req);
 
-    return res.status(500).json({
+  const token =
+    cookies[DEVELOPER_SESSION_COOKIE];
+
+  if (!token) {
+    return null;
+  }
+
+  return developerStore
+    .authenticateSession(token);
+}
+
+function setDeveloperSessionCookie(
+  res,
+  token,
+  expiresAt
+) {
+  const maxAgeSeconds =
+    Math.max(
+      0,
+      Math.floor(
+        (
+          Date.parse(expiresAt) -
+          Date.now()
+        ) / 1000
+      )
+    );
+
+  const attributes = [
+    `${DEVELOPER_SESSION_COOKIE}=${encodeURIComponent(token)}`,
+    "Path=/",
+    "HttpOnly",
+    "SameSite=Lax",
+    `Max-Age=${maxAgeSeconds}`
+  ];
+
+  if (DEVELOPER_SESSION_SECURE) {
+    attributes.push("Secure");
+  }
+
+  res.setHeader(
+    "Set-Cookie",
+    attributes.join("; ")
+  );
+}
+
+function clearDeveloperSessionCookie(res) {
+  const attributes = [
+    `${DEVELOPER_SESSION_COOKIE}=`,
+    "Path=/",
+    "HttpOnly",
+    "SameSite=Lax",
+    "Max-Age=0"
+  ];
+
+  if (DEVELOPER_SESSION_SECURE) {
+    attributes.push("Secure");
+  }
+
+  res.setHeader(
+    "Set-Cookie",
+    attributes.join("; ")
+  );
+}
+
+function developerAuth(
+  req,
+  res,
+  next
+) {
+  const session =
+    getDeveloperSession(req);
+
+  if (!session) {
+    return res.status(401).json({
       error: {
-        code: "PROJECT_CREATION_FAILED",
-        message: "Could not create project"
+        code: "DEVELOPER_AUTH_REQUIRED",
+        message:
+          "Developer authentication is required"
       }
     });
   }
-});
 
-app.post("/v1/api-keys", (req, res) => {
-  try {
-    const projectId =
-      typeof req.body?.projectId === "string"
-        ? req.body.projectId.trim()
-        : "";
+  req.developerIdentity = session;
 
-    const name =
-      typeof req.body?.name === "string"
-        ? req.body.name.trim()
-        : "Default";
+  return next();
+}
 
-    const environment =
-      req.body?.environment === "test"
-        ? "test"
-        : "live";
+function requireOwnedProject(
+  req,
+  res,
+  next
+) {
+  const developerId =
+    req.developerIdentity?.developerId;
 
-    if (!projectId) {
-      return res.status(400).json({
-        error: {
-          code: "INVALID_REQUEST",
-          message: "projectId is required"
-        }
-      });
-    }
-
-    const result =
-      apiKeyStore.createKey({
-        projectId,
-        name,
-        environment
-      });
-
-    return res.status(201).json(result);
-  } catch (error) {
-    console.error("API key creation error:", error);
-
-    return res.status(500).json({
-      error: {
-        code: "API_KEY_CREATION_FAILED",
-        message: "Could not create API key"
-      }
-    });
-  }
-});
-
-app.get("/v1/api-keys", (req, res) => {
   const projectId =
-    typeof req.query.projectId === "string"
-      ? req.query.projectId
-      : "";
+    req.params.id ||
+    req.body?.projectId ||
+    req.query?.projectId;
 
-  if (!projectId) {
-    return res.status(400).json({
-      error: {
-        code: "INVALID_REQUEST",
-        message: "projectId is required"
-      }
-    });
-  }
-
-  return res.json({
-    keys: apiKeyStore.list(projectId)
-  });
-});
-
-app.post("/v1/api-keys/:id/revoke", (req, res) => {
-  const revoked =
-    apiKeyStore.revoke(req.params.id);
-
-  if (!revoked) {
+  if (
+    !developerId ||
+    !projectId
+  ) {
     return res.status(404).json({
       error: {
-        code: "API_KEY_NOT_FOUND",
-        message: "API key not found or already revoked"
+        code: "PROJECT_NOT_FOUND",
+        message: "Project not found"
       }
     });
   }
 
-  return res.json({
-    revoked: true,
-    id: req.params.id
-  });
-});
+  const owned =
+    apiKeyStore.developerOwnsProject(
+      developerId,
+      projectId
+    );
 
+  if (!owned) {
+    return res.status(404).json({
+      error: {
+        code: "PROJECT_NOT_FOUND",
+        message: "Project not found"
+      }
+    });
+  }
+
+  req.developerProjectId =
+    projectId;
+
+  return next();
+}
+
+/*
+ * Developer management API rate limiting.
+ *
+ * This protects the entire browser-facing developer
+ * management surface, including authenticated
+ * project and API-key operations.
+ */
+app.use(
+  "/v1/developer",
+  createDeveloperRateLimiter()
+);
+
+/*
+ * Create developer account.
+ *
+ * A successful signup immediately establishes
+ * a dashboard session.
+ */
+/*
+ * Developer management API rate limiting.
+ *
+ * Protects the complete browser-facing developer
+ * management surface, including authenticated
+ * project and API-key operations.
+ */
+
+app.post(
+  "/v1/developer/signup",
+  requireTrustedOrigin,
+  createAuthRateLimiter(),
+  async (req, res) => {
+    try {
+      const email =
+        typeof req.body?.email === "string"
+          ? req.body.email.trim()
+          : "";
+
+      const password =
+        typeof req.body?.password === "string"
+          ? req.body.password
+          : "";
+
+      if (!email || !password) {
+        return res.status(400).json({
+          error: {
+            code: "INVALID_REQUEST",
+            message:
+              "Email and password are required"
+          }
+        });
+      }
+
+      const pending =
+        developerStore.createDeveloper({
+          email,
+          password
+        });
+
+      const developer =
+        await pending.create();
+
+      const session =
+        developerStore.createSession(
+          developer.id
+        );
+
+      setDeveloperSessionCookie(
+        res,
+        session.token,
+        session.expiresAt
+      );
+
+      return res.status(201).json({
+        developer: {
+          id: developer.id,
+          email: developer.email,
+          status: developer.status,
+          createdAt:
+            developer.created_at
+        }
+      });
+    } catch (error) {
+      if (
+        error?.code === "INVALID_EMAIL"
+      ) {
+        return res.status(400).json({
+          error: {
+            code: "INVALID_EMAIL",
+            message:
+              "A valid email address is required"
+          }
+        });
+      }
+
+      if (
+        error?.code === "DEVELOPER_EXISTS"
+      ) {
+        return res.status(409).json({
+          error: {
+            code: "DEVELOPER_EXISTS",
+            message:
+              "Developer account already exists"
+          }
+        });
+      }
+
+      if (
+        error?.message ===
+        "Password must be between 12 and 128 characters"
+      ) {
+        return res.status(400).json({
+          error: {
+            code: "INVALID_PASSWORD",
+            message: error.message
+          }
+        });
+      }
+
+      console.error(
+        "Developer signup error:",
+        error
+      );
+
+      return res.status(500).json({
+        error: {
+          code: "DEVELOPER_SIGNUP_FAILED",
+          message:
+            "Could not create developer account"
+        }
+      });
+    }
+  }
+);
+
+/*
+ * Developer login.
+ */
+app.post(
+  "/v1/developer/login",
+  requireTrustedOrigin,
+  createAuthRateLimiter(),
+  async (req, res) => {
+    try {
+      const email =
+        typeof req.body?.email === "string"
+          ? req.body.email.trim()
+          : "";
+
+      const password =
+        typeof req.body?.password === "string"
+          ? req.body.password
+          : "";
+
+      if (!email || !password) {
+        return res.status(400).json({
+          error: {
+            code: "INVALID_REQUEST",
+            message:
+              "Email and password are required"
+          }
+        });
+      }
+
+      const developer =
+        await developerStore.authenticate(
+          email,
+          password
+        );
+
+      if (!developer) {
+        return res.status(401).json({
+          error: {
+            code: "INVALID_CREDENTIALS",
+            message:
+              "Invalid email or password"
+          }
+        });
+      }
+
+      const session =
+        developerStore.createSession(
+          developer.id
+        );
+
+      setDeveloperSessionCookie(
+        res,
+        session.token,
+        session.expiresAt
+      );
+
+      return res.json({
+        developer: {
+          id: developer.id,
+          email: developer.email,
+          status: developer.status
+        }
+      });
+    } catch (error) {
+      console.error(
+        "Developer login error:",
+        error
+      );
+
+      return res.status(500).json({
+        error: {
+          code: "DEVELOPER_LOGIN_FAILED",
+          message:
+            "Could not authenticate developer"
+        }
+      });
+    }
+  }
+);
+
+/*
+ * Developer logout.
+ */
+app.post(
+  "/v1/developer/logout",
+  requireTrustedOrigin,
+  (req, res) => {
+    const cookies =
+      parseCookies(req);
+
+    const token =
+      cookies[DEVELOPER_SESSION_COOKIE];
+
+    if (token) {
+      developerStore.revokeSession(token);
+    }
+
+    clearDeveloperSessionCookie(res);
+
+    return res.json({
+      loggedOut: true
+    });
+  }
+);
+
+/*
+ * Current developer identity.
+ */
+app.get(
+  "/v1/developer/me",
+  developerAuth,
+  (req, res) => {
+    const developer =
+      developerStore.getById(
+        req.developerIdentity.developerId
+      );
+
+    if (!developer) {
+      clearDeveloperSessionCookie(res);
+
+      return res.status(401).json({
+        error: {
+          code: "DEVELOPER_AUTH_REQUIRED",
+          message:
+            "Developer authentication is required"
+        }
+      });
+    }
+
+    return res.json({
+      developer: {
+        id: developer.id,
+        email: developer.email,
+        status: developer.status,
+        createdAt:
+          developer.created_at,
+        updatedAt:
+          developer.updated_at
+      }
+    });
+  }
+);
+
+/*
+ * Developer projects.
+ */
+app.get(
+  "/v1/developer/projects",
+  developerAuth,
+  (req, res) => {
+    const projects =
+      apiKeyStore.listProjects(
+        req.developerIdentity.developerId
+      );
+
+    return res.json({
+      projects
+    });
+  }
+);
+
+/*
+ * Create project owned by the
+ * authenticated developer.
+ */
+app.post(
+  "/v1/developer/projects",
+  requireTrustedOrigin,
+  developerAuth,
+  (req, res) => {
+    try {
+      const name =
+        typeof req.body?.name === "string"
+          ? req.body.name.trim()
+          : "";
+
+      if (!name) {
+        return res.status(400).json({
+          error: {
+            code: "INVALID_REQUEST",
+            message:
+              "Project name is required"
+          }
+        });
+      }
+
+      if (name.length > 100) {
+        return res.status(400).json({
+          error: {
+            code: "INVALID_REQUEST",
+            message:
+              "Project name must be 100 characters or less"
+          }
+        });
+      }
+
+      const project =
+        apiKeyStore.createProject({
+          name,
+          developerId:
+            req.developerIdentity.developerId
+        });
+
+      return res.status(201).json({
+        project
+      });
+    } catch (error) {
+      console.error(
+        "Developer project creation error:",
+        error
+      );
+
+      return res.status(500).json({
+        error: {
+          code: "PROJECT_CREATION_FAILED",
+          message:
+            "Could not create project"
+        }
+      });
+    }
+  }
+);
+
+/*
+ * Get one owned project.
+ */
+app.get(
+  "/v1/developer/projects/:id",
+  developerAuth,
+  requireOwnedProject,
+  (req, res) => {
+    const project =
+      apiKeyStore.getProject(
+        req.developerProjectId
+      );
+
+    if (!project) {
+      return res.status(404).json({
+        error: {
+          code: "PROJECT_NOT_FOUND",
+          message: "Project not found"
+        }
+      });
+    }
+
+    return res.json({
+      project: {
+        id: project.id,
+        name: project.name,
+        createdAt:
+          project.created_at,
+        updatedAt:
+          project.updated_at ||
+          project.created_at
+      }
+    });
+  }
+);
+
+/*
+ * List API keys belonging to an
+ * authenticated developer's project.
+ */
+app.get(
+  "/v1/developer/projects/:id/api-keys",
+  developerAuth,
+  requireOwnedProject,
+  (req, res) => {
+    return res.json({
+      keys:
+        apiKeyStore.list(
+          req.developerProjectId
+        )
+    });
+  }
+);
+
+/*
+ * Create project API key.
+ *
+ * The plaintext secret is returned only here.
+ * It is never stored in the database.
+ */
+app.post(
+  "/v1/developer/projects/:id/api-keys",
+  requireTrustedOrigin,
+  developerAuth,
+  requireOwnedProject,
+  (req, res) => {
+    try {
+      const name =
+        typeof req.body?.name === "string"
+          ? req.body.name.trim()
+          : "Default";
+
+      const environment =
+        req.body?.environment === "test"
+          ? "test"
+          : "live";
+
+      const result =
+        apiKeyStore.createKey({
+          projectId:
+            req.developerProjectId,
+          name,
+          environment
+        });
+
+      return res.status(201).json({
+        key: result
+      });
+    } catch (error) {
+      console.error(
+        "Developer API key creation error:",
+        error
+      );
+
+      return res.status(500).json({
+        error: {
+          code: "API_KEY_CREATION_FAILED",
+          message:
+            "Could not create API key"
+        }
+      });
+    }
+  }
+);
+
+/*
+ * Revoke an API key belonging to
+ * the authenticated developer's project.
+ */
+app.post(
+  "/v1/developer/projects/:id/api-keys/:keyId/revoke",
+  requireTrustedOrigin,
+  developerAuth,
+  requireOwnedProject,
+  (req, res) => {
+    const key =
+      apiKeyStore.getKey(
+        req.params.keyId
+      );
+
+    if (
+      !key ||
+      key.project_id !==
+        req.developerProjectId
+    ) {
+      return res.status(404).json({
+        error: {
+          code: "API_KEY_NOT_FOUND",
+          message:
+            "API key not found"
+        }
+      });
+    }
+
+    const revoked =
+      apiKeyStore.revoke(
+        req.params.keyId
+      );
+
+    if (!revoked) {
+      return res.status(404).json({
+        error: {
+          code: "API_KEY_NOT_FOUND",
+          message:
+            "API key not found or already revoked"
+        }
+      });
+    }
+
+    return res.json({
+      revoked: true,
+      id: req.params.keyId
+    });
+  }
+);
 
 /*
  * Phorva Production API v1
@@ -8060,7 +8678,11 @@ const productionApi = createProductionApi({
   }
 });
 
-app.use("/v1", productionApi);
+app.use(
+  "/v1",
+  createApiRateLimiter(),
+  productionApi
+);
 
 
 // PHORVA_DOCS_ROUTES
@@ -8136,6 +8758,65 @@ app.get("/dashboard", (req, res) => {
 
 app.get("/investor-mvp", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "investor-mvp.html"));
+});
+
+// Global HTTP error boundary.
+// Prevents parser/framework errors from exposing stack traces,
+// internal paths, or implementation details to API clients.
+app.use((error, req, res, next) => {
+  const requestId =
+    typeof req.requestId === "string" &&
+    req.requestId
+      ? req.requestId
+      : `req_${require("crypto").randomUUID()}`;
+
+  if (res.headersSent) {
+    return next(error);
+  }
+
+  if (
+    error instanceof SyntaxError &&
+    error.status === 400 &&
+    error.type === "entity.parse.failed"
+  ) {
+    return res.status(400).json({
+      requestId,
+      error: {
+        code: "INVALID_JSON",
+        message: "Request body contains invalid JSON"
+      }
+    });
+  }
+
+  if (
+    error &&
+    (
+      error.type === "entity.too.large" ||
+      error.status === 413
+    )
+  ) {
+    return res.status(413).json({
+      requestId,
+      error: {
+        code: "PAYLOAD_TOO_LARGE",
+        message: "Request payload exceeds the allowed size"
+      }
+    });
+  }
+
+  console.error("Unhandled HTTP error:", error);
+
+  return res.status(
+    error && Number.isInteger(error.status)
+      ? error.status
+      : 500
+  ).json({
+    requestId,
+    error: {
+      code: "INTERNAL_SERVER_ERROR",
+      message: "An unexpected server error occurred"
+    }
+  });
 });
 
 app.listen(PORT, () => {

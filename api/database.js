@@ -13,14 +13,21 @@ fs.mkdirSync(path.dirname(dataPath), {
   recursive: true
 });
 
+function emptyDatabase() {
+  return {
+    developers: [],
+    sessions: [],
+    projects: [],
+    apiKeys: [],
+    agents: []
+  };
+}
+
 if (!fs.existsSync(dataPath)) {
   fs.writeFileSync(
     dataPath,
     JSON.stringify(
-      {
-        projects: [],
-        apiKeys: []
-      },
+      emptyDatabase(),
       null,
       2
     ),
@@ -32,24 +39,54 @@ if (!fs.existsSync(dataPath)) {
 
 function load() {
   try {
-    const raw = fs.readFileSync(dataPath, "utf8");
+    const raw =
+      fs.readFileSync(
+        dataPath,
+        "utf8"
+      );
 
     if (!raw.trim()) {
-      return {
-        projects: [],
-        apiKeys: []
-      };
+      return emptyDatabase();
     }
 
-    const data = JSON.parse(raw);
+    const data =
+      JSON.parse(raw);
 
     return {
-      projects: Array.isArray(data.projects)
-        ? data.projects
-        : [],
-      apiKeys: Array.isArray(data.apiKeys)
-        ? data.apiKeys
-        : []
+      developers:
+        Array.isArray(
+          data.developers
+        )
+          ? data.developers
+          : [],
+
+      sessions:
+        Array.isArray(
+          data.sessions
+        )
+          ? data.sessions
+          : [],
+
+      projects:
+        Array.isArray(
+          data.projects
+        )
+          ? data.projects
+          : [],
+
+      apiKeys:
+        Array.isArray(
+          data.apiKeys
+        )
+          ? data.apiKeys
+          : [],
+
+      agents:
+        Array.isArray(
+          data.agents
+        )
+          ? data.agents
+          : []
     };
   } catch (error) {
     throw new Error(
@@ -59,17 +96,25 @@ function load() {
 }
 
 function save(data) {
-  const tempPath = `${dataPath}.tmp`;
+  const tempPath =
+    `${dataPath}.tmp`;
 
   fs.writeFileSync(
     tempPath,
-    JSON.stringify(data, null, 2),
+    JSON.stringify(
+      data,
+      null,
+      2
+    ),
     {
       mode: 0o600
     }
   );
 
-  fs.renameSync(tempPath, dataPath);
+  fs.renameSync(
+    tempPath,
+    dataPath
+  );
 }
 
 function getDataPath() {
@@ -78,8 +123,12 @@ function getDataPath() {
 
 function withData(callback) {
   const data = load();
-  const result = callback(data);
+
+  const result =
+    callback(data);
+
   save(data);
+
   return result;
 }
 
