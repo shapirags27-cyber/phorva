@@ -106,6 +106,15 @@ function normalizeVerificationResult(result) {
     policyPassed:
       verification.policyPassed === true,
 
+    capabilityAllowed:
+      verification.capabilityAllowed === true,
+
+    velocityAllowed:
+      verification.velocityAllowed === true,
+
+    quarantineAllowed:
+      verification.quarantineAllowed === true,
+
     authorizationPassed:
       verification.authorized === true,
 
