@@ -346,6 +346,15 @@ function createDeveloperStore(db) {
         session.expires_at
       ) <= Date.now()
     ) {
+      db.withData(data => {
+        data.sessions =
+          data.sessions.filter(
+            item =>
+              item.id !==
+              session.id
+          );
+      });
+
       return null;
     }
 
