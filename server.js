@@ -9876,9 +9876,6 @@ app.get("/dashboard", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "dashboard.html"));
 });
 
-app.get("/investor-mvp", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "investor-mvp.html"));
-});
 
 // Global HTTP error boundary.
 // Prevents parser/framework errors from exposing stack traces,
