@@ -9936,7 +9936,11 @@ app.use((error, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`AgentGuard running on port ${PORT}`);
-  console.log("Security verdict engine enabled");
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`AgentGuard running on port ${PORT}`);
+    console.log("Security verdict engine enabled");
+  });
+}
+
+module.exports = app;
