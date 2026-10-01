@@ -38,7 +38,11 @@ function hashApiKey(apiKey) {
 function createApiKeyStore(db) {
   function createProject({
     name,
-    developerId
+    developerId,
+    useCases = [],
+    actions = [],
+    policy = {},
+    securityProfile = null
   }) {
     if (
       typeof name !== "string" ||
@@ -54,6 +58,40 @@ function createApiKeyStore(db) {
       throw new Error("developerId is required");
     }
 
+    if (!Array.isArray(useCases)) {
+      throw new Error("useCases must be an array");
+    }
+
+    if (!Array.isArray(actions)) {
+      throw new Error("actions must be an array");
+    }
+
+    if (
+      !policy ||
+      typeof policy !== "object" ||
+      Array.isArray(policy)
+    ) {
+      throw new Error("policy must be an object");
+    }
+
+    const normalizedUseCases =
+      useCases
+        .filter(
+          value =>
+            typeof value === "string" &&
+            value.trim()
+        )
+        .map(value => value.trim());
+
+    const normalizedActions =
+      actions
+        .filter(
+          value =>
+            typeof value === "string" &&
+            value.trim()
+        )
+        .map(value => value.trim());
+
     const projectId =
       `proj_${crypto.randomUUID()}`;
 
@@ -64,6 +102,29 @@ function createApiKeyStore(db) {
       id: projectId,
       developer_id: developerId,
       name: name.trim(),
+
+      /*
+       * Phorva security context.
+       *
+       * use_cases remains for backward compatibility with
+       * the existing Developer Platform API.
+       *
+       * The new canonical project security model is stored
+       * in security_profile.
+       */
+      use_cases: normalizedUseCases,
+
+      actions: normalizedActions,
+
+      policy,
+
+      security_profile:
+        securityProfile &&
+        typeof securityProfile === "object" &&
+        !Array.isArray(securityProfile)
+          ? securityProfile
+          : null,
+
       created_at: now,
       updated_at: now
     };
@@ -80,7 +141,13 @@ function createApiKeyStore(db) {
       id: project.id,
       name: project.name,
       developerId: project.developer_id,
-      createdAt: project.created_at
+      useCases: project.use_cases,
+      actions: project.actions,
+      policy: project.policy,
+      securityProfile:
+        project.security_profile || null,
+      createdAt: project.created_at,
+      updatedAt: project.updated_at
     };
   }
 
@@ -115,11 +182,185 @@ function createApiKeyStore(db) {
       .map(project => ({
         id: project.id,
         name: project.name,
+        useCases: Array.isArray(project.use_cases)
+          ? project.use_cases
+          : [],
+        actions: Array.isArray(project.actions)
+          ? project.actions
+          : [],
+        policy:
+          project.policy &&
+          typeof project.policy === "object" &&
+          !Array.isArray(project.policy)
+            ? project.policy
+            : {},
+
+        securityProfile:
+          project.security_profile &&
+          typeof project.security_profile === "object" &&
+          !Array.isArray(project.security_profile)
+            ? project.security_profile
+            : null,
+
         createdAt: project.created_at,
         updatedAt:
           project.updated_at ||
           project.created_at
       }));
+  }
+
+  function updateProject(
+    projectId,
+    updates = {}
+  ) {
+    if (!projectId) {
+      throw new Error("projectId is required");
+    }
+
+    if (
+      !updates ||
+      typeof updates !== "object" ||
+      Array.isArray(updates)
+    ) {
+      throw new Error("updates must be an object");
+    }
+
+    let updatedProject = null;
+
+    db.withData((data) => {
+      const project =
+        data.projects.find(
+          item => item.id === projectId
+        );
+
+      if (!project) {
+        return;
+      }
+
+      if (
+        updates.name !== undefined
+      ) {
+        if (
+          typeof updates.name !== "string" ||
+          !updates.name.trim()
+        ) {
+          throw new Error(
+            "Project name must be a non-empty string"
+          );
+        }
+
+        project.name =
+          updates.name.trim();
+      }
+
+      if (
+        updates.useCases !== undefined
+      ) {
+        if (
+          !Array.isArray(updates.useCases)
+        ) {
+          throw new Error(
+            "useCases must be an array"
+          );
+        }
+
+        project.use_cases =
+          updates.useCases
+            .filter(
+              value =>
+                typeof value === "string" &&
+                value.trim()
+            )
+            .map(
+              value => value.trim()
+            );
+      }
+
+      if (
+        updates.policy !== undefined
+      ) {
+        if (
+          !updates.policy ||
+          typeof updates.policy !== "object" ||
+          Array.isArray(updates.policy)
+        ) {
+          throw new Error(
+            "policy must be an object"
+          );
+        }
+
+        project.policy =
+          updates.policy;
+      }
+
+      if (
+        updates.securityProfile !== undefined
+      ) {
+        if (
+          updates.securityProfile !== null &&
+          (
+            typeof updates.securityProfile !== "object" ||
+            Array.isArray(updates.securityProfile)
+          )
+        ) {
+          throw new Error(
+            "securityProfile must be an object or null"
+          );
+        }
+
+        project.security_profile =
+          updates.securityProfile;
+      }
+
+      /*
+       * Actions are intentionally NOT updated here.
+       *
+       * Phorva determines the relevant execution
+       * surface from actual activity rather than
+       * requiring developers to manually configure
+       * action types.
+       */
+
+      project.updated_at =
+        new Date().toISOString();
+
+      updatedProject = {
+        id: project.id,
+        name: project.name,
+        developerId:
+          project.developer_id,
+        useCases:
+          Array.isArray(project.use_cases)
+            ? project.use_cases
+            : [],
+        actions:
+          Array.isArray(project.actions)
+            ? project.actions
+            : [],
+        policy:
+          project.policy &&
+          typeof project.policy === "object" &&
+          !Array.isArray(project.policy)
+            ? project.policy
+            : {},
+        securityProfile:
+          project.security_profile &&
+          typeof project.security_profile === "object" &&
+          !Array.isArray(project.security_profile)
+            ? project.security_profile
+            : null,
+        createdAt:
+          project.created_at,
+        updatedAt:
+          project.updated_at
+      };
+    });
+
+    if (!updatedProject) {
+      throw new Error("Project not found");
+    }
+
+    return updatedProject;
   }
 
   function developerOwnsProject(
@@ -272,6 +513,16 @@ function createApiKeyStore(db) {
       return null;
     }
 
+    const project =
+      data.projects.find(
+        item =>
+          item.id === record.project_id
+      );
+
+    if (!project) {
+      return null;
+    }
+
     const now =
       new Date().toISOString();
 
@@ -359,6 +610,7 @@ function createApiKeyStore(db) {
     createProject,
     getProject,
     listProjects,
+    updateProject,
     developerOwnsProject,
     createKey,
     getKey,

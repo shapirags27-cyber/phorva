@@ -19,7 +19,8 @@ function emptyDatabase() {
     sessions: [],
     projects: [],
     apiKeys: [],
-    agents: []
+    agents: [],
+    passwordResetTokens: []
   };
 }
 
@@ -86,8 +87,29 @@ function load() {
           data.agents
         )
           ? data.agents
+          : [],
+
+      passwordResetTokens:
+        Array.isArray(
+          data.passwordResetTokens
+        )
+          ? data.passwordResetTokens
           : []
-    };
+    ,
+                   executionRecords:
+                            Array.isArray(
+                              data.executionRecords
+                            )
+                              ? data.executionRecords
+                              : [],
+
+                   securityAlerts:
+                            Array.isArray(
+                              data.securityAlerts
+                            )
+                              ? data.securityAlerts
+                              : []
+};
   } catch (error) {
     throw new Error(
       `Failed to read Phorva database: ${error.message}`

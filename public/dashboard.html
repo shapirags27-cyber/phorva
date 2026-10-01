@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phorva Dashboard</title>
+  <link rel="icon" href="/phorva-logo.png">
+
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#05070d;color:#f5f7ff;font-family:Inter,system-ui,sans-serif}
+    a{color:inherit;text-decoration:none}
+    .shell{min-height:100vh;display:flex}
+    .sidebar{width:240px;border-right:1px solid #182033;padding:22px 14px;background:#080b13}
+    .brand{display:flex;align-items:center;gap:10px;padding:8px 10px 28px;font-weight:700}
+    .brand img{width:30px;height:30px}
+    .nav{display:grid;gap:6px}
+    .nav a{padding:11px 12px;border-radius:9px;color:#9da7bd}
+    .nav a:hover,.nav a.active{background:#11182a;color:#fff}
+    .main{flex:1;padding:28px}
+    .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+    .title{font-size:28px;font-weight:700}
+    .subtitle{margin-top:6px;color:#7f8aa3;font-size:14px}
+    .connect{border:1px solid #27324a;background:#0d1321;color:#fff;border-radius:8px;padding:10px 16px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .card{border:1px solid #182238;background:#0a0f1b;border-radius:12px;padding:20px;min-height:130px}
+    .label{font-size:11px;letter-spacing:.12em;color:#68748d}
+    .value{font-size:20px;margin-top:12px}
+    input,select{
+      display:block;
+      width:100%;
+      margin-top:10px;
+      padding:10px;
+      border-radius:8px;
+      background:#0d1321;
+      color:#fff;
+      border:1px solid #27324a;
+    }
+    button{font-family:inherit}
+    @media(max-width:800px){
+      .sidebar{width:190px}
+      .grid{grid-template-columns:1fr}
+      .main{padding:20px}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <aside class="sidebar">
+      <a class="brand" href="/">
+        <img src="/phorva-logo.png" alt="Phorva">
+        <span>PHORVA</span>
+      </a>
+
+      <nav class="nav" aria-label="Dashboard navigation">
+        <a class="active" href="/dashboard">Dashboard</a>
+        <a href="/dashboard#agents">Agents</a>
+        <a href="/dashboard#activity">Activity</a>
+        <a href="/dashboard#actions">Actions</a>
+        <a href="/dashboard#policies">Policies</a>
+        <a href="/dashboard#verification">Verification</a>
+        <a href="/dashboard#integrations">Integrations</a>
+        <a href="/dashboard#settings">Settings</a>
+        <a href="/investor-mvp/">Investor MVP</a>
+        <a href="/docs">Docs</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+
+      <header class="top">
+        <div>
+          <div class="title">Dashboard</div>
+          <div class="subtitle">Execution control for autonomous agents</div>
+        </div>
+
+        <button class="connect" type="button">
+          Connect Wallet
+        </button>
+      </header>
+
+      <section class="grid">
+
+        <div class="card" id="agents">
+          <div class="label">AGENT</div>
+          <div class="value">No agent selected</div>
+        </div>
+
+        <div class="card" id="actions">
+          <div class="label">ACTION</div>
+
+          <div class="value">Choose an action</div>
+
+          <select id="actionType">
+            <option value="">Select action</option>
+            <option>Send</option>
+            <option>Swap</option>
+            <option>Bridge</option>
+            <option>Trade</option>
+            <option>Buy</option>
+            <option>Sell</option>
+            <option>Deposit</option>
+            <option>Withdraw</option>
+            <option>Approve</option>
+            <option>Stake</option>
+            <option>Unstake</option>
+            <option>Lend</option>
+            <option>Borrow</option>
+            <option>Repay</option>
+            <option>Claim</option>
+            <option>Mint</option>
+            <option>Redeem</option>
+            <option>Transfer</option>
+            <option>Prediction</option>
+            <option>Agent Payment</option>
+            <option>Contract Call</option>
+            <option>Custom Action</option>
+          </select>
+        </div>
+
+        <div class="card" id="policies">
+          <div class="label">POLICY</div>
+
+          <div class="value">Awaiting action</div>
+
+          <input
+            id="maxTransaction"
+            type="number"
+            placeholder="Max transaction"
+          >
+
+          <input
+            id="dailyLimit"
+            type="number"
+            placeholder="Daily limit"
+          >
+
+          <input
+            id="protocolAllowlist"
+            placeholder="Allowed protocol"
+          >
+        </div>
+
+        <div class="card" id="parameters" style="grid-column:1/-1">
+
+          <div class="label">ACTION PARAMETERS</div>
+
+          <div style="margin-top:16px">
+
+            <select id="chain">
+              <option value="">Loading chains...</option>
+            </select>
+
+            <select id="protocol">
+              <option value="">Select protocol</option>
+            </select>
+
+            <div id="actionSpecificFields" style="margin-top:14px">
+              Select an action to configure its parameters.
+            </div>
+
+          </div>
+        </div>
+
+        <div class="card" id="risk">
+
+          <div class="label">RISK</div>
+
+          <div class="value">Not evaluated</div>
+
+          <div
+            id="riskDetails"
+            style="margin-top:10px;color:#7f8aa3;font-size:13px"
+          >
+            Waiting for action verification.
+          </div>
+
+        </div>
+
+        <div class="card" id="authorization">
+
+          <div class="label">AUTHORIZATION</div>
+
+          <div class="value">Not evaluated</div>
+
+          <div
+            id="authorizationDetails"
+            style="margin-top:10px;color:#7f8aa3;font-size:13px"
+          >
+            Authorization will be derived from verified intent and policy.
+          </div>
+
+        </div>
+
+        <div class="card" id="verification">
+
+          <div class="label">VERIFICATION</div>
+
+          <div class="value">Ready</div>
+
+          <button
+            id="verifyAction"
+            style="margin-top:14px;width:100%;padding:12px;border:1px solid #303b55;border-radius:10px;background:#111827;color:white;font-weight:600;cursor:pointer"
+          >
+            Verify Action
+          </button>
+
+          <div
+            id="verificationStatus"
+            style="margin-top:10px;color:#7f8aa3;font-size:13px"
+          >
+            Ready for verification.
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    const actionType = document.getElementById("actionType");
+    const policyCard = document.querySelector("#policies .value");
+    const actionSpecificFields =
+      document.getElementById("actionSpecificFields");
+
+    const verificationValue =
+      document.querySelector("#verification .value");
+
+    const verificationStatus =
+      document.getElementById("verificationStatus");
+
+    const riskValue =
+      document.querySelector("#risk .value");
+
+    const riskDetails =
+      document.getElementById("riskDetails");
+
+    const authorizationValue =
+      document.querySelector("#authorization .value");
+
+    const authorizationDetails =
+      document.getElementById("authorizationDetails");
+
+    const chainSelect = document.getElementById("chain");
+    const protocolSelect =
+      document.getElementById("protocol");
+
+
+
+    let protocolRegistry = {};
+
+    async function loadProtocols() {
+      try {
+        const response = await fetch("/api/protocols");
+
+        if (!response.ok) {
+          throw new Error("Failed to load protocols");
+        }
+
+        protocolRegistry = await response.json();
+        updateProtocols();
+      } catch (error) {
+        protocolRegistry = {};
+      }
+    }
+
+    function updateProtocols() {
+      const chain = chainSelect.value;
+      const protocols = protocolRegistry[chain] || [];
+
+      protocolSelect.innerHTML =
+        '<option value="">Select protocol</option>' +
+        protocols.map(protocol =>
+          `<option value="${protocol}">${protocol}</option>`
+        ).join("");
+    }
+
+    async function loadChains() {
+      try {
+        const response = await fetch("/api/chains");
+
+        if (!response.ok) {
+          throw new Error("Failed to load chains");
+        }
+
+        const chains = await response.json();
+
+        chainSelect.innerHTML =
+          '<option value="">Select chain</option>' +
+          chains.map(chain =>
+            `<option value="${chain.key}" data-chain-id="${chain.chainId}">${chain.name}</option>`
+          ).join("");
+      } catch (error) {
+        chainSelect.innerHTML =
+          '<option value="">Failed to load chains</option>';
+      }
+    }
+
+    loadChains();
+    chainSelect.addEventListener("change", updateProtocols);
+
+    let assetRegistry = {};
+
+    async function loadAssets() {
+      try {
+        const response = await fetch("/api/assets");
+
+        if (!response.ok) {
+          throw new Error("Failed to load assets");
+        }
+
+        assetRegistry = await response.json();
+      } catch (error) {
+        assetRegistry = {};
+      }
+    }
+
+    loadAssets().then(() => {
+      if (actionType.value) {
+        actionType.dispatchEvent(new Event("change"));
+      }
+    });
+
+    function assetOptions() {
+      const chain = chainSelect.value;
+      const assets = assetRegistry[chain] || [];
+
+      return (
+        '<option value="">Select asset</option>' +
+        assets.map(asset => {
+          const value =
+            asset.type === "native"
+              ? "native"
+              : asset.address;
+
+          return `<option value="${value}" data-asset-type="${asset.type}" data-asset-address="${asset.address || ""}" data-asset-name="${asset.name}">${asset.name}</option>`;
+        }).join("") +
+        '<option value="custom">Custom asset address</option>'
+      );
+    }
+
+    function getAmount() {
+      const input =
+        actionSpecificFields.querySelector(
+          'input[placeholder="Amount"]'
+        );
+
+      return Number(input?.value || 0);
+    }
+
+    actionType.addEventListener("change", () => {
+      const action = actionType.value;
+
+      if (!action) {
+        actionSpecificFields.textContent =
+          "Select an action to configure its parameters.";
+        return;
+      }
+
+      actionType
+        .closest(".card")
+        .querySelector(".value")
+        .textContent = action;
+
+      policyCard.textContent = "Ready for evaluation";
+
+      if (
+        action === "Send" ||
+        action === "Transfer" ||
+        action === "Agent Payment"
+      ) {
+        actionSpecificFields.innerHTML = `
+          <select class="assetField">
+            ${assetOptions()}
+          </select>
+          <input class="customAssetField" placeholder="Custom asset address" style="display:none">
+          <input class="recipientField" placeholder="Recipient">
+          <input class="amountField" placeholder="Amount">
+        `;
+      }
+
+      else if (
+        action === "Swap" ||
+        action === "Trade"
+      ) {
+        actionSpecificFields.innerHTML = `
+          <select class="assetField tokenInField">
+            ${assetOptions()}
+          </select>
+          <input class="customAssetField tokenInCustomField" placeholder="Custom token in address" style="display:none">
+
+          <select class="assetField tokenOutField">
+            ${assetOptions()}
+          </select>
+          <input class="customAssetField tokenOutCustomField" placeholder="Custom token out address" style="display:none">
+
+          <input placeholder="Amount">
+        `;
+      }
+
+      else if (action === "Bridge") {
+        actionSpecificFields.innerHTML = `
+          <select class="assetField">
+            ${assetOptions()}
+          </select>
+          <input class="customAssetField" placeholder="Custom asset address" style="display:none">
+          <input placeholder="Amount">
+          <input placeholder="Destination chain">
+        `;
+      }
+
+      else if (
+        action === "Contract Call" ||
+        action === "Custom Action"
+      ) {
+        actionSpecificFields.innerHTML = `
+          <input placeholder="Contract address">
+          <input placeholder="Function">
+          <input placeholder="Parameters">
+        `;
+      }
+
+      else {
+        actionSpecificFields.innerHTML = `
+          <input placeholder="Asset or protocol">
+          <input placeholder="Amount">
+          <input placeholder="Additional parameters">
+        `;
+      }
+
+      const assetFields =
+        actionSpecificFields.querySelectorAll(".assetField");
+
+      assetFields.forEach((assetField) => {
+        let customAssetField;
+
+        if (assetField.classList.contains("tokenInField")) {
+          customAssetField =
+            actionSpecificFields.querySelector(".tokenInCustomField");
+        } else if (assetField.classList.contains("tokenOutField")) {
+          customAssetField =
+            actionSpecificFields.querySelector(".tokenOutCustomField");
+        } else {
+          customAssetField =
+            actionSpecificFields.querySelector(".customAssetField");
+        }
+
+        if (customAssetField) {
+          assetField.addEventListener("change", () => {
+            customAssetField.style.display =
+              assetField.value === "custom" ? "block" : "none";
+
+            if (assetField.value !== "custom") {
+              customAssetField.value = "";
+            }
+          });
+        }
+      });
+    });
+
+    document
+      .getElementById("verifyAction")
+      .addEventListener("click", async () => {
+
+        const action = actionType.value;
+
+        if (!action) {
+          verificationStatus.textContent =
+            "Select an action first.";
+          return;
+        }
+
+        const amountField =
+          actionSpecificFields.querySelector(".amountField");
+
+        const recipientField =
+          actionSpecificFields.querySelector(".recipientField");
+
+        const amount =
+          amountField?.value.trim() || "";
+
+        const recipient =
+          recipientField?.value.trim() || "";
+
+        if (!amount) {
+          verificationStatus.textContent =
+            "Enter an action amount first.";
+          return;
+        }
+
+        if (
+          (action === "Send" ||
+            action === "Transfer" ||
+            action === "Agent Payment") &&
+          !recipient
+        ) {
+          verificationStatus.textContent =
+            "Enter a recipient first.";
+          return;
+        }
+
+        const tokenInField =
+          actionSpecificFields.querySelector(".tokenInField");
+
+        const tokenOutField =
+          actionSpecificFields.querySelector(".tokenOutField");
+
+        const assetField =
+          tokenInField ||
+          actionSpecificFields.querySelector(".assetField");
+
+        const customAssetField =
+          tokenInField
+            ? actionSpecificFields.querySelector(".tokenInCustomField")
+            : actionSpecificFields.querySelector(".customAssetField");
+
+        let asset =
+          assetField?.value.trim() || "";
+
+        if (asset === "custom") {
+          asset =
+            customAssetField?.value.trim() || "";
+        }
+
+        let tokenOut = "";
+
+        if (tokenOutField) {
+          tokenOut = tokenOutField.value.trim();
+
+          if (tokenOut === "custom") {
+            tokenOut =
+              actionSpecificFields
+                .querySelector(".tokenOutCustomField")
+                ?.value.trim() || "";
+          }
+
+          if (!tokenOut) {
+            verificationStatus.textContent =
+              "Enter a token out asset first.";
+            return;
+          }
+        }
+
+        if (!asset) {
+          verificationStatus.textContent =
+            "Enter an asset first.";
+          return;
+        }
+
+        const chain =
+          document.getElementById("chain").value.trim();
+
+        const protocol =
+          document.getElementById("protocol").value.trim();
+
+        const selectedChain =
+          chainSelect.options[chainSelect.selectedIndex];
+
+        const chainId =
+          Number(selectedChain?.dataset.chainId || 0);
+
+        const maxTransaction =
+          Number(
+            document.getElementById("maxTransaction").value || 0
+          );
+
+        const dailyLimit =
+          Number(
+            document.getElementById("dailyLimit").value || 0
+          );
+
+        const isNativeAsset =
+          asset === "native";
+
+        const resolvedProtocol =
+          isNativeAsset ? "Native" : protocol;
+
+        const transactionTo =
+          isNativeAsset ? recipient : "";
+
+        const transactionValue =
+          isNativeAsset ? amount : "0";
+
+        const transactionCalldata =
+          isNativeAsset ? "0x" : "";
+
+        verificationStatus.textContent =
+          "Verifying action...";
+
+        verificationValue.textContent =
+          "VERIFYING";
+
+        riskValue.textContent =
+          "Evaluating";
+
+        authorizationValue.textContent =
+          "Evaluating";
+
+        try {
+          const response = await fetch("/authorize", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              agent: "dashboard-agent",
+
+              action: {
+                type: action.toLowerCase(),
+                chain,
+                protocol: resolvedProtocol,
+                asset,
+                tokenOut: tokenOut || undefined,
+                amount,
+                recipient: recipient || undefined
+              },
+
+              policy: {
+                maxTransactionAmount: maxTransaction,
+                dailyLimit
+              },
+
+              intent: {
+                type: action.toLowerCase(),
+                chain,
+                protocol: resolvedProtocol,
+                asset,
+                tokenOut: tokenOut || undefined,
+                amount,
+                recipient: recipient || undefined,
+                nativeValue: isNativeAsset ? amount : undefined
+              },
+
+              transaction: {
+                from: "0xAgentWallet",
+                to: transactionTo,
+                chainId,
+                expectedChainId: chainId,
+                value: transactionValue,
+                calldata: transactionCalldata,
+                amount
+              }
+            })
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              result.error || "Verification failed"
+            );
+          }
+
+          verificationValue.textContent =
+            result.authorized
+              ? "AUTHORIZED"
+              : "BLOCKED";
+
+          verificationStatus.textContent =
+            result.authorized
+              ? "Action authorized by Phorva."
+              : "Action blocked by Phorva.";
+
+          riskValue.textContent =
+            result.risk?.level ||
+            result.risk ||
+            "Evaluated";
+
+          riskDetails.textContent =
+            result.reason ||
+            "Risk evaluation completed.";
+
+          authorizationValue.textContent =
+            result.authorized
+              ? "AUTHORIZED"
+              : "BLOCKED";
+
+          authorizationDetails.textContent =
+            result.reason ||
+            "Authorization decision returned by Phorva.";
+
+        } catch (error) {
+
+          verificationValue.textContent =
+            "FAILED";
+
+          verificationStatus.textContent =
+            error.message;
+
+          riskValue.textContent =
+            "Not evaluated";
+
+          authorizationValue.textContent =
+            "Not evaluated";
+
+          riskDetails.textContent =
+            "Verification did not complete.";
+
+          authorizationDetails.textContent =
+            "No authorization decision was produced.";
+        }
+      });
+  </script>
+
+</body>
+</html>

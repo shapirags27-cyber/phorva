@@ -697,3 +697,895 @@ if (savedTheme) {
 }
 
 document.addEventListener("DOMContentLoaded", setup);
+
+/* ============================================================
+   PHORVA — AUTONOMOUS EXECUTION SECURITY
+   NEW DOCUMENTATION OVERRIDE
+   ============================================================ */
+
+PHORVA_PAGES["threat-model"] = `
+<div class="eyebrow">SECURITY / AUTONOMOUS EXECUTION</div>
+
+<h1>The Autonomous-Agent Threat Model</h1>
+
+<p>
+Phorva is the verification and authorization layer for autonomous agents
+executing in the real world. The security boundary cannot exist only inside
+the model because agents can be manipulated through prompts, tools, memory,
+APIs, delegated agents and external systems.
+</p>
+
+<div class="notice">
+<strong>CORE PRINCIPLE</strong>
+<p>
+An agent may propose anything. Phorva determines what it is authorized
+to execute.
+</p>
+</div>
+
+<div class="architecture vertical">
+
+<div>
+UNTRUSTED WORLD
+<br>
+<small>web · X · email · documents · APIs</small>
+</div>
+
+<span>↓</span>
+
+<div>
+AGENT
+<br>
+<small>reasoning · planning · memory</small>
+</div>
+
+<span>↓</span>
+
+<div class="accent">
+PHORVA CONTROL PLANE
+<br>
+<small>
+identity · intent · capability · policy · risk
+</small>
+</div>
+
+<span>↓</span>
+
+<div>
+WALLET / SIGNER / API
+<br>
+<small>protected execution boundary</small>
+</div>
+
+<span>↓</span>
+
+<div>
+BLOCKCHAIN / WORLD
+<br>
+<small>irreversible effects</small>
+</div>
+
+</div>
+
+
+<h2>01 · Agent Identity & Privilege</h2>
+
+<p>
+Phorva treats agent identity as more than a wallet address.
+An agent's authorization context can include ownership, wallets,
+chains, protocols, capabilities and policy scope.
+</p>
+
+<pre><code>Agent Identity
+├── agent ID
+├── project / owner
+├── wallet(s)
+├── permitted chains
+├── permitted protocols
+├── permitted actions
+├── spending limits
+├── policy version
+└── authorization scope</code></pre>
+
+
+<h2>02 · Goal Hijacking / Prompt Injection</h2>
+
+<p>
+Phorva does not need to become a prompt-injection filter.
+Instead, the execution boundary assumes that an agent can be manipulated
+and independently verifies the resulting action.
+</p>
+
+<pre><code>DECLARED INTENT
+
+Swap $300 USDC → ETH
+
+
+ACTUAL TRANSACTION
+
+Transfer $15,000 USDC
+→ unknown recipient
+
+
+PHORVA
+
+Intent mismatch
+Destination violation
+
+VERDICT: BLOCK</code></pre>
+
+
+<h2>03 · Tool Misuse & Excessive Agency</h2>
+
+<p>
+Agents should not automatically receive unrestricted execution capabilities.
+Phorva can associate tools and actions with explicit capability policies.
+</p>
+
+<div class="cards">
+
+<div class="card">
+<h3>ALLOWED</h3>
+<p>swap<br>quote<br>balance</p>
+</div>
+
+<div class="card">
+<h3>RESTRICTED</h3>
+<p>bridge<br>approve</p>
+</div>
+
+<div class="card">
+<h3>FORBIDDEN</h3>
+<p>
+arbitrary contract call<br>
+wallet ownership change<br>
+raw calldata execution
+</p>
+</div>
+
+</div>
+
+
+<h2>04 · Supply Chain & Tool Security</h2>
+
+<p>
+An autonomous execution path may contain MCP servers, APIs, plugins,
+external tools or other agents. A compromised dependency can therefore
+become an execution risk.
+</p>
+
+<pre><code>AGENT
+  ↓
+MCP / TOOL
+  ↓
+API
+  ↓
+PROTOCOL
+  ↓
+EXECUTION</code></pre>
+
+<p>
+A future Phorva capability registry can associate sensitive capabilities
+with tool identity, permissions, version, integrity or attestation.
+</p>
+
+
+<h2>05 · Memory & Context Poisoning</h2>
+
+<pre><code>AGENT MEMORY
+
+"Preferred treasury address:
+0xATTACKER"
+
+
+PHORVA TRUSTED STATE
+
+Approved recipient:
+0xABC...
+
+Policy:
+v17
+
+Maximum:
+$5,000
+
+
+Agent memory can suggest.
+
+Phorva policy decides.</code></pre>
+
+
+<h2>06 · Insecure Agent-to-Agent Communication</h2>
+
+<p>
+Natural-language communication between autonomous agents should not
+automatically become authorization.
+</p>
+
+<pre><code>Agent A
+   ↓
+Signed Intent
+   ↓
+Agent B
+   ↓
+Phorva Verification
+   ↓
+Execution</code></pre>
+
+<p>
+Sensitive delegated execution can include identity, authorization scope,
+expiration and nonce.
+</p>
+
+
+<h2>07 · Cascading Failures & Blast Radius</h2>
+
+<pre><code>Agent A
+   ↓
+Agent B
+   ↓
+Agent C
+   ↓
+Payment Agent
+   ↓
+Multiple executions</code></pre>
+
+<p>
+Delegation must not automatically expand the original authorization envelope.
+</p>
+
+<pre><code>ORIGINAL AUTHORIZATION
+
+$500 / transaction
+$2,000 / day
+10 executions / hour
+approved counterparties only
+
+
+Agent A → Agent B → Agent C
+
+Authorization does not expand.</code></pre>
+
+
+<h2>08 · Execution Risk Classification</h2>
+
+<p>
+Not every operation has the same consequence. Phorva can classify execution
+according to the effect it can create.
+</p>
+
+<pre><code>READ
+  ↓
+SIMULATE
+  ↓
+WRITE
+  ↓
+FINANCIAL
+  ↓
+IRREVERSIBLE</code></pre>
+
+<p>
+Higher-impact operations can require stronger authorization.
+</p>
+
+
+<h2>09 · Human-Agent Trust Exploitation</h2>
+
+<p>
+Instead of asking humans to trust an agent's explanation, Phorva can expose
+deterministic verification evidence.
+</p>
+
+<pre><code>DECLARED INTENT
+
+Swap 300 USDC → ETH
+
+
+ACTUAL TRANSACTION
+
+Swap 4,000 USDC → ETH
+
+
+VERDICT
+
+BLOCK — INTENT MISMATCH
+
+Amount deviation: +1,233%</code></pre>
+
+
+<h2>10 · Rogue-Agent Behavior</h2>
+
+<p>
+Phorva does not need to determine whether an AI is philosophically "rogue."
+It can detect execution behavior outside the agent's authorization envelope.
+</p>
+
+<pre><code>NORMAL
+
+$50–$500
+Base
+Uniswap
+3 transactions/day
+
+
+OBSERVED
+
+$15,000
+Unknown contract
+New chain
+27 transactions
+
+
+PHORVA
+
+Behavioral deviation
+        ↓
+HIGH RISK
+        ↓
+QUARANTINE
+        ↓
+BLOCK</code></pre>
+
+
+<h2>11 · Key Compromise</h2>
+
+<p>
+Key compromise is a separate security class. Phorva can reduce the blast
+radius when protected execution is required to pass through the Phorva
+authorization boundary.
+</p>
+
+<div class="notice">
+<strong>IMPORTANT SECURITY BOUNDARY</strong>
+<p>
+If an attacker independently obtains a raw private key and bypasses the
+Phorva-controlled execution path, Phorva cannot stop that external signing
+operation.
+</p>
+</div>
+
+<pre><code>NORMAL
+   ↓
+ANOMALY
+   ↓
+RISK THRESHOLD
+   ↓
+QUARANTINE
+   ↓
+BLOCK NEW PROTECTED EXECUTIONS
+   ↓
+INDEPENDENT REVIEW</code></pre>
+
+
+<h2>12 · Approval & Allowance Abuse</h2>
+
+<p>
+Transaction value alone is not enough to determine risk.
+Some transactions grant future authority over assets.
+</p>
+
+<pre><code>approve(
+    maliciousSpender,
+    unlimited
+)
+
+
+Immediate transfer value:
+$0
+
+
+Potential future authority:
+VERY LARGE
+
+
+PHORVA → HIGH RISK / BLOCK</code></pre>
+
+<p>
+Sensitive operations include:
+</p>
+
+<pre><code>approve
+permit
+setApprovalForAll
+increaseAllowance
+delegate
+setOperator</code></pre>
+
+
+<h2>13 · Bridge Security</h2>
+
+<p>
+Cross-chain actions must be evaluated as complete execution paths rather
+than isolated transactions.
+</p>
+
+<pre><code>SOURCE CHAIN
+      ↓
+BRIDGE PROTOCOL
+      ↓
+TOKEN MAPPING
+      ↓
+DESTINATION CHAIN
+      ↓
+DESTINATION CONTRACT
+      ↓
+FINAL RECIPIENT
+      ↓
+MESSAGE / SLIPPAGE
+</code></pre>
+
+
+<h2>14 · Agent-to-Agent Payment Security</h2>
+
+<p>
+Autonomous payments require more than checking an amount.
+Phorva can bind the payment to the complete authorization context.
+</p>
+
+<pre><code>Payment Intent
+      +
+Counterparty Identity
+      +
+Amount
+      +
+Destination
+      +
+Service
+      +
+Expiration
+      +
+Nonce
+      ↓
+PHORVA AUTHORIZATION</code></pre>
+
+
+<h2>THE PHORVA SECURITY MODEL</h2>
+
+<div class="cards">
+
+<div class="card">
+<h3>01 · AGENT IDENTITY</h3>
+<p>
+Identity, ownership, wallets, capabilities and authorization scope.
+</p>
+</div>
+
+<div class="card">
+<h3>02 · INTENT + POLICY</h3>
+<p>
+Declared intent, project policy and agent-specific restrictions.
+</p>
+</div>
+
+<div class="card">
+<h3>03 · TOOL VERIFICATION</h3>
+<p>
+MCP, tools, APIs and delegated-agent capabilities.
+</p>
+</div>
+
+<div class="card">
+<h3>04 · EXECUTION RISK</h3>
+<p>
+Contracts, functions, parameters, destinations, approvals,
+velocity and behavioral deviation.
+</p>
+</div>
+
+<div class="card">
+<h3>05 · QUARANTINE</h3>
+<p>
+Blast-radius controls, anomaly response and protected execution shutdown.
+</p>
+</div>
+
+</div>
+
+
+<h2>THE EXECUTION SECURITY LOOP</h2>
+
+<pre><code>
+AGENT
+  ↓
+IDENTITY
+  ↓
+DECLARED INTENT
+  ↓
+CAPABILITY CHECK
+  ↓
+POLICY
+  ↓
+TOOL / API VERIFICATION
+  ↓
+TRANSACTION ANALYSIS
+  ↓
+RISK ENGINE
+  ↓
+┌─────────┬─────────┬───────────┐
+│  ALLOW  │  BLOCK  │ ESCALATE  │
+└─────────┴─────────┴───────────┘
+      ↓
+SIGNING / EXECUTION
+      ↓
+FINAL-STATE VERIFICATION
+      ↓
+PROOF / RECEIPT
+      ↓
+AUDIT TRAIL
+</code></pre>
+
+
+<div class="notice">
+
+<strong>PHORVA'S ARCHITECTURAL BOUNDARY</strong>
+
+<p>
+Phorva defines verification and authorization semantics.
+Wallets, MPC systems, smart accounts, relayers, card issuers and
+other infrastructure provide execution machinery.
+</p>
+
+<p>
+The protected integration must enforce the Phorva decision before
+signing or executing.
+</p>
+
+</div>
+`;
+
+
+/* ============================================================
+   VIRTUAL CARD / FINTECH INTEGRATION
+   ============================================================ */
+
+PHORVA_PAGES["virtual-cards"] = `
+
+<div class="eyebrow">USE CASE / FINANCIAL EXECUTION</div>
+
+<h1>Virtual Card Security</h1>
+
+<p>
+Autonomous agents are not limited to blockchain transactions.
+They can also initiate payments through virtual cards and other
+financial execution rails.
+</p>
+
+<div class="notice">
+
+<strong>ONE AUTHORIZATION MODEL. MULTIPLE EXECUTION RAILS.</strong>
+
+<p>
+Phorva can apply identity, intent, policy, risk and authorization
+before an autonomous payment reaches an external financial rail.
+</p>
+
+</div>
+
+
+<div class="architecture vertical">
+
+<div>
+AGENT
+<br>
+<small>"Buy $50 of cloud infrastructure"</small>
+</div>
+
+<span>↓</span>
+
+<div class="accent">
+PHORVA
+<br>
+<small>
+identity · intent · policy · risk · authorization
+</small>
+</div>
+
+<span>↓</span>
+
+<div>
+CARD / PAYMENT PROVIDER
+<br>
+<small>existing financial infrastructure</small>
+</div>
+
+<span>↓</span>
+
+<div>
+MERCHANT
+</div>
+
+</div>
+
+
+<h2>Example Policy</h2>
+
+<pre><code>Project: Autonomous Finance
+
+maxTransaction:
+  $100
+
+monthlyLimit:
+  $2,000
+
+allowedCategories:
+  - cloud infrastructure
+  - software
+  - developer tools
+
+blockedCategories:
+  - gambling
+  - cash withdrawal
+  - restricted merchants</code></pre>
+
+
+<h2>Authorized Purchase</h2>
+
+<pre><code>AGENT INTENT
+
+Buy $50 of cloud compute
+
+
+PHORVA
+
+Transaction:
+$50
+
+Maximum:
+$100
+
+Category:
+Allowed
+
+Agent:
+Authorized
+
+Risk:
+LOW
+
+
+VERDICT: ALLOW
+
+
+        ↓
+
+CARD PAYMENT
+
+        ↓
+
+MERCHANT</code></pre>
+
+
+<h2>Blocked Purchase</h2>
+
+<pre><code>AGENT INTENT
+
+Buy $50 of cloud compute
+
+
+ACTUAL REQUEST
+
+$900
+
+
+PROJECT LIMIT
+
+$100
+
+
+PHORVA
+
+VERDICT: BLOCK
+
+Reason:
+TRANSACTION LIMIT EXCEEDED</code></pre>
+
+
+<h2>Compromised-Agent Example</h2>
+
+<pre><code>NORMAL
+
+$20–$100
+Known merchants
+Low frequency
+
+
+SUDDENLY
+
+$900
+New merchant
+Multiple attempts
+Unusual category
+
+
+PHORVA
+
+Behavioral anomaly
+       ↓
+Risk increase
+       ↓
+QUARANTINE
+       ↓
+BLOCK</code></pre>
+
+
+<h2>Integration Architecture</h2>
+
+<pre><code>
+EXISTING APPLICATION
+        ↓
+AUTONOMOUS AGENT
+        ↓
+PHORVA SDK / API
+        ↓
+IDENTITY
+        ↓
+INTENT
+        ↓
+POLICY
+        ↓
+RISK
+        ↓
+AUTHORIZATION
+        ↓
+CARD / PAYMENT RAIL
+        ↓
+MERCHANT
+</code></pre>
+
+
+<h2>Phorva Is Not The Card Issuer</h2>
+
+<p>
+Phorva does not replace the card issuer, card network, regulated payment
+provider or PCI environment.
+</p>
+
+<p>
+The financial infrastructure continues to perform the actual payment.
+Phorva provides the autonomous execution authorization layer.
+</p>
+
+
+<h2>Cross-Rail Security</h2>
+
+<p>
+The same project-level authorization model can eventually govern multiple
+execution environments.
+</p>
+
+<pre><code>
+                    PHORVA
+                       │
+          ┌────────────┼────────────┐
+          ↓            ↓            ↓
+      BLOCKCHAIN     CARD        API
+      EXECUTION    PAYMENT     EXECUTION
+          │            │            │
+          ↓            ↓            ↓
+       WALLET       ISSUER       SERVICE
+</code></pre>
+
+
+<div class="notice">
+
+<strong>INTEGRATION STATUS</strong>
+
+<p>
+This documentation describes the Phorva integration architecture.
+It does not claim that Phorva currently issues virtual cards or
+processes card payments directly.
+</p>
+
+<p>
+Specific provider integrations should use that provider's documented
+API and authorization capabilities.
+</p>
+
+</div>
+
+`;
+
+
+/* ============================================================
+   PHORVA SECURITY OVERVIEW
+   ============================================================ */
+
+PHORVA_PAGES["security"] = `
+
+<div class="eyebrow">PHORVA / SECURITY</div>
+
+<h1>Autonomous Execution Security</h1>
+
+<p>
+Phorva is designed around a simple security boundary:
+the agent can propose an action, but it cannot decide whether that
+action is authorized.
+</p>
+
+<div class="notice">
+
+<strong>THE SECURITY BOUNDARY</strong>
+
+<p>
+Do not try to make the autonomous agent perfectly trustworthy.
+Make the execution environment capable of safely handling an
+untrusted or compromised agent.
+</p>
+
+</div>
+
+
+<h2>What Phorva Verifies</h2>
+
+<div class="cards">
+
+<div class="card">
+<h3>IDENTITY</h3>
+<p>Who is attempting the execution?</p>
+</div>
+
+<div class="card">
+<h3>INTENT</h3>
+<p>What was the agent supposed to do?</p>
+</div>
+
+<div class="card">
+<h3>CAPABILITY</h3>
+<p>Is this action within the agent's capabilities?</p>
+</div>
+
+<div class="card">
+<h3>POLICY</h3>
+<p>Does the action satisfy project and agent policy?</p>
+</div>
+
+<div class="card">
+<h3>RISK</h3>
+<p>Does the execution look anomalous or dangerous?</p>
+</div>
+
+<div class="card">
+<h3>EXECUTION</h3>
+<p>Did the final state match the authorized action?</p>
+</div>
+
+</div>
+
+
+<h2>Authorization Decision</h2>
+
+<pre><code>
+IDENTITY
+   +
+INTENT
+   +
+CAPABILITY
+   +
+POLICY
+   +
+TRANSACTION
+   +
+RISK
+   ↓
+
+PHORVA
+
+ALLOW
+BLOCK
+ESCALATE
+QUARANTINE
+</code></pre>
+
+
+<h2>Why This Matters</h2>
+
+<p>
+Autonomous agents operate across systems that were not designed to trust
+their reasoning blindly. Phorva moves the security decision outside the
+agent's reasoning process and into an independently enforceable execution
+boundary.
+</p>
+
+`;
+ 
+console.log("PHORVA: expanded autonomous execution security docs loaded.");

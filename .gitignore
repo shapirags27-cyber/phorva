@@ -7,3 +7,12 @@ node_modules/
 .vercel
 server.js.backup*
 *.backup*
+
+# Local secrets / session captures
+phorva-cookies.txt
+phorva-signup-headers.txt
+
+# Local development backups
+*.bak
+*.bak-*
+*.before-*

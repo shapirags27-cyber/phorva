@@ -8,6 +8,12 @@ const { createProductionApi } = require("./api/production-api");
 const db = require("./api/database");
 const { createApiKeyStore } = require("./api/api-keys");
 const { createAgentStore } = require("./api/agents");
+const {
+  createExecutionRecordStore
+} = require("./api/execution-records");
+const {
+  createSecurityAlertStore
+} = require("./api/security-alerts");
 const { createDeveloperStore } = require("./api/developers");
 const {
   corsOrigin,
@@ -20,6 +26,23 @@ const {
 const apiKeyStore = createApiKeyStore(db);
 const agentStore = createAgentStore(db);
 const developerStore = createDeveloperStore(db);
+const executionRecordStore =
+  createExecutionRecordStore(db);
+
+const securityAlertStore =
+  createSecurityAlertStore(db);
+
+const {
+  getUseCases,
+  isValidUseCase,
+  getUseCase
+} = require("./api/use-cases");
+
+const {
+  createSecurityProfile
+} = require("./api/security-profile");
+
+
 
 const chains = {
   baseSepolia: {
@@ -83,6 +106,7 @@ app.use(
     limit: "1mb"
   })
 );
+
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -827,6 +851,10 @@ function decodeUniversalRouterExecute(calldata) {
 
 
 function decodeParameters(calldata, category) {
+  calldata =
+    typeof calldata === "string" && calldata.length > 0
+      ? calldata
+      : "0x";
 
   if (category === "universalRouter") {
     const decoded =
@@ -1321,6 +1349,10 @@ function verifyExecutionType(intent, analysis) {
   }
 
   if (canonicalType === "transfer") {
+    if (decodedFunction.category === "nativeTransfer") {
+      return decodedParameters.valid === true;
+    }
+
     return (
       VERIFIED_EXECUTION_TYPES.transfer.includes(
         decodedFunction.category
@@ -1636,13 +1668,41 @@ function buildExecutionTransaction({
       );
     }
 
+    const normalizedRecipient =
+      String(recipient).toLowerCase();
+
     if (
-      value === null ||
-      value === undefined ||
-      String(value) === "0"
+      !/^0x[0-9a-f]{40}$/.test(
+        normalizedRecipient
+      )
     ) {
       throw new Error(
+        "Native send requires a valid recipient address."
+      );
+    }
+
+    let nativeValue;
+
+    try {
+      nativeValue = BigInt(String(value));
+    } catch {
+      throw new Error(
+        "Native send value must be an integer."
+      );
+    }
+
+    if (nativeValue <= 0n) {
+      throw new Error(
         "Native send requires a non-zero native value."
+      );
+    }
+
+    if (
+      nativeValue >
+      0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
+    ) {
+      throw new Error(
+        "Native send value exceeds uint256."
       );
     }
 
@@ -1657,8 +1717,8 @@ function buildExecutionTransaction({
           transaction?.from ??
           intent?.wallet ??
           null,
-        to: recipient,
-        value: String(value),
+        to: normalizedRecipient,
+        value: nativeValue.toString(),
         calldata: "0x"
       }
     };
@@ -1687,6 +1747,19 @@ function buildExecutionTransaction({
       );
     }
 
+    const normalizedToken =
+      String(token).toLowerCase();
+
+    if (
+      !/^0x[0-9a-f]{40}$/.test(
+        normalizedToken
+      )
+    ) {
+      throw new Error(
+        "ERC-20 transfer requires a valid token contract address."
+      );
+    }
+
     if (!recipient) {
       throw new Error(
         "ERC-20 transfer requires a recipient."
@@ -1702,14 +1775,51 @@ function buildExecutionTransaction({
       );
     }
 
+    const normalizedRecipient =
+      String(recipient).toLowerCase();
+
+    if (
+      !/^0x[0-9a-f]{40}$/.test(
+        normalizedRecipient
+      )
+    ) {
+      throw new Error(
+        "ERC-20 transfer requires a valid recipient address."
+      );
+    }
+
+    let transferAmount;
+
+    try {
+      transferAmount = BigInt(String(amount));
+    } catch {
+      throw new Error(
+        "ERC-20 transfer amount must be an integer."
+      );
+    }
+
+    if (transferAmount <= 0n) {
+      throw new Error(
+        "ERC-20 transfer amount must be greater than zero."
+      );
+    }
+
+    if (
+      transferAmount >
+      0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
+    ) {
+      throw new Error(
+        "ERC-20 transfer amount exceeds uint256."
+      );
+    }
+
     const recipientWord =
-      String(recipient)
-        .toLowerCase()
+      normalizedRecipient
         .replace(/^0x/, "")
         .padStart(64, "0");
 
     const amountWord =
-      BigInt(String(amount))
+      transferAmount
         .toString(16)
         .padStart(64, "0");
 
@@ -1724,7 +1834,7 @@ function buildExecutionTransaction({
           transaction?.from ??
           intent?.wallet ??
           null,
-        to: token,
+        to: normalizedToken,
         value: "0",
         calldata:
           "0xa9059cbb" +
@@ -1757,9 +1867,35 @@ function buildExecutionTransaction({
       );
     }
 
+    const normalizedToken =
+      String(token).toLowerCase();
+
+    if (
+      !/^0x[0-9a-f]{40}$/.test(
+        normalizedToken
+      )
+    ) {
+      throw new Error(
+        "Approval requires a valid token contract address."
+      );
+    }
+
     if (!spender) {
       throw new Error(
         "Approval requires a spender."
+      );
+    }
+
+    const normalizedSpender =
+      String(spender).toLowerCase();
+
+    if (
+      !/^0x[0-9a-f]{40}$/.test(
+        normalizedSpender
+      )
+    ) {
+      throw new Error(
+        "Approval requires a valid spender address."
       );
     }
 
@@ -1772,14 +1908,38 @@ function buildExecutionTransaction({
       );
     }
 
+    let approvalAmount;
+
+    try {
+      approvalAmount = BigInt(String(allowance));
+    } catch {
+      throw new Error(
+        "Approval allowance must be an integer."
+      );
+    }
+
+    if (approvalAmount < 0n) {
+      throw new Error(
+        "Approval allowance cannot be negative."
+      );
+    }
+
+    if (
+      approvalAmount >
+      0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
+    ) {
+      throw new Error(
+        "Approval allowance exceeds uint256."
+      );
+    }
+
     const spenderWord =
-      String(spender)
-        .toLowerCase()
+      normalizedSpender
         .replace(/^0x/, "")
         .padStart(64, "0");
 
     const allowanceWord =
-      BigInt(String(allowance))
+      approvalAmount
         .toString(16)
         .padStart(64, "0");
 
@@ -1794,7 +1954,7 @@ function buildExecutionTransaction({
           transaction?.from ??
           intent?.wallet ??
           null,
-        to: token,
+        to: normalizedToken,
         value: "0",
         calldata:
           "0x095ea7b3" +
@@ -1826,7 +1986,13 @@ function buildExecutionTransaction({
     }
 
     const target =
-      universalRouter[0];
+      String(universalRouter[0]).toLowerCase();
+
+    if (!/^0x[0-9a-f]{40}$/.test(target)) {
+      throw new Error(
+        "Configured Uniswap Universal Router address is invalid."
+      );
+    }
 
     const tokenIn =
       intent?.tokenIn ||
@@ -1843,6 +2009,27 @@ function buildExecutionTransaction({
     const amountOutMin =
       intent?.amountOutMin ??
       0;
+
+    const nativeValue =
+      transaction?.value ??
+      intent?.nativeValue ??
+      "0";
+
+    let parsedNativeValue;
+
+    try {
+      parsedNativeValue = BigInt(String(nativeValue));
+    } catch {
+      throw new Error(
+        "Swap native value must be an integer."
+      );
+    }
+
+    if (parsedNativeValue !== 0n) {
+      throw new Error(
+        "Verified ERC-20 swap does not permit native value."
+      );
+    }
 
     const recipient =
       intent?.recipient ||
@@ -1890,7 +2077,11 @@ function buildExecutionTransaction({
         const parsed =
           BigInt(String(value));
 
-        if (parsed < 0n) {
+        if (
+          parsed < 0n ||
+          parsed >
+          0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
+        ) {
           throw new Error();
         }
 
@@ -1909,6 +2100,12 @@ function buildExecutionTransaction({
 
     const amountInWord =
       uintWord(amountIn, "swap input amount");
+
+    if (BigInt(String(amountIn)) <= 0n) {
+      throw new Error(
+        "Swap input amount must be greater than zero."
+      );
+    }
 
     const amountOutMinWord =
       uintWord(
@@ -2005,10 +2202,7 @@ function buildExecutionTransaction({
           intent?.wallet ??
           null,
         to: target,
-        value:
-          transaction?.value ??
-          intent?.nativeValue ??
-          "0",
+        value: "0",
         calldata
       }
     };
@@ -2032,7 +2226,7 @@ function analyzeTransaction(tx, intent) {
     );
 
   const isNativeTransfer =
-    intent?.type === "send" &&
+    (intent?.type === "send" || intent?.type === "transfer") &&
     (!tx.calldata || tx.calldata === "0x") &&
     tx.to &&
     tx.value !== undefined &&
@@ -2639,6 +2833,25 @@ function verifyExecutionAuthorization({
   const decodedParameters = analysis.decodedParameters || {};
   const normalizedAction = analysis.normalizedAction || {};
 
+  const effectiveAction = {
+    ...action,
+    type:
+      normalizedAction.action ??
+      action.type,
+    chain:
+      action.chain ??
+      transaction.chainId ??
+      transaction.expectedChainId,
+    protocol:
+      action.protocol ??
+      analysis.protocol,
+    asset:
+      action.asset ??
+      normalizedAction.asset ??
+      normalizedAction.assetAddress ??
+      normalizedAction.tokenIn
+  };
+
   const decodedActualAmount =
     decodedParameters.actualAmount ??
     decodedParameters.amount;
@@ -2798,14 +3011,54 @@ function verifyExecutionAuthorization({
       policy
     );
 
+  const isNativeTransfer =
+    analysis.decodedFunction?.category ===
+    "nativeTransfer";
+
+  const actionTypeMatches =
+    effectiveAction.type === intent.type ||
+    (
+      isNativeTransfer &&
+      (
+        (effectiveAction.type === "send" &&
+          intent.type === "transfer") ||
+        (effectiveAction.type === "transfer" &&
+          intent.type === "send")
+      )
+    );
+
+  const chainMatches =
+    intent.chain === undefined ||
+    intent.chain === null ||
+    intent.chain === "" ||
+    String(effectiveAction.chain) === String(intent.chain);
+
+  const protocolMatches =
+    intent.protocol === undefined ||
+    intent.protocol === null ||
+    intent.protocol === "" ||
+    effectiveAction.protocol === intent.protocol;
+
+  const assetMatches =
+    intent.asset === undefined ||
+    intent.asset === null ||
+    intent.asset === "" ||
+    effectiveAction.asset === intent.asset;
+
   const intentMatched =
-    action.type === intent.type &&
-    action.chain === intent.chain &&
-    action.protocol === intent.protocol &&
-    action.asset === intent.asset;
+    actionTypeMatches &&
+    chainMatches &&
+    protocolMatches &&
+    assetMatches;
 
   const protocolMatched =
-    analysis.protocol === intent.protocol;
+    analysis.protocol === intent.protocol ||
+    (
+      analysis.decodedFunction?.category === "nativeTransfer" &&
+      (intent.protocol === undefined ||
+        intent.protocol === null ||
+        intent.protocol === "")
+    );
 
   const normalizeVerifierAddress = value =>
     typeof value === "string"
@@ -4201,6 +4454,40 @@ function derivePhorvaAuthorization({
 const PHORVA_VERIFICATION_SECRET =
   process.env.PHORVA_VERIFICATION_SECRET ||
   crypto.randomBytes(32).toString("hex");
+
+if (process.env.NODE_ENV === "production") {
+  if (
+    !process.env.PHORVA_VERIFICATION_SECRET ||
+    process.env.PHORVA_VERIFICATION_SECRET.length < 32
+  ) {
+    throw new Error(
+      "PHORVA_VERIFICATION_SECRET must be configured with at least 32 characters in production"
+    );
+  }
+
+  const productionOrigins =
+    String(process.env.PHORVA_ALLOWED_ORIGINS || "")
+      .split(",")
+      .map(origin => origin.trim())
+      .filter(Boolean);
+
+  if (productionOrigins.length === 0) {
+    throw new Error(
+      "PHORVA_ALLOWED_ORIGINS must be configured in production"
+    );
+  }
+
+  if (
+    productionOrigins.some(
+      origin =>
+        !origin.startsWith("https://")
+    )
+  ) {
+    throw new Error(
+      "Production allowed origins must use HTTPS"
+    );
+  }
+}
 
 function createPhorvaVerificationReceipt({
   executionGraph,
@@ -8204,6 +8491,168 @@ app.post(
 );
 
 /*
+ * Request a developer password reset.
+ *
+ * The response is intentionally generic so the endpoint
+ * does not reveal whether an email address belongs to a
+ * Phorva developer account.
+ *
+ * In development, the reset URL is returned so the flow
+ * can be tested without an email provider. Production
+ * delivery should be connected to the application's
+ * transactional email provider before enabling this
+ * response mode for users.
+ */
+app.post(
+  "/v1/developer/forgot-password",
+  requireTrustedOrigin,
+  createAuthRateLimiter(),
+  (req, res) => {
+    try {
+      const email =
+        typeof req.body?.email === "string"
+          ? req.body.email.trim()
+          : "";
+
+      if (!email) {
+        return res.status(400).json({
+          error: {
+            code: "INVALID_REQUEST",
+            message:
+              "Email is required"
+          }
+        });
+      }
+
+      const result =
+        developerStore.createPasswordResetToken(
+          email
+        );
+
+      /*
+       * Never expose account existence through the normal
+       * response. The development reset URL is included only
+       * outside production for local testing.
+       */
+      const response = {
+        accepted: true,
+        message:
+          "If an account exists for that email, password reset instructions have been prepared."
+      };
+
+      if (
+        process.env.NODE_ENV !==
+        "production" &&
+        result.developer
+      ) {
+        response.developmentResetUrl =
+          `/developer/reset-password.html?token=${encodeURIComponent(result.token)}`;
+
+        response.expiresAt =
+          result.expiresAt;
+      }
+
+      return res.json(response);
+    } catch (error) {
+      console.error(
+        "Developer password reset request error:",
+        error
+      );
+
+      return res.status(500).json({
+        error: {
+          code: "PASSWORD_RESET_REQUEST_FAILED",
+          message:
+            "Unable to process the password reset request"
+        }
+      });
+    }
+  }
+);
+
+/*
+ * Complete a developer password reset.
+ */
+app.post(
+  "/v1/developer/reset-password",
+  requireTrustedOrigin,
+  createAuthRateLimiter(),
+  async (req, res) => {
+    try {
+      const token =
+        typeof req.body?.token === "string"
+          ? req.body.token.trim()
+          : "";
+
+      const password =
+        typeof req.body?.password === "string"
+          ? req.body.password
+          : "";
+
+      if (!token || !password) {
+        return res.status(400).json({
+          error: {
+            code: "INVALID_REQUEST",
+            message:
+              "Reset token and password are required"
+          }
+        });
+      }
+
+      const result =
+        await developerStore.resetPassword(
+          token,
+          password
+        );
+
+      if (!result.success) {
+        const status =
+          result.code ===
+          "RESET_TOKEN_EXPIRED"
+            ? 410
+            : 400;
+
+        return res.status(status).json({
+          error: {
+            code: result.code,
+            message:
+              result.code ===
+              "RESET_TOKEN_EXPIRED"
+                ? "Password reset link has expired"
+                : "Invalid or already used password reset link"
+          }
+        });
+      }
+
+      /*
+       * There is no active session after a password reset.
+       * The user must authenticate again with the new password.
+       */
+      clearDeveloperSessionCookie(res);
+
+      return res.json({
+        reset: true,
+        message:
+          "Password reset successfully. Please sign in with your new password."
+      });
+    } catch (error) {
+      console.error(
+        "Developer password reset error:",
+        error
+      );
+
+      return res.status(500).json({
+        error: {
+          code: "PASSWORD_RESET_FAILED",
+          message:
+            "Unable to reset developer password"
+        }
+      });
+    }
+  }
+);
+
+/*
  * Developer login.
  */
 app.post(
@@ -8399,16 +8848,133 @@ app.post(
         });
       }
 
+      /*
+       * =====================================================
+       * PHORVA USE CASE
+       * =====================================================
+       *
+       * One project must establish what the developer is
+       * building.
+       *
+       * Developers do NOT manually configure:
+       * swap / transfer / bridge / trade / approve / etc.
+       *
+       * Those are derived from actual execution activity.
+       */
+      const rawUseCase =
+        typeof req.body?.useCase === "string"
+          ? req.body.useCase.trim()
+          : typeof req.body?.use_case === "string"
+            ? req.body.use_case.trim()
+            : "";
+
+      if (!rawUseCase) {
+        return res.status(400).json({
+          error: {
+            code: "USE_CASE_REQUIRED",
+            message:
+              "A Phorva use case is required when creating a project.",
+            useCases: getUseCases()
+          }
+        });
+      }
+
+      if (!isValidUseCase(rawUseCase)) {
+        return res.status(400).json({
+          error: {
+            code: "INVALID_USE_CASE",
+            message:
+              "The selected Phorva use case is not valid.",
+            useCases: getUseCases()
+          }
+        });
+      }
+
+      const selectedUseCase =
+        getUseCase(rawUseCase);
+
+      /*
+       * =====================================================
+       * OPTIONAL EXPLICIT LIMITS
+       * =====================================================
+       *
+       * These are company-defined hard controls.
+       *
+       * They are intentionally separate from Phorva's
+       * adaptive execution baseline.
+       */
+      const maxTransactionAmount =
+        req.body?.maxTransactionAmount ??
+        req.body?.max_transaction_amount;
+
+      const agentTransactionLimit =
+        req.body?.agentTransactionLimit ??
+        req.body?.agent_transaction_limit;
+
+      const dailyLimit =
+        req.body?.dailyLimit ??
+        req.body?.daily_limit;
+
+      let securityProfile;
+
+      try {
+        securityProfile =
+          createSecurityProfile({
+            useCase: selectedUseCase.id,
+            maxTransactionAmount,
+            agentTransactionLimit,
+            dailyLimit
+          });
+      } catch (profileError) {
+        return res.status(400).json({
+          error: {
+            code: "INVALID_SECURITY_PROFILE",
+            message:
+              profileError.message
+          }
+        });
+      }
+
+      /*
+       * Keep the legacy fields for compatibility with the
+       * existing Developer Platform.
+       *
+       * The canonical Phorva use case is represented as the
+       * single selected use case.
+       */
+      const useCases = [
+        selectedUseCase.id
+      ];
+
+      /*
+       * Action types are intentionally NOT supplied by the
+       * developer. Phorva determines the relevant execution
+       * surface from the actual activity.
+       */
+      const actions = [];
+
+      const policy =
+        req.body?.policy &&
+        typeof req.body.policy === "object" &&
+        !Array.isArray(req.body.policy)
+          ? req.body.policy
+          : {};
+
       const project =
         apiKeyStore.createProject({
           name,
           developerId:
-            req.developerIdentity.developerId
+            req.developerIdentity.developerId,
+          useCases,
+          actions,
+          policy,
+          securityProfile
         });
 
       return res.status(201).json({
         project
       });
+
     } catch (error) {
       console.error(
         "Developer project creation error:",
@@ -8429,6 +8995,8 @@ app.post(
 /*
  * Get one owned project.
  */
+
+
 app.get(
   "/v1/developer/projects/:id",
   developerAuth,
@@ -8452,6 +9020,26 @@ app.get(
       project: {
         id: project.id,
         name: project.name,
+        useCases: Array.isArray(project.use_cases)
+          ? project.use_cases
+          : [],
+        actions: Array.isArray(project.actions)
+          ? project.actions
+          : [],
+        policy:
+          project.policy &&
+          typeof project.policy === "object" &&
+          !Array.isArray(project.policy)
+            ? project.policy
+            : {},
+
+        securityProfile:
+          project.security_profile &&
+          typeof project.security_profile === "object" &&
+          !Array.isArray(project.security_profile)
+            ? project.security_profile
+            : null,
+
         createdAt:
           project.created_at,
         updatedAt:
@@ -8459,6 +9047,183 @@ app.get(
           project.created_at
       }
     });
+  }
+);
+
+/*
+ * Update an owned developer project.
+ *
+ * Developers configure the security posture here.
+ * Action types are intentionally not accepted.
+ */
+app.patch(
+  "/v1/developer/projects/:id",
+  requireTrustedOrigin,
+  developerAuth,
+  requireOwnedProject,
+  (req, res) => {
+    try {
+      const body =
+        req.body &&
+        typeof req.body === "object" &&
+        !Array.isArray(req.body)
+          ? req.body
+          : {};
+
+      const updates = {};
+
+      if (body.name !== undefined) {
+        updates.name = body.name;
+      }
+
+      /*
+       * A project has one canonical use case.
+       * Do not allow arbitrary action configuration.
+       */
+      if (body.useCase !== undefined) {
+        if (
+          typeof body.useCase !== "string" ||
+          !body.useCase.trim()
+        ) {
+          return res.status(400).json({
+            error: {
+              code: "INVALID_USE_CASE",
+              message:
+                "useCase must be a non-empty string"
+            }
+          });
+        }
+
+        const selectedUseCase =
+          getUseCase(
+            body.useCase.trim()
+          );
+
+        if (!selectedUseCase) {
+          return res.status(400).json({
+            error: {
+              code: "INVALID_USE_CASE",
+              message:
+                "Unsupported Phorva use case"
+            }
+          });
+        }
+
+        updates.useCases =
+          [selectedUseCase.id];
+      }
+
+      if (body.policy !== undefined) {
+        updates.policy =
+          body.policy;
+      }
+
+      /*
+       * Security profile updates are constructed
+       * from the canonical project settings rather
+       * than accepting arbitrary profile internals.
+       */
+      if (
+        body.maxTransactionAmount !== undefined ||
+        body.agentTransactionLimit !== undefined ||
+        body.dailyLimit !== undefined ||
+        body.useCase !== undefined
+      ) {
+        const project =
+          apiKeyStore.getProject(
+            req.developerProjectId
+          );
+
+        const currentProfile =
+          project?.security_profile || {};
+
+        const currentLimits =
+          currentProfile.explicitLimits || {};
+
+        const selectedUseCase =
+          body.useCase !== undefined
+            ? getUseCase(
+                body.useCase.trim()
+              )
+            : getUseCase(
+                Array.isArray(project?.use_cases)
+                  ? project.use_cases[0]
+                  : ""
+              );
+
+        if (!selectedUseCase) {
+          return res.status(400).json({
+            error: {
+              code: "INVALID_USE_CASE",
+              message:
+                "Project must have a valid use case"
+            }
+          });
+        }
+
+        updates.securityProfile =
+          createSecurityProfile({
+            useCase:
+              selectedUseCase.id,
+            maxTransactionAmount:
+              body.maxTransactionAmount !== undefined
+                ? body.maxTransactionAmount
+                : currentLimits.maxTransactionAmount,
+            agentTransactionLimit:
+              body.agentTransactionLimit !== undefined
+                ? body.agentTransactionLimit
+                : currentLimits.agentTransactionLimit,
+            dailyLimit:
+              body.dailyLimit !== undefined
+                ? body.dailyLimit
+                : currentLimits.dailyLimit
+          });
+      }
+
+      /*
+       * No editable action field is accepted.
+       * The execution surface remains derived from
+       * actual agent activity.
+       */
+      if (
+        Object.prototype.hasOwnProperty.call(
+          body,
+          "actions"
+        )
+      ) {
+        return res.status(400).json({
+          error: {
+            code: "ACTIONS_NOT_CONFIGURABLE",
+            message:
+              "Action types are determined from actual activity and cannot be manually configured"
+          }
+        });
+      }
+
+      const project =
+        apiKeyStore.updateProject(
+          req.developerProjectId,
+          updates
+        );
+
+      return res.status(200).json({
+        project
+      });
+    } catch (error) {
+      console.error(
+        "developer project update error:",
+        error
+      );
+
+      return res.status(400).json({
+        error: {
+          code: "PROJECT_UPDATE_FAILED",
+          message:
+            error.message ||
+            "Unable to update project"
+        }
+      });
+    }
   }
 );
 
@@ -8611,6 +9376,22 @@ const productionApi = createProductionApi({
       );
     }
 
+    const project =
+      apiKeyStore.getProject(projectId);
+
+    if (!project) {
+      throw new Error(
+        "Authenticated Phorva project was not found"
+      );
+    }
+
+    const securityProfile =
+      (project.securityProfile || project.security_profile) &&
+      typeof (project.securityProfile || project.security_profile) === "object" &&
+      !Array.isArray(project.securityProfile || project.security_profile)
+        ? (project.securityProfile || project.security_profile)
+        : null;
+
     const agentId =
       agent?.id ??
       agent?.agentId;
@@ -8633,13 +9414,271 @@ const productionApi = createProductionApi({
       );
     }
 
-    return verifyExecutionAuthorization({
-      agent: registeredAgent,
-      action,
-      intent,
-      policy: registeredAgent.policy,
-      transaction
-    });
+    const registeredPolicy =
+      registeredAgent.policy &&
+      typeof registeredAgent.policy === "object" &&
+      !Array.isArray(registeredAgent.policy)
+        ? registeredAgent.policy
+        : {};
+
+    const explicitLimits =
+      securityProfile?.explicitLimits &&
+      typeof securityProfile.explicitLimits === "object" &&
+      !Array.isArray(securityProfile.explicitLimits)
+        ? securityProfile.explicitLimits
+        : {};
+
+    const finiteLimit = value => {
+      const number = Number(value);
+
+      return Number.isFinite(number) &&
+        number >= 0
+        ? number
+        : null;
+    };
+
+    const minimumConfiguredLimit = (...values) => {
+      const limits =
+        values
+          .map(finiteLimit)
+          .filter(value => value !== null);
+
+      return limits.length > 0
+        ? Math.min(...limits)
+        : undefined;
+    };
+
+    /*
+     * Phorva owns the project-level security ceiling.
+     *
+     * Existing agent policy remains active, but a project
+     * security profile can never be bypassed by an agent
+     * policy with a higher limit.
+     */
+    const effectivePolicy = {
+      ...registeredPolicy
+    };
+
+    const projectMaxTransaction =
+      finiteLimit(
+        explicitLimits.maxTransactionAmount
+      );
+
+    const agentTransactionLimit =
+      finiteLimit(
+        explicitLimits.agentTransactionLimit
+      );
+
+    const registeredMaxTransaction =
+      minimumConfiguredLimit(
+        registeredPolicy.maxTransactionAmount,
+        registeredPolicy.maxTransaction
+      );
+
+    const effectiveMaxTransaction =
+      minimumConfiguredLimit(
+        projectMaxTransaction,
+        agentTransactionLimit,
+        registeredMaxTransaction
+      );
+
+    if (effectiveMaxTransaction !== undefined) {
+      effectivePolicy.maxTransactionAmount =
+        effectiveMaxTransaction;
+    }
+
+    const projectDailyLimit =
+      finiteLimit(
+        explicitLimits.dailyLimit
+      );
+
+    const registeredDailyLimit =
+      finiteLimit(
+        registeredPolicy.dailyLimit
+      );
+
+    const effectiveDailyLimit =
+      minimumConfiguredLimit(
+        projectDailyLimit,
+        registeredDailyLimit
+      );
+
+    if (effectiveDailyLimit !== undefined) {
+      effectivePolicy.dailyLimit =
+        effectiveDailyLimit;
+    }
+
+    const verification =
+      verifyExecutionAuthorization({
+        agent: registeredAgent,
+        action,
+        intent,
+        policy: effectivePolicy,
+        transaction
+      });
+
+    let baselineDecision = null;
+    let reviewRequired = false;
+    let reviewReason = null;
+
+    const currentBaseline =
+      securityProfile?.adaptiveBaseline &&
+      typeof securityProfile.adaptiveBaseline === "object" &&
+      !Array.isArray(securityProfile.adaptiveBaseline)
+        ? securityProfile.adaptiveBaseline
+        : {
+            enabled: true,
+            status: "INITIALIZING",
+            observationCount: 0,
+            normalRange: null
+          };
+
+    const actualAmount =
+      Number(verification.actualTransactionAmount);
+
+    if (
+      verification.authorized === true &&
+      currentBaseline.enabled === true &&
+      Number.isFinite(actualAmount) &&
+      actualAmount >= 0
+    ) {
+      const observationCount =
+        Number(currentBaseline.observationCount) || 0;
+
+      const range =
+        currentBaseline.normalRange &&
+        typeof currentBaseline.normalRange === "object" &&
+        !Array.isArray(currentBaseline.normalRange)
+          ? currentBaseline.normalRange
+          : null;
+
+      if (
+        currentBaseline.status === "ESTABLISHED" &&
+        range &&
+        Number.isFinite(Number(range.min)) &&
+        Number.isFinite(Number(range.max))
+      ) {
+        const min = Number(range.min);
+        const max = Number(range.max);
+
+        const lowerBound =
+          min === 0
+            ? 0
+            : min * 0.5;
+
+        const upperBound =
+          max === 0
+            ? 0
+            : max * 2;
+
+        if (
+          actualAmount < lowerBound ||
+          actualAmount > upperBound
+        ) {
+          baselineDecision = "ABNORMAL";
+          reviewRequired = true;
+          reviewReason =
+            "Transaction amount is outside the agent's established adaptive baseline.";
+        } else {
+          baselineDecision = "NORMAL";
+        }
+      }
+
+      if (!reviewRequired) {
+        const nextCount = observationCount + 1;
+
+        const nextMin =
+          range &&
+          Number.isFinite(Number(range.min))
+            ? Math.min(Number(range.min), actualAmount)
+            : actualAmount;
+
+        const nextMax =
+          range &&
+          Number.isFinite(Number(range.max))
+            ? Math.max(Number(range.max), actualAmount)
+            : actualAmount;
+
+        const nextStatus =
+          nextCount >= 5
+            ? "ESTABLISHED"
+            : "INITIALIZING";
+
+        const updatedAdaptiveBaseline = {
+          ...currentBaseline,
+          status: nextStatus,
+          observationCount: nextCount,
+          normalRange: {
+            min: nextMin,
+            max: nextMax
+          },
+          lastObservedAt:
+            new Date().toISOString()
+        };
+
+        const updatedSecurityProfile = {
+          ...securityProfile,
+          adaptiveBaseline:
+            updatedAdaptiveBaseline
+        };
+
+        if (typeof apiKeyStore?.updateProject === "function") {
+          apiKeyStore.updateProject(
+            projectId,
+            {
+              securityProfile:
+                updatedSecurityProfile
+            }
+          );
+        }
+
+        currentBaseline.enabled =
+          updatedAdaptiveBaseline.enabled;
+        currentBaseline.status =
+          updatedAdaptiveBaseline.status;
+        currentBaseline.observationCount =
+          updatedAdaptiveBaseline.observationCount;
+        currentBaseline.normalRange =
+          updatedAdaptiveBaseline.normalRange;
+        currentBaseline.lastObservedAt =
+          updatedAdaptiveBaseline.lastObservedAt;
+      }
+    }
+
+    return {
+      ...verification,
+      reviewRequired,
+      reviewReason,
+      baselineDecision,
+      securityContext: {
+        projectId,
+        projectName: project.name,
+        useCases: Array.isArray(project.useCases)
+          ? project.useCases
+          : Array.isArray(project.use_cases)
+            ? project.use_cases
+            : [],
+        securityProfileId:
+          securityProfile?.id || null,
+        securityProfileVersion:
+          securityProfile?.version || null,
+        adaptiveBaseline:
+          currentBaseline,
+        explicitLimits: {
+          maxTransactionAmount:
+            effectiveMaxTransaction !== undefined
+              ? effectiveMaxTransaction
+              : null,
+          agentTransactionLimit:
+            agentTransactionLimit,
+          dailyLimit:
+            effectiveDailyLimit !== undefined
+              ? effectiveDailyLimit
+              : null
+        }
+      }
+    };
+
   },
 
   getHealth: async () => ({
@@ -8649,6 +9688,87 @@ const productionApi = createProductionApi({
     verificationMode: "PURE_EXECUTION_VERIFICATION",
     analyzer: "EVM parameter verification"
   }),
+
+  recordExecution: record => {
+    return executionRecordStore.createRecord(
+      record
+    );
+  },
+
+  listExecutions: ({ projectId, limit }) => {
+    return executionRecordStore.listByProject(
+      projectId,
+      limit
+    );
+  },
+
+  listReviews: ({ projectId, limit }) => {
+    return executionRecordStore.listReviews(
+      projectId,
+      limit
+    );
+  },
+
+  getReview: ({
+    projectId,
+    verificationId
+  }) => {
+    const record =
+      executionRecordStore.getByVerificationId(
+        verificationId
+      );
+
+    if (
+      !record ||
+      record.project_id !== projectId ||
+      !record.review ||
+      record.review.required !== true
+    ) {
+      return null;
+    }
+
+    return record;
+  },
+
+  updateReview: ({
+    projectId,
+    verificationId,
+    decision,
+    reason
+  }) => {
+    return executionRecordStore.updateReview(
+      verificationId,
+      projectId,
+      decision,
+      reason
+    );
+  },
+
+  createSecurityAlert: alert => {
+    return securityAlertStore.createAlert(
+      alert
+    );
+  },
+
+  listSecurityAlerts: ({
+    projectId,
+    limit
+  }) => {
+    return securityAlertStore.listByProject(
+      projectId,
+      limit
+    );
+  },
+
+  resolveSecurityAlert: ({
+    projectId,
+    alertId
+  }) => {
+    return securityAlertStore.resolveAlert(
+      alertId,
+      projectId
+    );
+  },
 
   authenticate: async (req) => {
     const authorization =

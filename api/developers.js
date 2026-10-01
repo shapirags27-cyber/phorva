@@ -384,6 +384,247 @@ function createDeveloperStore(db) {
     };
   }
 
+  const PASSWORD_RESET_TTL_MS =
+    1000 * 60 * 30;
+
+  const PASSWORD_RESET_BYTES = 32;
+
+  function hashPasswordResetToken(token) {
+    return crypto
+      .createHash("sha256")
+      .update(token, "utf8")
+      .digest("hex");
+  }
+
+  function createPasswordResetToken(email) {
+    const normalizedEmail =
+      normalizeEmail(email);
+
+    const developer =
+      getByEmail(normalizedEmail);
+
+    /*
+     * Always perform the same token-generation work even
+     * when the account does not exist. The HTTP layer can
+     * therefore return a generic response without revealing
+     * whether an email is registered.
+     */
+    const token =
+      crypto
+        .randomBytes(
+          PASSWORD_RESET_BYTES
+        )
+        .toString("base64url");
+
+    const tokenHash =
+      hashPasswordResetToken(token);
+
+    const now = Date.now();
+
+    const expiresAt =
+      new Date(
+        now + PASSWORD_RESET_TTL_MS
+      ).toISOString();
+
+    db.withData(data => {
+      if (!Array.isArray(data.passwordResetTokens)) {
+        data.passwordResetTokens = [];
+      }
+
+      /*
+       * Remove previous unused reset tokens for this developer.
+       */
+      if (developer) {
+        data.passwordResetTokens =
+          data.passwordResetTokens.filter(
+            item =>
+              item.developer_id !== developer.id ||
+              item.used_at
+          );
+      }
+
+      /*
+       * Store only the hash of the reset token.
+       */
+      if (developer) {
+        data.passwordResetTokens.push({
+          id:
+            `reset_${crypto.randomUUID()}`,
+
+          developer_id:
+            developer.id,
+
+          token_hash:
+            tokenHash,
+
+          created_at:
+            new Date(now).toISOString(),
+
+          expires_at:
+            expiresAt,
+
+          used_at: null
+        });
+      }
+    });
+
+    return {
+      token,
+      expiresAt,
+      developer: developer
+        ? {
+            id: developer.id,
+            email: developer.email
+          }
+        : null
+    };
+  }
+
+  async function resetPassword(
+    token,
+    password
+  ) {
+    if (
+      typeof token !== "string" ||
+      !token
+    ) {
+      return {
+        success: false,
+        code: "INVALID_RESET_TOKEN"
+      };
+    }
+
+    const tokenHash =
+      hashPasswordResetToken(token);
+
+    const data =
+      db.load();
+
+    const resetRecord =
+      Array.isArray(
+        data.passwordResetTokens
+      )
+        ? data.passwordResetTokens.find(
+            item =>
+              item.token_hash ===
+                tokenHash &&
+              !item.used_at
+          )
+        : null;
+
+    if (!resetRecord) {
+      return {
+        success: false,
+        code: "INVALID_RESET_TOKEN"
+      };
+    }
+
+    if (
+      Date.parse(
+        resetRecord.expires_at
+      ) <= Date.now()
+    ) {
+      db.withData(current => {
+        current.passwordResetTokens =
+          current.passwordResetTokens.filter(
+            item =>
+              item.id !==
+              resetRecord.id
+          );
+      });
+
+      return {
+        success: false,
+        code: "RESET_TOKEN_EXPIRED"
+      };
+    }
+
+    const developer =
+      data.developers.find(
+        item =>
+          item.id ===
+          resetRecord.developer_id
+      );
+
+    if (
+      !developer ||
+      developer.status !== "active"
+    ) {
+      return {
+        success: false,
+        code: "INVALID_RESET_TOKEN"
+      };
+    }
+
+    /*
+     * Validate and hash the new password before changing
+     * any persistent state.
+     */
+    const passwordHash =
+      await createPasswordHash(password);
+
+    const now =
+      new Date().toISOString();
+
+    db.withData(current => {
+      const currentDeveloper =
+        current.developers.find(
+          item =>
+            item.id ===
+            developer.id
+        );
+
+      if (!currentDeveloper) {
+        throw new Error(
+          "Developer account no longer exists"
+        );
+      }
+
+      currentDeveloper.password_hash =
+        passwordHash;
+
+      currentDeveloper.updated_at =
+        now;
+
+      const currentReset =
+        current.passwordResetTokens.find(
+          item =>
+            item.id ===
+            resetRecord.id
+        );
+
+      if (currentReset) {
+        currentReset.used_at =
+          now;
+      }
+
+      /*
+       * Password reset invalidates every existing developer
+       * session so an old session cannot remain authenticated
+       * after the credential has changed.
+       */
+      current.sessions =
+        current.sessions.map(
+          session =>
+            session.developer_id ===
+            developer.id
+              ? {
+                  ...session,
+                  revoked_at: now
+                }
+              : session
+        );
+    });
+
+    return {
+      success: true,
+      developer: {
+        id: developer.id,
+        email: developer.email
+      }
+    };
+  }
+
   function revokeSession(token) {
     if (
       typeof token !== "string" ||
@@ -426,7 +667,9 @@ function createDeveloperStore(db) {
     authenticate,
     createSession,
     authenticateSession,
-    revokeSession
+    revokeSession,
+    createPasswordResetToken,
+    resetPassword
   };
 }
 

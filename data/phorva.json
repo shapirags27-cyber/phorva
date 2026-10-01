@@ -1,9 +1,385 @@
 {
+  "developers": [
+    {
+      "id": "dev_5ce45cea-9417-4af2-8c10-e15d8cf2e1c4",
+      "email": "developer-test@example.com",
+      "password_hash": {
+        "algorithm": "scrypt",
+        "salt": "cc318c7db94c97ec1d8a2506dac87bb1",
+        "hash": "923880789f2c7c174c599255f0ac3aead19a7b9ed1dcc6ee39cfc656f73337d622cdb54a178f29fa33a95f89220ea6f60c1dd72613bc110e593c72c2051eea93"
+      },
+      "status": "active",
+      "created_at": "2026-09-29T08:04:35.370Z",
+      "updated_at": "2026-09-29T08:04:35.394Z"
+    },
+    {
+      "id": "dev_99797af8-0591-4580-91d3-0a7b99134623",
+      "email": "developer-test-2@example.com",
+      "password_hash": {
+        "algorithm": "scrypt",
+        "salt": "f5907960e045ba9b8584f8d4c3563af3",
+        "hash": "1084303f7c9a43235b72cebb86f5687996f13464cf65b80f68ecf7f44d01c165a173e45e290b8d9d32ed0253dc995becd0f7d304925ff2d32fa139bf224e3d31"
+      },
+      "status": "active",
+      "created_at": "2026-09-29T08:07:41.835Z",
+      "updated_at": "2026-09-29T08:07:41.835Z"
+    },
+    {
+      "id": "dev_f3525e76-b6d4-4d49-bf9a-2c9d0e9de0b9",
+      "email": "security-test@example.com",
+      "password_hash": {
+        "algorithm": "scrypt",
+        "salt": "253672732c91dc1c77b409d9cb179b0d",
+        "hash": "f585a87012d0063e713bc6359e6bf155a5c145a965ed1d63d3806cc5e125dc3aa6f878145f53328313a85a63d5f70120b3fd4302070a18ba877dfbc5c677e4b3"
+      },
+      "status": "active",
+      "created_at": "2026-09-29T08:31:45.633Z",
+      "updated_at": "2026-09-29T08:31:45.633Z"
+    },
+    {
+      "id": "dev_05fc1eec-fb2b-48f5-90d3-5d8666dcef16",
+      "email": "isolation-test-b@example.com",
+      "password_hash": {
+        "algorithm": "scrypt",
+        "salt": "3325aea578f3c7c7c82514fe3aca9b45",
+        "hash": "01f4f4ef647d9d9bcd502b986e3b27a0b45dce8d007ac583981295407425ecfd86f4b14e58178aa75e0dbbd807299528505801722fa5ac11d1e452bf29b96ff8"
+      },
+      "status": "active",
+      "created_at": "2026-09-29T08:42:50.279Z",
+      "updated_at": "2026-09-29T08:42:50.279Z"
+    },
+    {
+      "id": "dev_cb8539e6-e3e6-48ec-8f72-a31b985cf773",
+      "email": "bensonbenedict271998@gmail.com",
+      "password_hash": {
+        "algorithm": "scrypt",
+        "salt": "030d70fa35ca6b3f970773723cf79fb7",
+        "hash": "9d182dd0746497f5151a00d9ac59992f5d154e84fcda905988b9aac99f8aeaab5c175501a404f6b378fa9d113cf0aac691e71d5bdd2cc554723067a0b60c2f38"
+      },
+      "status": "active",
+      "created_at": "2026-09-29T16:28:03.163Z",
+      "updated_at": "2026-09-29T16:28:03.163Z"
+    },
+    {
+      "id": "dev_93ebc73e-fbf4-4163-88ba-1881b2d20c71",
+      "email": "adaptive-baseline-test@example.com",
+      "password_hash": {
+        "algorithm": "scrypt",
+        "salt": "df4f3443cbed33db3514a28ccf418fef",
+        "hash": "3083fd6a0cf5289e0a5d77df4a3f8935ab1e4d635ad79a07400d4f0be53148546ec7425ef97824f47dfe935fb886a57dbfe26795aefce768b277616a3d06a4fc"
+      },
+      "status": "active",
+      "created_at": "2026-09-30T19:26:58.810Z",
+      "updated_at": "2026-09-30T19:26:58.810Z"
+    },
+    {
+      "id": "dev_e6bc73f0-fcd1-4003-9d87-19adfcb20cfb",
+      "email": "adaptive-baseline-test-2@example.com",
+      "password_hash": {
+        "algorithm": "scrypt",
+        "salt": "820200824c4b428e263019a88b68f314",
+        "hash": "2e745bff7cd8690a2fa2bcbaa593682000134aa7d36d3d52c9cef3293333c3839ce640442c6f9954baf561fe150a441769bd405cd28d793362bee3323fce98f8"
+      },
+      "status": "active",
+      "created_at": "2026-09-30T19:30:08.629Z",
+      "updated_at": "2026-09-30T19:30:08.630Z"
+    }
+  ],
+  "sessions": [
+    {
+      "id": "sess_c2b0ccbb-1b13-4faf-a7d2-e5fae2c9baec",
+      "developer_id": "dev_5ce45cea-9417-4af2-8c10-e15d8cf2e1c4",
+      "token_hash": "4929844474626abad02fa8e38a6853492240a1e88e77c70eb00c7072f08f067b",
+      "created_at": "2026-09-29T08:04:35.397Z",
+      "expires_at": "2026-10-06T08:04:35.397Z",
+      "revoked_at": null
+    },
+    {
+      "id": "sess_c54d475e-c999-43e0-bc10-08dfb2e384d6",
+      "developer_id": "dev_99797af8-0591-4580-91d3-0a7b99134623",
+      "token_hash": "b46b569d09a770bbc471012291c185252c72d4343aecd277642d635fb444e04a",
+      "created_at": "2026-09-29T08:07:41.836Z",
+      "expires_at": "2026-10-06T08:07:41.836Z",
+      "revoked_at": null
+    },
+    {
+      "id": "sess_c2ac91bc-4aab-4c22-bc23-9a381fbd8b65",
+      "developer_id": "dev_f3525e76-b6d4-4d49-bf9a-2c9d0e9de0b9",
+      "token_hash": "a403029765c7e4deac28bf08014894ffdecb169e1cf11bc0efce9ab38f5c6635",
+      "created_at": "2026-09-29T08:31:45.636Z",
+      "expires_at": "2026-10-06T08:31:45.636Z",
+      "revoked_at": "2026-09-29T08:33:18.116Z"
+    },
+    {
+      "id": "sess_50817077-a085-4d5b-855f-00cc8885f088",
+      "developer_id": "dev_f3525e76-b6d4-4d49-bf9a-2c9d0e9de0b9",
+      "token_hash": "a00aef1f6b0f594a41d160e1e9fc7ddd68a5fdbeedb785d74eedc3b601facaf3",
+      "created_at": "2026-09-29T08:33:39.673Z",
+      "expires_at": "2026-10-06T08:33:39.673Z",
+      "revoked_at": null
+    },
+    {
+      "id": "sess_859eb50f-f4f3-4402-9b34-93dc993632d4",
+      "developer_id": "dev_05fc1eec-fb2b-48f5-90d3-5d8666dcef16",
+      "token_hash": "0b3bf513572fb46c6069ee1af6fa0aa7a60cebd31867bbb74dbb8a728367f108",
+      "created_at": "2026-09-29T08:42:50.280Z",
+      "expires_at": "2026-10-06T08:42:50.280Z",
+      "revoked_at": null
+    },
+    {
+      "id": "sess_53212b47-bc7e-47c6-8301-e55cdf727d0b",
+      "developer_id": "dev_05fc1eec-fb2b-48f5-90d3-5d8666dcef16",
+      "token_hash": "05b195e09fc2320658d5b14154468438a11a38d137ebc208e96dacdbc5709f98",
+      "created_at": "2026-09-29T08:43:17.886Z",
+      "expires_at": "2026-10-06T08:43:17.886Z",
+      "revoked_at": null
+    },
+    {
+      "id": "sess_2eec20e2-6a08-400d-a0af-45045df13729",
+      "developer_id": "dev_cb8539e6-e3e6-48ec-8f72-a31b985cf773",
+      "token_hash": "7312b8a57f7d83452d38156009e5da1c1aba1f0ab08b7b5c5dd9cceec5cb2e65",
+      "created_at": "2026-09-29T16:28:03.174Z",
+      "expires_at": "2026-10-06T16:28:03.174Z",
+      "revoked_at": "2026-09-29T16:29:25.781Z"
+    },
+    {
+      "id": "sess_6fbb68da-5294-4603-8600-ea87d591fca1",
+      "developer_id": "dev_cb8539e6-e3e6-48ec-8f72-a31b985cf773",
+      "token_hash": "e25284ca50d9ddf653a447dd7939d36b72bc43a22c6bc185d7ba07947974b7c0",
+      "created_at": "2026-09-29T17:16:13.132Z",
+      "expires_at": "2026-10-06T17:16:13.132Z",
+      "revoked_at": null
+    },
+    {
+      "id": "sess_e66b0239-e60a-4d31-b52b-3eb71d34901b",
+      "developer_id": "dev_cb8539e6-e3e6-48ec-8f72-a31b985cf773",
+      "token_hash": "703be1419ea79bb3fab43a4fbbe9798612154cff8f63e05956f3e1865478e069",
+      "created_at": "2026-09-29T22:08:49.175Z",
+      "expires_at": "2026-10-06T22:08:49.175Z",
+      "revoked_at": null
+    },
+    {
+      "id": "sess_dc0a7571-d378-4b10-b879-32c39dd62392",
+      "developer_id": "dev_93ebc73e-fbf4-4163-88ba-1881b2d20c71",
+      "token_hash": "b5c193a41116b1a4e10139c2054052f9a255b5f1c1f2fe979c4a137ad3d25546",
+      "created_at": "2026-09-30T19:26:58.813Z",
+      "expires_at": "2026-10-07T19:26:58.813Z",
+      "revoked_at": null
+    },
+    {
+      "id": "sess_a6db5cca-a560-4166-84bd-8c8c088f386f",
+      "developer_id": "dev_e6bc73f0-fcd1-4003-9d87-19adfcb20cfb",
+      "token_hash": "61f7480e0534050b14d583d9162f35b1f3fd5c588e2a65f30b949db6c43f0fbe",
+      "created_at": "2026-09-30T19:30:08.633Z",
+      "expires_at": "2026-10-07T19:30:08.633Z",
+      "revoked_at": null
+    }
+  ],
   "projects": [
     {
       "id": "proj_7403aefa-b32b-4fd6-91b2-afe2b23b75a5",
       "name": "Phorva Development",
       "created_at": "2026-09-25T08:20:13.766Z"
+    },
+    {
+      "id": "proj_2166ff3e-789d-4be1-94c4-977591544269",
+      "developer_id": "dev_99797af8-0591-4580-91d3-0a7b99134623",
+      "name": "Production Integration",
+      "created_at": "2026-09-29T08:08:41.605Z",
+      "updated_at": "2026-09-29T08:08:41.605Z"
+    },
+    {
+      "id": "proj_b1a952e8-accc-453a-b378-4fd95c8462dc",
+      "developer_id": "dev_f3525e76-b6d4-4d49-bf9a-2c9d0e9de0b9",
+      "name": "CSRF-Test-Project",
+      "created_at": "2026-09-29T08:33:59.109Z",
+      "updated_at": "2026-09-29T08:33:59.109Z"
+    },
+    {
+      "id": "proj_6fb9749e-6a44-480c-a39a-30f23d8e4637",
+      "developer_id": "dev_f3525e76-b6d4-4d49-bf9a-2c9d0e9de0b9",
+      "name": "Security-Test-Project",
+      "created_at": "2026-09-29T08:34:11.575Z",
+      "updated_at": "2026-09-29T08:34:11.575Z"
+    },
+    {
+      "id": "proj_6275493a-5138-4d92-a6f6-3ddee0b9b0f5",
+      "developer_id": "dev_f3525e76-b6d4-4d49-bf9a-2c9d0e9de0b9",
+      "name": "Trusted-Origin-Test",
+      "created_at": "2026-09-29T08:38:46.830Z",
+      "updated_at": "2026-09-29T08:38:46.830Z"
+    },
+    {
+      "id": "proj_5526a2d3-4962-4c2c-af7e-df7209c208e2",
+      "developer_id": "dev_f3525e76-b6d4-4d49-bf9a-2c9d0e9de0b9",
+      "name": "RateLimit-Cleanup-Test",
+      "created_at": "2026-09-29T08:41:49.634Z",
+      "updated_at": "2026-09-29T08:41:49.634Z"
+    },
+    {
+      "id": "proj_8e977a85-5e9d-4319-ac07-bd2ebbaa610e",
+      "developer_id": "dev_05fc1eec-fb2b-48f5-90d3-5d8666dcef16",
+      "name": "Developer-B-Isolation-Project",
+      "created_at": "2026-09-29T08:43:59.609Z",
+      "updated_at": "2026-09-29T08:43:59.609Z"
+    },
+    {
+      "id": "proj_7bcef223-978f-4552-b8ff-cacb7129c2cd",
+      "developer_id": "dev_cb8539e6-e3e6-48ec-8f72-a31b985cf773",
+      "name": "My trade",
+      "use_cases": [
+        "autonomous-trading",
+        "defi"
+      ],
+      "actions": [
+        "swap",
+        "deposit",
+        "withdraw",
+        "supply",
+        "redeem",
+        "lend",
+        "borrow",
+        "repay",
+        "stake",
+        "unstake",
+        "lp-add",
+        "lp-remove",
+        "claim",
+        "approve",
+        "permit",
+        "bridge",
+        "wrap",
+        "unwrap",
+        "mint",
+        "burn",
+        "liquidate",
+        "rebalance",
+        "contract-call",
+        "custom-action",
+        "send",
+        "transfer",
+        "deploy",
+        "upgrade"
+      ],
+      "policy": {
+        "maxTransaction": "100000",
+        "dailyLimit": "1000000"
+      },
+      "created_at": "2026-09-29T22:02:32.985Z",
+      "updated_at": "2026-09-29T22:02:32.985Z"
+    },
+    {
+      "id": "proj_99523dc8-fc6e-409c-b270-73a4719015d4",
+      "developer_id": "dev_cb8539e6-e3e6-48ec-8f72-a31b985cf773",
+      "name": "My trade",
+      "use_cases": [
+        "defi"
+      ],
+      "actions": [
+        "swap",
+        "deposit",
+        "withdraw",
+        "supply",
+        "redeem",
+        "lend",
+        "borrow",
+        "repay",
+        "stake",
+        "unstake",
+        "lp-add",
+        "lp-remove",
+        "claim",
+        "approve",
+        "permit",
+        "bridge",
+        "wrap",
+        "unwrap",
+        "mint",
+        "burn",
+        "liquidate",
+        "rebalance",
+        "contract-call",
+        "custom-action"
+      ],
+      "policy": {
+        "maxTransaction": "10000",
+        "dailyLimit": "100000"
+      },
+      "created_at": "2026-09-29T22:13:31.280Z",
+      "updated_at": "2026-09-29T22:13:31.280Z"
+    },
+    {
+      "id": "proj_32be4139-cc53-43af-995b-0a1ab54f79ce",
+      "developer_id": "dev_cb8539e6-e3e6-48ec-8f72-a31b985cf773",
+      "name": "My trade",
+      "use_cases": [
+        "defi"
+      ],
+      "actions": [
+        "withdraw",
+        "supply",
+        "repay",
+        "borrow",
+        "deposit",
+        "redeem",
+        "lend",
+        "swap",
+        "stake",
+        "unstake",
+        "lp-add",
+        "lp-remove",
+        "claim",
+        "approve",
+        "permit",
+        "bridge",
+        "wrap",
+        "unwrap",
+        "rebalance",
+        "liquidate",
+        "burn",
+        "contract-call",
+        "mint",
+        "custom-action"
+      ],
+      "policy": {
+        "maxTransaction": "10000",
+        "dailyLimit": "100000"
+      },
+      "created_at": "2026-09-29T22:16:24.158Z",
+      "updated_at": "2026-09-29T22:16:24.158Z"
+    },
+    {
+      "id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "developer_id": "dev_e6bc73f0-fcd1-4003-9d87-19adfcb20cfb",
+      "name": "Adaptive Baseline Test",
+      "use_cases": [
+        "autonomous-trading"
+      ],
+      "actions": [],
+      "policy": {},
+      "security_profile": {
+        "id": "profile_cd3d2a1076da4c517b84",
+        "version": "phorva-security-profile-v1",
+        "useCase": "autonomous-trading",
+        "explicitLimits": {
+          "maxTransactionAmount": 10000,
+          "agentTransactionLimit": 10000,
+          "dailyLimit": 50000
+        },
+        "adaptiveBaseline": {
+          "enabled": true,
+          "status": "ESTABLISHED",
+          "observationCount": 5,
+          "normalRange": {
+            "min": 80,
+            "max": 150
+          },
+          "lastObservedAt": "2026-09-30T23:42:41.561Z"
+        },
+        "createdAt": "2026-09-30T19:31:17.853Z"
+      },
+      "created_at": "2026-09-30T19:31:17.854Z",
+      "updated_at": "2026-09-30T23:42:41.562Z"
     }
   ],
   "apiKeys": [
@@ -17,6 +393,1035 @@
       "created_at": "2026-09-25T08:21:15.139Z",
       "last_used_at": "2026-09-25T08:24:35.064Z",
       "revoked_at": null
+    },
+    {
+      "id": "key_553fd71b-32f7-446e-978f-65da47105be6",
+      "project_id": "proj_2166ff3e-789d-4be1-94c4-977591544269",
+      "name": "Production Live",
+      "key_prefix": "pk_live_f9f95b12",
+      "key_hash": "593772e13b3d79a1947a74d8564842f25ff43037fc027aa8c41f365f06b782d1",
+      "environment": "live",
+      "created_at": "2026-09-29T08:09:47.079Z",
+      "last_used_at": null,
+      "revoked_at": "2026-09-29T08:11:04.085Z"
+    },
+    {
+      "id": "key_27375615-76a3-45bc-a865-1a3d32202ce7",
+      "project_id": "proj_8e977a85-5e9d-4319-ac07-bd2ebbaa610e",
+      "name": "Isolation-Test-Key",
+      "key_prefix": "pk_test_eb595454",
+      "key_hash": "dba9be52100aff9ff41a4e774da664455ac71b75ee7ad46b02a7ae1a24a42d43",
+      "environment": "test",
+      "created_at": "2026-09-29T08:46:49.865Z",
+      "last_used_at": null,
+      "revoked_at": "2026-09-29T08:47:52.598Z"
+    },
+    {
+      "id": "key_01f1be49-494e-470b-9b83-5b00a5c17598",
+      "project_id": "proj_7bcef223-978f-4552-b8ff-cacb7129c2cd",
+      "name": "Default",
+      "key_prefix": "pk_test_7b3ca1b7",
+      "key_hash": "fbfd0d1771b305de6304cead3e10706858a4464531acc4cd4b5a43e220182920",
+      "environment": "test",
+      "created_at": "2026-09-29T22:02:33.051Z",
+      "last_used_at": null,
+      "revoked_at": null
+    },
+    {
+      "id": "key_92d1e8a1-cb72-42be-98e7-c992f50cc462",
+      "project_id": "proj_99523dc8-fc6e-409c-b270-73a4719015d4",
+      "name": "Default",
+      "key_prefix": "pk_test_1a20976b",
+      "key_hash": "6a5f27da53fdf51f00159b5f8175b44fb5e653081e28ec015f5b43d8b429bf56",
+      "environment": "test",
+      "created_at": "2026-09-29T22:13:31.347Z",
+      "last_used_at": null,
+      "revoked_at": null
+    },
+    {
+      "id": "key_5b89e0c7-f6ad-417d-901c-f34c814fda86",
+      "project_id": "proj_32be4139-cc53-43af-995b-0a1ab54f79ce",
+      "name": "Default",
+      "key_prefix": "pk_test_cab3ca0f",
+      "key_hash": "1f66f60931b66d27671e0bf76d3681d1d261f6bb10c5ad34363e9ff0d1ca3442",
+      "environment": "test",
+      "created_at": "2026-09-29T22:16:24.647Z",
+      "last_used_at": null,
+      "revoked_at": null
+    },
+    {
+      "id": "key_f2e0a232-df6c-4d6f-9960-a8286b61a4d7",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "name": "Adaptive Baseline Test Key",
+      "key_prefix": "pk_test_05e2a7d1",
+      "key_hash": "0049d1a2245d29151eb94c3bd3049e0c8c0c8fc69a941d07dcb715429e8cd6b6",
+      "environment": "test",
+      "created_at": "2026-09-30T19:33:31.786Z",
+      "last_used_at": "2026-10-01T00:05:17.094Z",
+      "revoked_at": null
+    },
+    {
+      "id": "key_2ba6d292-3c24-4b8f-8460-a0e3fd9ee179",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "name": "Adaptive Baseline Test Key",
+      "key_prefix": "pk_test_8a9caa71",
+      "key_hash": "c27d2844190c2b74200b43b4ae8f9bb6ee2cf1c969c69d8a73bb20b490961f43",
+      "environment": "test",
+      "created_at": "2026-09-30T22:55:41.120Z",
+      "last_used_at": "2026-09-30T22:57:20.844Z",
+      "revoked_at": "2026-09-30T23:26:02.542Z"
+    },
+    {
+      "id": "key_8ef1cca7-b372-46be-89a1-0436dac8081b",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "name": "Adaptive Baseline Test Key",
+      "key_prefix": "pk_test_b391c4e9",
+      "key_hash": "d2a85d59e98c4323dbcecbd7a59d3d48e2051342c44f9af80c26609197f3be70",
+      "environment": "test",
+      "created_at": "2026-09-30T23:23:46.416Z",
+      "last_used_at": null,
+      "revoked_at": "2026-09-30T23:26:02.569Z"
+    },
+    {
+      "id": "key_7c347b7a-feb1-4177-80c7-58e461be1d94",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "name": "Full Phorva E2E Test",
+      "key_prefix": "pk_test_093727aa",
+      "key_hash": "dc5e424d6a6e2c9344bcb3ee5373f4168ddfaba0b3a36cbee3ece5b519dda8a2",
+      "environment": "test",
+      "created_at": "2026-09-30T23:27:11.993Z",
+      "last_used_at": "2026-10-01T00:19:50.621Z",
+      "revoked_at": null
+    }
+  ],
+  "agents": [
+    {
+      "id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "name": "Adaptive Baseline Agent",
+      "capabilities": [
+        "trade",
+        "swap",
+        "transfer"
+      ],
+      "policy": {
+        "maxTransactionAmount": 10000,
+        "dailyLimit": 50000
+      },
+      "created_at": "2026-09-30T19:38:42.109Z",
+      "revoked_at": null
+    }
+  ],
+  "passwordResetTokens": [
+    {
+      "id": "reset_52258377-4267-4aaa-b373-5fbc7656bff5",
+      "developer_id": "dev_cb8539e6-e3e6-48ec-8f72-a31b985cf773",
+      "token_hash": "1464eccba2c750d0aae4d8ef29c76a860d8e808211a5975e0eccab3b969e577a",
+      "created_at": "2026-09-29T16:29:33.957Z",
+      "expires_at": "2026-09-29T16:59:33.957Z",
+      "used_at": null
+    }
+  ],
+  "executionRecords": [
+    {
+      "id": "exec_c9b3df9f-90dd-4181-9f2e-8c84e54a3814",
+      "request_id": "req_462ce39e-2255-4753-b219-088064bd96d8",
+      "verification_id": "ver_e5c8554e-cd01-48e0-911f-87da9d3c1153",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": null,
+      "status": "BLOCKED",
+      "risk": "HIGH",
+      "requested_amount": "100",
+      "actual_transaction_amount": null,
+      "action_type": "trade",
+      "intent_type": "trade",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": null,
+      "baseline_decision": null,
+      "checks": {
+        "policyPassed": false,
+        "intentMatched": true,
+        "parameterMatched": false,
+        "executionTypeMatched": false,
+        "nativeValueMatched": false,
+        "protocolMatched": false,
+        "transactionSecuritySafe": false
+      },
+      "transaction": {
+        "chainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "100"
+      },
+      "created_at": "2026-09-30T22:57:20.859Z",
+      "updated_at": "2026-09-30T22:57:20.859Z"
+    },
+    {
+      "id": "exec_d774f7da-03c8-45a4-b1e6-005635e0a1b7",
+      "request_id": "req_36434d02-6027-49a7-a3a3-9c81bbe1b004",
+      "verification_id": "ver_ac917416-34d2-49c5-ae7e-80f60989939c",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "BLOCKED",
+      "risk": "HIGH",
+      "requested_amount": "100",
+      "actual_transaction_amount": 100,
+      "action_type": "send",
+      "intent_type": "send",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": null,
+      "checks": {
+        "policyPassed": true,
+        "intentMatched": true,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": false,
+        "protocolMatched": false,
+        "transactionSecuritySafe": true
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "100",
+        "calldata": "0x"
+      },
+      "created_at": "2026-09-30T23:28:18.547Z",
+      "updated_at": "2026-09-30T23:28:18.547Z"
+    },
+    {
+      "id": "exec_f3e31582-82eb-4f9a-9dd1-d0c31b76a2e9",
+      "request_id": "req_2e7d55f5-f9bb-4488-9b8e-da7b21b858f1",
+      "verification_id": "ver_5051309c-0b45-4e5a-9d54-a96262772c8d",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "BLOCKED",
+      "risk": "HIGH",
+      "requested_amount": "100",
+      "actual_transaction_amount": null,
+      "action_type": "transfer",
+      "intent_type": "transfer",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": null,
+      "checks": {
+        "policyPassed": false,
+        "intentMatched": true,
+        "parameterMatched": false,
+        "executionTypeMatched": false,
+        "nativeValueMatched": true,
+        "protocolMatched": false,
+        "transactionSecuritySafe": false
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "100",
+        "calldata": "0x"
+      },
+      "created_at": "2026-09-30T23:31:45.878Z",
+      "updated_at": "2026-09-30T23:31:45.878Z"
+    },
+    {
+      "id": "exec_f89eccbb-9a2f-40ba-808c-a10455ad274d",
+      "request_id": "req_44e1fdad-25fd-420d-8f3b-29fb4ed73cf8",
+      "verification_id": "ver_f3a8c7cb-dd3b-4d35-a750-6f351d4dd9fc",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "BLOCKED",
+      "risk": "HIGH",
+      "requested_amount": "100",
+      "actual_transaction_amount": 100,
+      "action_type": "transfer",
+      "intent_type": "transfer",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": null,
+      "checks": {
+        "policyPassed": true,
+        "intentMatched": true,
+        "parameterMatched": true,
+        "executionTypeMatched": false,
+        "nativeValueMatched": true,
+        "protocolMatched": false,
+        "transactionSecuritySafe": true
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "100",
+        "calldata": "0x"
+      },
+      "created_at": "2026-09-30T23:35:32.801Z",
+      "updated_at": "2026-09-30T23:35:32.801Z"
+    },
+    {
+      "id": "exec_2c79574c-57dd-418c-a768-11883120542e",
+      "request_id": "req_2e8bad4a-d26a-4cad-b84c-4f8d92a7aa3d",
+      "verification_id": "ver_77e5bfc7-feae-4b4a-9480-06aee76d9648",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "VERIFIED",
+      "risk": "LOW",
+      "requested_amount": "100",
+      "actual_transaction_amount": 100,
+      "action_type": "transfer",
+      "intent_type": "transfer",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": null,
+      "checks": {
+        "policyPassed": true,
+        "intentMatched": true,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": true,
+        "protocolMatched": true,
+        "transactionSecuritySafe": true
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "100",
+        "calldata": "0x"
+      },
+      "created_at": "2026-09-30T23:39:24.725Z",
+      "updated_at": "2026-09-30T23:39:24.725Z"
+    },
+    {
+      "id": "exec_941019c2-c4e1-4082-8cb3-50e405f9db91",
+      "request_id": "req_c187dbff-b956-4acb-adf3-662ffc6cadd3",
+      "verification_id": "ver_006c91f5-ebfb-457b-afa0-e2d940687864",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "VERIFIED",
+      "risk": "LOW",
+      "requested_amount": "120",
+      "actual_transaction_amount": 120,
+      "action_type": "transfer",
+      "intent_type": "transfer",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": null,
+      "checks": {
+        "policyPassed": true,
+        "intentMatched": true,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": true,
+        "protocolMatched": true,
+        "transactionSecuritySafe": true
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "120",
+        "calldata": "0x"
+      },
+      "created_at": "2026-09-30T23:41:18.665Z",
+      "updated_at": "2026-09-30T23:41:18.665Z"
+    },
+    {
+      "id": "exec_b0424b65-2715-482e-a8b5-d954d0eb94e1",
+      "request_id": "req_c524d053-9629-4b2d-bcad-60e381dac94f",
+      "verification_id": "ver_47631968-e251-402a-afcf-c3dd683ee711",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "VERIFIED",
+      "risk": "LOW",
+      "requested_amount": "80",
+      "actual_transaction_amount": 80,
+      "action_type": "transfer",
+      "intent_type": "transfer",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": null,
+      "checks": {
+        "policyPassed": true,
+        "intentMatched": true,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": true,
+        "protocolMatched": true,
+        "transactionSecuritySafe": true
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "80",
+        "calldata": "0x"
+      },
+      "created_at": "2026-09-30T23:41:53.766Z",
+      "updated_at": "2026-09-30T23:41:53.766Z"
+    },
+    {
+      "id": "exec_c24bf0db-ffa1-495b-bdd7-4cd595cc40ff",
+      "request_id": "req_6d9f3dcd-0611-48b9-aac8-72c2f40cc9c4",
+      "verification_id": "ver_e54885f5-ad26-4fed-9275-b286d6aadd5b",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "VERIFIED",
+      "risk": "LOW",
+      "requested_amount": "150",
+      "actual_transaction_amount": 150,
+      "action_type": "transfer",
+      "intent_type": "transfer",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": null,
+      "checks": {
+        "policyPassed": true,
+        "intentMatched": true,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": true,
+        "protocolMatched": true,
+        "transactionSecuritySafe": true
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "150",
+        "calldata": "0x"
+      },
+      "created_at": "2026-09-30T23:42:16.966Z",
+      "updated_at": "2026-09-30T23:42:16.966Z"
+    },
+    {
+      "id": "exec_3e61a17e-5eba-4511-b464-8fe008954f8b",
+      "request_id": "req_2b2efdbb-c139-46ef-a108-c16222b3440d",
+      "verification_id": "ver_a0d273fe-fe5b-4536-a942-3cf9a82230ab",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "VERIFIED",
+      "risk": "LOW",
+      "requested_amount": "110",
+      "actual_transaction_amount": 110,
+      "action_type": "transfer",
+      "intent_type": "transfer",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": null,
+      "checks": {
+        "policyPassed": true,
+        "intentMatched": true,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": true,
+        "protocolMatched": true,
+        "transactionSecuritySafe": true
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "110",
+        "calldata": "0x"
+      },
+      "created_at": "2026-09-30T23:42:41.563Z",
+      "updated_at": "2026-09-30T23:42:41.563Z"
+    },
+    {
+      "id": "exec_9218ca7e-2974-4fd0-ad6f-5308c7cbbd48",
+      "request_id": "req_00201f5c-4707-4f68-9a96-2d23f39165f4",
+      "verification_id": "ver_3d2c6611-0389-4415-893e-c90bab84237a",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "REVIEW_REQUIRED",
+      "risk": "LOW",
+      "requested_amount": "5000",
+      "actual_transaction_amount": 5000,
+      "action_type": "transfer",
+      "intent_type": "transfer",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": "REVIEW_REQUIRED",
+      "checks": {
+        "policyPassed": true,
+        "intentMatched": true,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": true,
+        "protocolMatched": true,
+        "transactionSecuritySafe": true
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "5000",
+        "calldata": "0x"
+      },
+      "created_at": "2026-09-30T23:43:38.973Z",
+      "updated_at": "2026-09-30T23:43:38.973Z"
+    },
+    {
+      "id": "exec_701644e4-716e-4c2e-9436-65e3a08b34e0",
+      "request_id": "req_964bc245-0906-4c08-bc3a-f264ef61261e",
+      "verification_id": "ver_f355d42b-9710-47f8-9eba-de12a8d263d0",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "REVIEW_REQUIRED",
+      "risk": "LOW",
+      "requested_amount": "5000",
+      "actual_transaction_amount": 5000,
+      "action_type": "transfer",
+      "intent_type": "transfer",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": "ABNORMAL",
+      "checks": {
+        "policyPassed": true,
+        "intentMatched": true,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": true,
+        "protocolMatched": true,
+        "transactionSecuritySafe": true
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "5000",
+        "calldata": "0x"
+      },
+      "created_at": "2026-09-30T23:50:40.294Z",
+      "updated_at": "2026-09-30T23:50:40.294Z"
+    },
+    {
+      "id": "exec_cc8a7da7-d6cf-443a-9836-513fc8d491dd",
+      "request_id": "req_f33926ef-7181-4cd5-8d1e-5fc61a88249e",
+      "verification_id": "ver_ca9c5551-6a67-40f9-8514-8aa320752d4a",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "BLOCKED",
+      "risk": "HIGH",
+      "review": {
+        "required": false,
+        "status": "NOT_REQUIRED",
+        "reason": null,
+        "decision": null,
+        "reviewed_at": null
+      },
+      "requested_amount": "5000",
+      "actual_transaction_amount": 5000,
+      "action_type": "transfer",
+      "intent_type": "transfer",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": null,
+      "checks": {
+        "policyPassed": true,
+        "intentMatched": false,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": false,
+        "protocolMatched": true,
+        "transactionSecuritySafe": true
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "5000",
+        "calldata": "0x"
+      },
+      "created_at": "2026-10-01T00:03:25.434Z",
+      "updated_at": "2026-10-01T00:03:25.434Z"
+    },
+    {
+      "id": "exec_9f87384b-cfdf-49aa-968b-663ef4aa787f",
+      "request_id": "req_a5082ae7-e7fd-4c59-802a-ca3be1d16656",
+      "verification_id": "ver_46357db1-55b0-4ee4-91c4-9f893516270a",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "BLOCKED",
+      "risk": "HIGH",
+      "review": {
+        "required": false,
+        "status": "NOT_REQUIRED",
+        "reason": null,
+        "decision": null,
+        "reviewed_at": null
+      },
+      "requested_amount": "5000",
+      "actual_transaction_amount": 5000,
+      "action_type": "transfer",
+      "intent_type": "transfer",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": null,
+      "checks": {
+        "policyPassed": true,
+        "intentMatched": false,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": true,
+        "protocolMatched": true,
+        "transactionSecuritySafe": true
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "5000",
+        "calldata": "0x"
+      },
+      "created_at": "2026-10-01T00:05:17.101Z",
+      "updated_at": "2026-10-01T00:05:17.101Z"
+    },
+    {
+      "id": "exec_6b44013b-d06e-4e3a-a6cd-fbe4ed4742cd",
+      "request_id": "req_d754a04a-f072-46bc-8711-b20edcdb1233",
+      "verification_id": "ver_9270333b-2d7a-43cf-b185-0881ff13be10",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "BLOCKED",
+      "risk": "HIGH",
+      "review": {
+        "required": false,
+        "status": "NOT_REQUIRED",
+        "reason": null,
+        "decision": null,
+        "reviewed_at": null
+      },
+      "requested_amount": "5000",
+      "actual_transaction_amount": 5000,
+      "action_type": "transfer",
+      "intent_type": "transfer",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": null,
+      "checks": {
+        "policyPassed": true,
+        "intentMatched": false,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": true,
+        "protocolMatched": true,
+        "transactionSecuritySafe": true
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "5000",
+        "calldata": "0x"
+      },
+      "created_at": "2026-10-01T00:09:33.464Z",
+      "updated_at": "2026-10-01T00:09:33.464Z"
+    },
+    {
+      "id": "exec_345afa49-c4e7-41f1-84f2-1e9f25bc8579",
+      "request_id": "req_7f1c935a-98d9-4cb3-9431-bcf7af7e1c6c",
+      "verification_id": "ver_4c68f725-f741-4e97-86a2-ebd2fef631db",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "APPROVED",
+      "risk": "LOW",
+      "review": {
+        "required": true,
+        "status": "APPROVED",
+        "reason": "Approved after developer review.",
+        "decision": "APPROVED",
+        "reviewed_at": "2026-10-01T00:17:30.614Z"
+      },
+      "requested_amount": "5000",
+      "actual_transaction_amount": 5000,
+      "action_type": "transfer",
+      "intent_type": "transfer",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": "ABNORMAL",
+      "checks": {
+        "policyPassed": true,
+        "intentMatched": true,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": true,
+        "protocolMatched": true,
+        "transactionSecuritySafe": true
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "5000",
+        "calldata": "0x"
+      },
+      "created_at": "2026-10-01T00:15:27.345Z",
+      "updated_at": "2026-10-01T00:17:30.614Z"
+    },
+    {
+      "id": "exec_7931d7f7-fd1e-4cde-9545-71172062dbb2",
+      "request_id": "req_8d31cc1d-fecc-4103-aa21-44854cb79810",
+      "verification_id": "ver_212785c4-ada4-4786-acd0-333a5d5200e5",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": "Adaptive Baseline Agent",
+      "use_case": "autonomous-trading",
+      "status": "BLOCKED",
+      "risk": "LOW",
+      "review": {
+        "required": true,
+        "status": "REJECTED",
+        "reason": "Rejected because the transaction is outside the agent baseline.",
+        "decision": "REJECTED",
+        "reviewed_at": "2026-10-01T00:18:51.588Z"
+      },
+      "requested_amount": "5000",
+      "actual_transaction_amount": 5000,
+      "action_type": "transfer",
+      "intent_type": "transfer",
+      "chain": 84532,
+      "protocol": null,
+      "security_profile_id": "profile_cd3d2a1076da4c517b84",
+      "baseline_decision": "ABNORMAL",
+      "checks": {
+        "policyPassed": true,
+        "intentMatched": true,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": true,
+        "protocolMatched": true,
+        "transactionSecuritySafe": true
+      },
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "5000",
+        "calldata": "0x"
+      },
+      "created_at": "2026-10-01T00:18:07.594Z",
+      "updated_at": "2026-10-01T00:18:51.588Z"
+    }
+  ],
+  "securityAlerts": [
+    {
+      "id": "alert_a040aca7-8150-42df-9ca5-c8c72e7a81f5",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": null,
+      "verification_id": "ver_e5c8554e-cd01-48e0-911f-87da9d3c1153",
+      "request_id": "req_462ce39e-2255-4753-b219-088064bd96d8",
+      "type": "UNAUTHORIZED_EXECUTION_ATTEMPT",
+      "severity": "HIGH",
+      "title": "Unauthorized execution attempt detected",
+      "message": "Phorva blocked a transaction that did not match the agent's verified execution intent.",
+      "reason": "transaction parameters do not match the verified intent; execution type does not match the verified intent; native transaction value does not match the verified intent; protocol does not match the verified intent",
+      "transaction": {
+        "chainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "100"
+      },
+      "metadata": {
+        "actionType": "trade",
+        "intentType": "trade",
+        "requestedAmount": "100",
+        "actualTransactionAmount": null,
+        "risk": "HIGH",
+        "intentMatched": true,
+        "parameterMatched": false,
+        "executionTypeMatched": false,
+        "nativeValueMatched": false,
+        "protocolMatched": false
+      },
+      "status": "OPEN",
+      "created_at": "2026-09-30T22:57:20.862Z",
+      "updated_at": "2026-09-30T22:57:20.862Z",
+      "resolved_at": null
+    },
+    {
+      "id": "alert_5296213b-32e7-4c1e-ab3f-bfbd096f0152",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": null,
+      "verification_id": "ver_ac917416-34d2-49c5-ae7e-80f60989939c",
+      "request_id": "req_36434d02-6027-49a7-a3a3-9c81bbe1b004",
+      "type": "UNAUTHORIZED_EXECUTION_ATTEMPT",
+      "severity": "HIGH",
+      "title": "Unauthorized execution attempt detected",
+      "message": "Phorva blocked a transaction that did not match the agent's verified execution intent.",
+      "reason": "native transaction value does not match the verified intent; protocol does not match the verified intent",
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "100",
+        "calldata": "0x"
+      },
+      "metadata": {
+        "actionType": "send",
+        "intentType": "send",
+        "requestedAmount": "100",
+        "actualTransactionAmount": 100,
+        "risk": "HIGH",
+        "intentMatched": true,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": false,
+        "protocolMatched": false
+      },
+      "status": "OPEN",
+      "created_at": "2026-09-30T23:28:18.551Z",
+      "updated_at": "2026-09-30T23:28:18.551Z",
+      "resolved_at": null
+    },
+    {
+      "id": "alert_64f21a97-26ba-493d-ab95-4a73f8e30861",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": null,
+      "verification_id": "ver_5051309c-0b45-4e5a-9d54-a96262772c8d",
+      "request_id": "req_2e7d55f5-f9bb-4488-9b8e-da7b21b858f1",
+      "type": "UNAUTHORIZED_EXECUTION_ATTEMPT",
+      "severity": "HIGH",
+      "title": "Unauthorized execution attempt detected",
+      "message": "Phorva blocked a transaction that did not match the agent's verified execution intent.",
+      "reason": "transaction parameters do not match the verified intent; execution type does not match the verified intent; protocol does not match the verified intent",
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "100",
+        "calldata": "0x"
+      },
+      "metadata": {
+        "actionType": "transfer",
+        "intentType": "transfer",
+        "requestedAmount": "100",
+        "actualTransactionAmount": null,
+        "risk": "HIGH",
+        "intentMatched": true,
+        "parameterMatched": false,
+        "executionTypeMatched": false,
+        "nativeValueMatched": true,
+        "protocolMatched": false
+      },
+      "status": "OPEN",
+      "created_at": "2026-09-30T23:31:45.880Z",
+      "updated_at": "2026-09-30T23:31:45.880Z",
+      "resolved_at": null
+    },
+    {
+      "id": "alert_21ad9c5b-806e-4c19-a488-1e38c7fe2327",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": null,
+      "verification_id": "ver_f3a8c7cb-dd3b-4d35-a750-6f351d4dd9fc",
+      "request_id": "req_44e1fdad-25fd-420d-8f3b-29fb4ed73cf8",
+      "type": "UNAUTHORIZED_EXECUTION_ATTEMPT",
+      "severity": "HIGH",
+      "title": "Unauthorized execution attempt detected",
+      "message": "Phorva blocked a transaction that did not match the agent's verified execution intent.",
+      "reason": "execution type does not match the verified intent; protocol does not match the verified intent",
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "100",
+        "calldata": "0x"
+      },
+      "metadata": {
+        "actionType": "transfer",
+        "intentType": "transfer",
+        "requestedAmount": "100",
+        "actualTransactionAmount": 100,
+        "risk": "HIGH",
+        "intentMatched": true,
+        "parameterMatched": true,
+        "executionTypeMatched": false,
+        "nativeValueMatched": true,
+        "protocolMatched": false
+      },
+      "status": "OPEN",
+      "created_at": "2026-09-30T23:35:32.804Z",
+      "updated_at": "2026-09-30T23:35:32.804Z",
+      "resolved_at": null
+    },
+    {
+      "id": "alert_3eb7ac13-4dc0-4d60-a604-db72b9953bd1",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": null,
+      "verification_id": "ver_ca9c5551-6a67-40f9-8514-8aa320752d4a",
+      "request_id": "req_f33926ef-7181-4cd5-8d1e-5fc61a88249e",
+      "type": "UNAUTHORIZED_EXECUTION_ATTEMPT",
+      "severity": "HIGH",
+      "title": "Unauthorized execution attempt detected",
+      "message": "Phorva blocked a transaction that did not match the agent's verified execution intent.",
+      "reason": "declared intent does not match the observed execution; native transaction value does not match the verified intent",
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "5000",
+        "calldata": "0x"
+      },
+      "metadata": {
+        "actionType": "transfer",
+        "intentType": "transfer",
+        "requestedAmount": 5000,
+        "actualTransactionAmount": 5000,
+        "risk": "HIGH",
+        "intentMatched": false,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": false,
+        "protocolMatched": true
+      },
+      "status": "OPEN",
+      "created_at": "2026-10-01T00:03:25.437Z",
+      "updated_at": "2026-10-01T00:03:25.437Z",
+      "resolved_at": null
+    },
+    {
+      "id": "alert_3105acb7-2431-4523-a846-fb5cb7fa959b",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": null,
+      "verification_id": "ver_46357db1-55b0-4ee4-91c4-9f893516270a",
+      "request_id": "req_a5082ae7-e7fd-4c59-802a-ca3be1d16656",
+      "type": "UNAUTHORIZED_EXECUTION_ATTEMPT",
+      "severity": "HIGH",
+      "title": "Unauthorized execution attempt detected",
+      "message": "Phorva blocked a transaction that did not match the agent's verified execution intent.",
+      "reason": "declared intent does not match the observed execution",
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "5000",
+        "calldata": "0x"
+      },
+      "metadata": {
+        "actionType": "transfer",
+        "intentType": "transfer",
+        "requestedAmount": 5000,
+        "actualTransactionAmount": 5000,
+        "risk": "HIGH",
+        "intentMatched": false,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": true,
+        "protocolMatched": true
+      },
+      "status": "OPEN",
+      "created_at": "2026-10-01T00:05:17.104Z",
+      "updated_at": "2026-10-01T00:05:17.104Z",
+      "resolved_at": null
+    },
+    {
+      "id": "alert_252c5ac1-3c90-44de-9b46-d2168e151fac",
+      "project_id": "proj_168656dc-a4fb-4ef0-acfb-960e3b813b33",
+      "project_name": "Adaptive Baseline Test",
+      "agent_id": "agent_7a38298d-dda4-4940-b5d4-6e67df44b5b9",
+      "agent_name": null,
+      "verification_id": "ver_9270333b-2d7a-43cf-b185-0881ff13be10",
+      "request_id": "req_d754a04a-f072-46bc-8711-b20edcdb1233",
+      "type": "UNAUTHORIZED_EXECUTION_ATTEMPT",
+      "severity": "HIGH",
+      "title": "Unauthorized execution attempt detected",
+      "message": "Phorva blocked a transaction that did not match the agent's verified execution intent.",
+      "reason": "declared intent does not match the observed execution",
+      "transaction": {
+        "chainId": 84532,
+        "expectedChainId": 84532,
+        "to": "0x0000000000000000000000000000000000000001",
+        "value": "5000",
+        "calldata": "0x"
+      },
+      "metadata": {
+        "actionType": "transfer",
+        "intentType": "transfer",
+        "requestedAmount": 5000,
+        "actualTransactionAmount": 5000,
+        "risk": "HIGH",
+        "intentMatched": false,
+        "parameterMatched": true,
+        "executionTypeMatched": true,
+        "nativeValueMatched": true,
+        "protocolMatched": true
+      },
+      "status": "OPEN",
+      "created_at": "2026-10-01T00:09:33.467Z",
+      "updated_at": "2026-10-01T00:09:33.467Z",
+      "resolved_at": null
     }
   ]
 }
