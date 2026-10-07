@@ -2187,189 +2187,251 @@ main,
 </section>
 
 <!-- AGENT -->
-
 <section class="view" id="agent">
+  <div class="kicker">PHORVA execution security</div>
+  <h1 class="title">Verify an autonomous order</h1>
+  <p class="sub">
+    See what an agent intended to do, what it actually attempted,
+    and whether PHORVA allowed the execution.
+  </p>
 
-<div class="kicker">Main product</div>
-
-<h1 class="title">Agent</h1>
-
-<p class="sub">
-Prepare an autonomous action and send it through the real PHORVA authorization engine.
-The agent's wallet remains external to PHORVA; PHORVA evaluates whether the requested execution is authorized.
-</p>
-
-<div class="agent">
-
-  <div class="card">
-
+  <!-- ORDER -->
+  <div class="card" style="margin-top:24px">
     <div class="head">
       <div>
-        <strong>Agent Context</strong>
-        <div class="muted">Execution identity</div>
+        <strong>Autonomous Order</strong>
+        <div class="muted">A real authorization request sent to PHORVA</div>
       </div>
-      <span class="badge">PHORVA CORE</span>
+      <span class="badge">LIVE ENGINE</span>
     </div>
 
     <div class="fields">
-
-      <div class="field full">
-        <small>Agent</small>
-        <input id="agentName" value="TradingAgent-01">
-      </div>
-
-      <div class="field full">
-        <small>Agent wallet address</small>
-        <input id="agentWallet" value="0x0000000000000000000000000000000000000000">
+      <div class="field">
+        <small>Application</small>
+        <select id="agentScenario">
+          <option value="trading">AI Trading</option>
+          <option value="treasury">Treasury Agent</option>
+          <option value="payments">AI Payment</option>
+          <option value="prediction">Prediction Market</option>
+        </select>
       </div>
 
       <div class="field">
         <small>Network</small>
-        <select id="agentChain"></select>
-      </div>
-
-      <div class="field">
-        <small>Domain</small>
-        <select id="agentDomain">
-          <option value="defi">DeFi</option>
-          <option value="prediction-market">Prediction Market</option>
-          <option value="gaming">Gaming</option>
-          <option value="dao">DAO / Treasury</option>
-          <option value="agent-payment">Agent Payment</option>
-          <option value="virtual-card">Virtual Card / Payments</option>
-          <option value="general">General On-Chain</option>
-        </select>
+        <select id="agentNetwork"></select>
       </div>
 
       <div class="field full">
-        <small>Action</small>
-        <select id="agentAction"></select>
+        <small>Agent</small>
+        <div class="agent-order-value" id="agentOrderAgent">TradingAgent-01</div>
       </div>
-
     </div>
-
   </div>
 
-
-  <div class="card">
-
+  <!-- INTENT -->
+  <div class="card" style="margin-top:16px">
     <div class="head">
       <div>
-        <strong>Prepare Execution</strong>
-        <div class="muted">Evaluated by the PHORVA authorization engine</div>
+        <strong>What the agent intends to do</strong>
+        <div class="muted">The declared action PHORVA receives before execution</div>
+      </div>
+      <span class="badge green">DECLARED INTENT</span>
+    </div>
+
+    <div class="pad">
+      <div class="agent-intent">
+        <div>
+          <small>Action</small>
+          <strong id="agentIntentAction">Swap</strong>
+        </div>
+
+        <div>
+          <small>Amount</small>
+          <strong id="agentIntentAmount">300 USDC</strong>
+        </div>
+
+        <div>
+          <small>Protocol</small>
+          <strong id="agentIntentProtocol">Uniswap</strong>
+        </div>
       </div>
 
-      <span class="badge green">LIVE</span>
+      <div class="agent-order-description" id="agentIntentDescription">
+        Swap 300 USDC for ETH on Uniswap.
+      </div>
+    </div>
+  </div>
+
+  <!-- EXECUTION -->
+  <div class="card" style="margin-top:16px">
+    <div class="head">
+      <div>
+        <strong>What the agent actually attempts</strong>
+        <div class="muted">This is the transaction PHORVA evaluates</div>
+      </div>
+      <span class="badge">EXECUTION REQUEST</span>
     </div>
 
     <div class="fields">
-
-      <div class="field" id="agentProtocolField">
-        <small>Protocol</small>
-        <select id="agentProtocol"></select>
+      <div class="field">
+        <small>Attempted amount</small>
+        <input id="agentAttemptedAmount" type="number" min="0" step="1" value="500">
       </div>
 
-      <div class="field" id="agentAssetField">
-        <small>Asset</small>
-        <select id="agentAsset"></select>
+      <div class="field">
+        <small>Maximum allowed</small>
+        <input id="agentPolicyMaximum" type="number" min="0" step="1" value="300">
       </div>
 
       <div class="field full">
-        <small>Action Parameters</small>
-        <div id="agentActionFields"></div>
+        <small>Execution</small>
+        <div class="agent-order-value" id="agentExecutionDescription">
+          Swap transaction submitted for verification.
+        </div>
       </div>
-
     </div>
-
   </div>
 
-
-  <div class="card">
-
+  <!-- CHECKS -->
+  <div class="card" style="margin-top:16px">
     <div class="head">
       <div>
-        <strong>Authorization Policy</strong>
-        <div class="muted">Limits inherited by the execution</div>
+        <strong>PHORVA verification</strong>
+        <div class="muted">
+          Identity → intent → policy → parameters → protocol → security
+        </div>
+      </div>
+      <span class="badge" id="agentVerificationBadge">READY</span>
+    </div>
+
+    <div class="guard-grid">
+      <div class="guard-item">
+        <span class="status" id="agentCheckIdentity"></span>
+        <b>Agent identity</b>
+        <p id="agentCheckIdentityText">Waiting for authorization.</p>
+      </div>
+
+      <div class="guard-item">
+        <span class="status" id="agentCheckIntent"></span>
+        <b>Intent</b>
+        <p id="agentCheckIntentText">Waiting for authorization.</p>
+      </div>
+
+      <div class="guard-item">
+        <span class="status" id="agentCheckPolicy"></span>
+        <b>Policy</b>
+        <p id="agentCheckPolicyText">Waiting for authorization.</p>
+      </div>
+
+      <div class="guard-item">
+        <span class="status" id="agentCheckParameters"></span>
+        <b>Parameters</b>
+        <p id="agentCheckParametersText">Waiting for authorization.</p>
+      </div>
+
+      <div class="guard-item">
+        <span class="status" id="agentCheckProtocol"></span>
+        <b>Protocol</b>
+        <p id="agentCheckProtocolText">Waiting for authorization.</p>
+      </div>
+
+      <div class="guard-item">
+        <span class="status" id="agentCheckSecurity"></span>
+        <b>Transaction security</b>
+        <p id="agentCheckSecurityText">Waiting for authorization.</p>
       </div>
     </div>
 
-    <div class="fields">
+    <!-- VERDICT -->
+    <div id="agentVerdict" class="result" style="display:none;margin-top:20px">
+      <div class="result-title" id="agentVerdictTitle"></div>
+      <div class="muted" id="agentVerdictReason"></div>
 
+      <div class="verdict-grid" style="margin-top:16px">
+        <div class="verdict">
+          <small>Intent</small>
+          <b id="agentVerdictIntent">—</b>
+        </div>
+
+        <div class="verdict">
+          <small>Policy</small>
+          <b id="agentVerdictPolicy">—</b>
+        </div>
+
+        <div class="verdict">
+          <small>Parameters</small>
+          <b id="agentVerdictParameters">—</b>
+        </div>
+
+        <div class="verdict">
+          <small>Protocol</small>
+          <b id="agentVerdictProtocol">—</b>
+        </div>
+
+        <div class="verdict">
+          <small>Security</small>
+          <b id="agentVerdictSecurity">—</b>
+        </div>
+
+        <div class="verdict">
+          <small>Execution</small>
+          <b id="agentVerdictExecution">—</b>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECEIPT -->
+  <div class="card" id="agentReceipt" style="margin-top:16px;display:none">
+    <div class="head">
+      <div>
+        <strong>Verification Receipt</strong>
+        <div class="muted">The authorization evidence produced by PHORVA</div>
+      </div>
+      <span class="badge" id="agentReceiptBadge">—</span>
+    </div>
+
+    <div class="pad">
       <div class="field">
-        <small>Maximum transaction</small>
-        <input id="policyMaximum" type="number" value="500" min="0" step="1">
+        <small>Agent</small>
+        <b id="agentReceiptAgent">—</b>
       </div>
 
-      <div class="field">
-        <small>Daily limit</small>
-        <input id="dailyLimit" type="number" value="2000" min="0" step="1">
+      <div class="field" style="margin-top:12px">
+        <small>Declared intent</small>
+        <b id="agentReceiptIntent">—</b>
       </div>
 
-    </div>
+      <div class="field" style="margin-top:12px">
+        <small>Actual execution</small>
+        <b id="agentReceiptActual">—</b>
+      </div>
 
+      <div class="field" style="margin-top:12px">
+        <small>Network</small>
+        <b id="agentReceiptNetwork">—</b>
+      </div>
+
+      <div class="field" style="margin-top:12px">
+        <small>Authorization</small>
+        <b id="agentReceiptAuthorization">—</b>
+      </div>
+
+      <div class="field" style="margin-top:12px">
+        <small>Verification ID</small>
+        <b id="agentReceiptId">—</b>
+      </div>
+    </div>
   </div>
 
-</div>
+  <button class="primary" id="agentVerifyButton" style="margin-top:20px">
+    Verify &amp; Authorize
+  </button>
 
-
-<button class="primary" id="evaluate">
-Verify &amp; Authorize
-</button>
-
-<div class="note">
-PHORVA independently evaluates identity, intent, policy, parameters, protocol, transaction security and execution authorization.
-</div>
-
-
-<div class="result" id="authorizationResult">
-
-  <div class="result-title" id="resultTitle">
-    Authorization result
+  <div class="muted" style="margin-top:12px">
+    PHORVA decides whether the agent's requested execution is allowed to happen.
   </div>
-
-  <div class="muted" id="resultReason"></div>
-
-  <div class="verdict-grid">
-
-    <div class="verdict">
-      <small>Policy</small>
-      <b id="vPolicy">—</b>
-    </div>
-
-    <div class="verdict">
-      <small>Intent</small>
-      <b id="vIntent">—</b>
-    </div>
-
-    <div class="verdict">
-      <small>Parameters</small>
-      <b id="vParameters">—</b>
-    </div>
-
-    <div class="verdict">
-      <small>Protocol</small>
-      <b id="vProtocol">—</b>
-    </div>
-
-    <div class="verdict">
-      <small>Contract</small>
-      <b id="vContract">—</b>
-    </div>
-
-    <div class="verdict">
-      <small>Transaction security</small>
-      <b id="vSecurity">—</b>
-    </div>
-
-  </div>
-
-  <pre id="proofOutput"></pre>
-
-</div>
-
 </section>
-
-
 
 <!-- GUARD -->
 
@@ -5221,7 +5283,7 @@ async function loadChains(){
 
    chains = await api("/api/chains");
 
-   const select = document.getElementById("agentChain");
+   const select = document.getElementById("agentNetwork");
 
    select.innerHTML = "";
 
@@ -5282,1925 +5344,6 @@ async function loadProtocols(){
 
 
 
-const AGENT_ACTIONS = {
-  defi: [
-    ["swap","Swap"],
-    ["approve","Approve"],
-    ["permit","Permit"],
-    ["deposit","Deposit"],
-    ["withdraw","Withdraw"],
-    ["supply","Supply"],
-    ["redeem","Redeem"],
-    ["lend","Lend"],
-    ["borrow","Borrow"],
-    ["repay","Repay"],
-    ["stake","Stake"],
-    ["unstake","Unstake"],
-    ["lp-add","Add Liquidity"],
-    ["lp-remove","Remove Liquidity"],
-    ["claim","Claim"],
-    ["bridge","Bridge"],
-    ["wrap","Wrap"],
-    ["unwrap","Unwrap"],
-    ["mint","Mint"],
-    ["burn","Burn"],
-    ["liquidate","Liquidate"],
-    ["rebalance","Rebalance"],
-    ["contract-call","Contract Call"],
-    ["custom-action","Custom Action"]
-  ],
-
-  "prediction-market": [
-    ["buy-position","Buy Position"],
-    ["sell-position","Sell Position"],
-    ["add-position","Add Position"],
-    ["reduce-position","Reduce Position"],
-    ["close-position","Close Position"],
-    ["deposit-collateral","Deposit Collateral"],
-    ["withdraw-collateral","Withdraw Collateral"],
-    ["claim-winnings","Claim Winnings"],
-    ["redeem-position","Redeem Position"],
-    ["split-position","Split Position"],
-    ["merge-position","Merge Position"],
-    ["trade","Trade"],
-    ["approve","Approve"],
-    ["contract-call","Contract Call"],
-    ["custom-action","Custom Action"]
-  ],
-
-  gaming: [
-    ["purchase","Purchase"],
-    ["sell","Sell"],
-    ["trade","Trade"],
-    ["transfer","Transfer"],
-    ["upgrade","Upgrade"],
-    ["craft","Craft"],
-    ["equip","Equip"],
-    ["unequip","Unequip"],
-    ["marketplace-listing","Marketplace Listing"],
-    ["marketplace-bid","Marketplace Bid"],
-    ["marketplace-offer","Marketplace Offer"],
-    ["mint","Mint"],
-    ["burn","Burn"],
-    ["claim","Claim"],
-    ["stake","Stake"],
-    ["unstake","Unstake"],
-    ["deposit","Deposit"],
-    ["withdraw","Withdraw"],
-    ["approve","Approve"],
-    ["contract-call","Contract Call"],
-    ["custom-action","Custom Action"]
-  ],
-
-  dao: [
-    ["transfer","Transfer Funds"],
-    ["deposit","Deposit Funds"],
-    ["withdraw","Withdraw Funds"],
-    ["approve","Approve"],
-    ["delegate","Delegate"],
-    ["undelegate","Undelegate"],
-    ["propose","Create Proposal"],
-    ["vote","Vote"],
-    ["queue","Queue Proposal"],
-    ["execute","Execute Proposal"],
-    ["cancel-proposal","Cancel Proposal"],
-    ["claim","Claim"],
-    ["stream","Stream Funds"],
-    ["create-grant","Create Grant"],
-    ["fund-grant","Fund Grant"],
-    ["contract-call","Contract Call"],
-    ["custom-action","Custom Action"]
-  ],
-
-  "agent-payment": [
-    ["pay","Pay"],
-    ["send","Send Payment"],
-    ["transfer","Transfer"],
-    ["request-payment","Request Payment"],
-    ["split-payment","Split Payment"],
-    ["recurring-payment","Recurring Payment"],
-    ["deposit","Deposit"],
-    ["withdraw","Withdraw"],
-    ["refund","Refund"],
-    ["claim","Claim"],
-    ["approve","Approve"],
-    ["contract-call","Contract Call"],
-    ["custom-action","Custom Action"]
-  ],
-
-  "virtual-card": [
-    ["purchase","Purchase"],
-    ["authorize","Authorize"],
-    ["capture","Capture"],
-    ["void","Void"],
-    ["refund","Refund"],
-    ["partial-refund","Partial Refund"],
-    ["payment","Payment"],
-    ["transfer","Transfer"],
-    ["deposit","Deposit"],
-    ["withdraw","Withdraw"],
-    ["fund-card","Fund Card"],
-    ["withdraw-card-balance","Withdraw Card Balance"],
-    ["approve","Approve"],
-    ["contract-call","Contract Call"],
-    ["custom-action","Custom Action"]
-  ],
-
-  general: [
-    ["send","Send"],
-    ["transfer","Transfer"],
-    ["approve","Approve"],
-    ["permit","Permit"],
-    ["contract-call","Contract Call"],
-    ["deploy","Deploy Contract"],
-    ["upgrade","Upgrade Contract"],
-    ["mint","Mint"],
-    ["burn","Burn"],
-    ["claim","Claim"],
-    ["deposit","Deposit"],
-    ["withdraw","Withdraw"],
-    ["stake","Stake"],
-    ["unstake","Unstake"],
-    ["bridge","Bridge"],
-    ["custom-action","Custom Action"]
-  ]
-};
-
-
-const AGENT_ACTION_FIELDS = {
-
-  defi: {
-    swap: [
-      ["sellAsset","Sell Asset","text","USDC"],
-      ["buyAsset","Buy Asset","text","ETH"],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"],
-      ["minimumOutput","Minimum Output","number","0"]
-    ],
-
-    approve: [
-      ["spender","Spender Address","text",""],
-      ["approvalAmount","Approval Amount","number","500"],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    permit: [
-      ["spender","Spender Address","text",""],
-      ["approvalAmount","Permit Amount","number","500"],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    bridge: [
-      ["recipient","Recipient Address","text",""],
-      ["destinationChain","Destination Chain","select",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    deposit: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    withdraw: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    supply: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    redeem: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    lend: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    borrow: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    repay: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    stake: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    unstake: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "lp-add": [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "lp-remove": [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    claim: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    wrap: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    unwrap: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    mint: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    burn: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    liquidate: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    rebalance: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "contract-call": [
-      ["target","Target Contract","text",""],
-      ["functionName","Function","text",""],
-      ["selector","Selector","text",""]
-    ],
-
-    "custom-action": [
-      ["target","Target Contract","text",""],
-      ["functionName","Function","text",""],
-      ["selector","Selector","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ]
-  },
-
-  "prediction-market": {
-    "buy-position": [
-      ["market","Market","text",""],
-      ["outcome","Outcome","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "sell-position": [
-      ["market","Market","text",""],
-      ["outcome","Outcome","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "add-position": [
-      ["market","Market","text",""],
-      ["outcome","Outcome","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "reduce-position": [
-      ["market","Market","text",""],
-      ["outcome","Outcome","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "close-position": [
-      ["market","Market","text",""],
-      ["outcome","Outcome","text",""]
-    ],
-
-    "deposit-collateral": [
-      ["market","Market","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "withdraw-collateral": [
-      ["market","Market","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "claim-winnings": [
-      ["market","Market","text",""],
-      ["outcome","Outcome","text",""]
-    ],
-
-    "redeem-position": [
-      ["market","Market","text",""],
-      ["outcome","Outcome","text",""]
-    ],
-
-    "split-position": [
-      ["market","Market","text",""],
-      ["outcome","Outcome","text",""]
-    ],
-
-    "merge-position": [
-      ["market","Market","text",""],
-      ["outcome","Outcome","text",""]
-    ],
-
-    trade: [
-      ["market","Market","text",""],
-      ["outcome","Outcome","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    approve: [
-      ["spender","Spender Address","text",""],
-      ["approvalAmount","Approval Amount","number","500"]
-    ],
-
-    "contract-call": [
-      ["target","Target Contract","text",""],
-      ["functionName","Function","text",""],
-      ["selector","Selector","text",""]
-    ],
-
-    "custom-action": [
-      ["market","Market","text",""],
-      ["outcome","Outcome","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ]
-  },
-
-  gaming: {
-    purchase: [
-      ["itemId","Item / Asset ID","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    sell: [
-      ["itemId","Item / Asset ID","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    trade: [
-      ["itemId","Item / Asset ID","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    transfer: [
-      ["recipient","Recipient Address","text",""],
-      ["itemId","Item / Asset ID","text",""]
-    ],
-
-    upgrade: [
-      ["itemId","Item / Asset ID","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    craft: [
-      ["itemId","Item / Asset ID","text",""]
-    ],
-
-    equip: [
-      ["itemId","Item / Asset ID","text",""]
-    ],
-
-    unequip: [
-      ["itemId","Item / Asset ID","text",""]
-    ],
-
-    "marketplace-listing": [
-      ["itemId","Item / Asset ID","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "marketplace-bid": [
-      ["itemId","Item / Asset ID","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "marketplace-offer": [
-      ["itemId","Item / Asset ID","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    mint: [
-      ["itemId","Item / Asset ID","text",""]
-    ],
-
-    burn: [
-      ["itemId","Item / Asset ID","text",""]
-    ],
-
-    claim: [
-      ["itemId","Item / Asset ID","text",""]
-    ],
-
-    stake: [
-      ["itemId","Item / Asset ID","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    unstake: [
-      ["itemId","Item / Asset ID","text",""]
-    ],
-
-    deposit: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    withdraw: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    approve: [
-      ["spender","Spender Address","text",""],
-      ["approvalAmount","Approval Amount","number","500"]
-    ],
-
-    "contract-call": [
-      ["target","Target Contract","text",""],
-      ["functionName","Function","text",""],
-      ["selector","Selector","text",""]
-    ],
-
-    "custom-action": [
-      ["itemId","Item / Asset ID","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ]
-  },
-
-  dao: {
-    transfer: [
-      ["recipient","Recipient Address","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    deposit: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    withdraw: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    approve: [
-      ["spender","Spender Address","text",""],
-      ["approvalAmount","Approval Amount","number","500"]
-    ],
-
-    delegate: [
-      ["delegatee","Delegatee Address","text",""]
-    ],
-
-    undelegate: [
-      ["delegatee","Delegatee Address","text",""]
-    ],
-
-    propose: [
-      ["proposalId","Proposal ID","text",""]
-    ],
-
-    vote: [
-      ["proposalId","Proposal ID","text",""],
-      ["vote","Vote","select",""]
-    ],
-
-    queue: [
-      ["proposalId","Proposal ID","text",""]
-    ],
-
-    execute: [
-      ["proposalId","Proposal ID","text",""]
-    ],
-
-    "cancel-proposal": [
-      ["proposalId","Proposal ID","text",""]
-    ],
-
-    claim: [
-      ["proposalId","Proposal / Grant ID","text",""]
-    ],
-
-    stream: [
-      ["recipient","Recipient Address","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "create-grant": [
-      ["recipient","Grant Recipient","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "fund-grant": [
-      ["proposalId","Grant ID","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "contract-call": [
-      ["target","Target Contract","text",""],
-      ["functionName","Function","text",""],
-      ["selector","Selector","text",""]
-    ],
-
-    "custom-action": [
-      ["target","Target Contract","text",""],
-      ["functionName","Function","text",""],
-      ["selector","Selector","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ]
-  },
-
-  "agent-payment": {
-    pay: [
-      ["recipient","Recipient Address","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    send: [
-      ["recipient","Recipient Address","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    transfer: [
-      ["recipient","Recipient Address","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "request-payment": [
-      ["recipient","Recipient Address","text",""],
-      ["intentAmount","Declared Amount","number","300"]
-    ],
-
-    "split-payment": [
-      ["recipient","Recipient Address","text",""],
-      ["intentAmount","Declared Amount","number","300"]
-    ],
-
-    "recurring-payment": [
-      ["recipient","Recipient Address","text",""],
-      ["intentAmount","Declared Amount","number","300"]
-    ],
-
-    deposit: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    withdraw: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    refund: [
-      ["recipient","Recipient Address","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    claim: [
-      ["recipient","Recipient Address","text",""]
-    ],
-
-    approve: [
-      ["spender","Spender Address","text",""],
-      ["approvalAmount","Approval Amount","number","500"]
-    ],
-
-    "contract-call": [
-      ["target","Target Contract","text",""],
-      ["functionName","Function","text",""],
-      ["selector","Selector","text",""]
-    ],
-
-    "custom-action": [
-      ["recipient","Recipient Address","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ]
-  },
-
-  "virtual-card": {
-    purchase: [
-      ["merchant","Merchant","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    authorize: [
-      ["merchant","Merchant","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    capture: [
-      ["merchant","Merchant","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    void: [
-      ["merchant","Merchant","text",""]
-    ],
-
-    refund: [
-      ["merchant","Merchant","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "partial-refund": [
-      ["merchant","Merchant","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    payment: [
-      ["merchant","Merchant","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    transfer: [
-      ["recipient","Recipient Address","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    deposit: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    withdraw: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "fund-card": [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "withdraw-card-balance": [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    approve: [
-      ["spender","Spender Address","text",""],
-      ["approvalAmount","Approval Amount","number","500"]
-    ],
-
-    "contract-call": [
-      ["target","Target Contract","text",""],
-      ["functionName","Function","text",""],
-      ["selector","Selector","text",""]
-    ],
-
-    "custom-action": [
-      ["merchant","Merchant","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ]
-  },
-
-  general: {
-    send: [
-      ["recipient","Recipient Address","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    transfer: [
-      ["recipient","Recipient Address","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    approve: [
-      ["spender","Spender Address","text",""],
-      ["approvalAmount","Approval Amount","number","500"]
-    ],
-
-    permit: [
-      ["spender","Spender Address","text",""],
-      ["approvalAmount","Permit Amount","number","500"]
-    ],
-
-    "contract-call": [
-      ["target","Target Contract","text",""],
-      ["functionName","Function","text",""],
-      ["selector","Selector","text",""]
-    ],
-
-    deploy: [
-      ["target","Contract Target","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    upgrade: [
-      ["target","Contract Target","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    mint: [
-      ["target","Target Contract","text",""]
-    ],
-
-    burn: [
-      ["target","Target Contract","text",""]
-    ],
-
-    claim: [
-      ["target","Target Contract","text",""]
-    ],
-
-    deposit: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    withdraw: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    stake: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    unstake: [
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    bridge: [
-      ["recipient","Recipient Address","text",""],
-      ["destinationChain","Destination Chain","select",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ],
-
-    "custom-action": [
-      ["target","Target Contract","text",""],
-      ["functionName","Function","text",""],
-      ["selector","Selector","text",""],
-      ["intentAmount","Declared Amount","number","300"],
-      ["actualAmount","Actual Attempt","number","500"]
-    ]
-  }
-};
-
-function renderAgentActionFields(){
-
-  const domain =
-    document.getElementById("agentDomain").value;
-
-  const action =
-    document.getElementById("agentAction").value;
-
-  const container =
-    document.getElementById("agentActionFields");
-
-  if(!container) return;
-
-  container.innerHTML = "";
-
-  const title =
-    document.createElement("div");
-
-  title.className = "muted";
-  title.textContent =
-    domain.replace(/-/g, " ") +
-    " → " +
-    action.replace(/-/g, " ");
-
-  container.appendChild(title);
-
-  const fields =
-    document.createElement("div");
-
-  fields.className = "fields";
-
-  const definitions =
-    AGENT_ACTION_FIELDS[domain]?.[action] || [];
-
-  definitions.forEach(
-    ([id,label,type,value]) => {
-
-      const field =
-        document.createElement("div");
-
-      field.className = "field";
-
-      const small =
-        document.createElement("small");
-
-      small.textContent = label;
-
-      let input;
-
-      if(type === "select"){
-
-        input =
-          document.createElement("select");
-
-        if(id === "destinationChain"){
-
-          [
-            ["", "Select destination chain"],
-            ["baseSepolia", "Base Sepolia"],
-            ["ethereumSepolia", "Ethereum Sepolia"],
-            ["arbitrumSepolia", "Arbitrum Sepolia"]
-          ].forEach(
-            ([optionValue,optionText]) => {
-
-              const option =
-                document.createElement("option");
-
-              option.value = optionValue;
-              option.textContent = optionText;
-
-              input.appendChild(option);
-            }
-          );
-
-        }else if(id === "vote"){
-
-          [
-            ["", "Select vote"],
-            ["for", "For"],
-            ["against", "Against"],
-            ["abstain", "Abstain"]
-          ].forEach(
-            ([optionValue,optionText]) => {
-
-              const option =
-                document.createElement("option");
-
-              option.value = optionValue;
-              option.textContent = optionText;
-
-              input.appendChild(option);
-            }
-          );
-        }
-
-      }else{
-
-        input =
-          document.createElement("input");
-
-        input.type = type;
-        input.value = value;
-      }
-
-      input.id =
-        "agentAction_" + id;
-
-      field.appendChild(small);
-      field.appendChild(input);
-      fields.appendChild(field);
-    }
-  );
-
-  container.appendChild(fields);
-
-  const policy =
-    document.createElement("div");
-
-  policy.className = "fields";
-
-}
-
-function updateAgentActions(){
-
- const domain =
-   document.getElementById("agentDomain").value;
-
- const select =
-   document.getElementById("agentAction");
-
- const actions =
-   AGENT_ACTIONS[domain] || AGENT_ACTIONS.general;
-
- select.innerHTML = "";
-
- actions.forEach(([value, label]) => {
-
-   const option =
-     document.createElement("option");
-
-   option.value = value;
-   option.textContent = label;
-
-   select.appendChild(option);
-
- });
-}
-
-
-document.getElementById("agentDomain")
-.addEventListener("change", () => {
- updateAgentActions();
- renderAgentActionFields();
-});
-
-document.getElementById("agentAction")
-.addEventListener("change", () => {
- updateAgentContextFields();
- renderAgentActionFields();
-});
-
-updateAgentActions();
-updateAgentContextFields();
-renderAgentActionFields();
-
-
-
-const AGENT_CONTEXT_RULES = {
-
-  defi: {
-    swap:{protocol:true,asset:"token"},
-    deposit:{protocol:true,asset:"any"},
-    withdraw:{protocol:true,asset:"any"},
-    supply:{protocol:true,asset:"token"},
-    redeem:{protocol:true,asset:"token"},
-    lend:{protocol:true,asset:"token"},
-    borrow:{protocol:true,asset:"token"},
-    repay:{protocol:true,asset:"token"},
-    stake:{protocol:true,asset:"token"},
-    unstake:{protocol:true,asset:"token"},
-    "lp-add":{protocol:true,asset:"token"},
-    "lp-remove":{protocol:true,asset:"token"},
-    claim:{protocol:true,asset:"token"},
-    approve:{protocol:false,asset:"token"},
-    permit:{protocol:false,asset:"token"},
-    bridge:{protocol:true,asset:"token"},
-    wrap:{protocol:false,asset:"native"},
-    unwrap:{protocol:false,asset:"token"},
-    mint:{protocol:true,asset:"none"},
-    burn:{protocol:true,asset:"token"},
-    liquidate:{protocol:true,asset:"token"},
-    rebalance:{protocol:true,asset:"token"},
-    "contract-call":{protocol:false,asset:"none"},
-    "custom-action":{protocol:false,asset:"none"}
-  },
-
-  "prediction-market":{
-    "buy-position":{protocol:true,asset:"token"},
-    "sell-position":{protocol:true,asset:"token"},
-    "add-position":{protocol:true,asset:"token"},
-    "reduce-position":{protocol:true,asset:"token"},
-    "close-position":{protocol:true,asset:"none"},
-    "deposit-collateral":{protocol:true,asset:"token"},
-    "withdraw-collateral":{protocol:true,asset:"token"},
-    "claim-winnings":{protocol:true,asset:"none"},
-    "redeem-position":{protocol:true,asset:"none"},
-    "split-position":{protocol:true,asset:"none"},
-    "merge-position":{protocol:true,asset:"none"},
-    trade:{protocol:true,asset:"token"},
-    approve:{protocol:false,asset:"token"},
-    "contract-call":{protocol:false,asset:"none"},
-    "custom-action":{protocol:false,asset:"none"}
-  },
-
-  gaming:{
-    purchase:{protocol:true,asset:"token"},
-    sell:{protocol:true,asset:"token"},
-    trade:{protocol:true,asset:"token"},
-    transfer:{protocol:true,asset:"token"},
-    mint:{protocol:true,asset:"none"},
-    burn:{protocol:true,asset:"token"},
-    claim:{protocol:true,asset:"none"},
-    upgrade:{protocol:true,asset:"none"},
-    craft:{protocol:true,asset:"none"},
-    equip:{protocol:true,asset:"none"},
-    unequip:{protocol:true,asset:"none"},
-    stake:{protocol:true,asset:"token"},
-    unstake:{protocol:true,asset:"token"},
-    deposit:{protocol:true,asset:"token"},
-    withdraw:{protocol:true,asset:"token"},
-    approve:{protocol:false,asset:"token"},
-    "marketplace-listing":{protocol:true,asset:"none"},
-    "marketplace-bid":{protocol:true,asset:"token"},
-    "marketplace-offer":{protocol:true,asset:"token"},
-    "contract-call":{protocol:false,asset:"none"},
-    "custom-action":{protocol:false,asset:"none"}
-  },
-
-  dao:{
-    transfer:{protocol:false,asset:"token"},
-    deposit:{protocol:true,asset:"token"},
-    withdraw:{protocol:true,asset:"token"},
-    approve:{protocol:false,asset:"token"},
-    delegate:{protocol:true,asset:"none"},
-    undelegate:{protocol:true,asset:"none"},
-    propose:{protocol:true,asset:"none"},
-    vote:{protocol:true,asset:"none"},
-    queue:{protocol:true,asset:"none"},
-    execute:{protocol:true,asset:"none"},
-    "cancel-proposal":{protocol:true,asset:"none"},
-    claim:{protocol:true,asset:"none"},
-    stream:{protocol:true,asset:"token"},
-    "create-grant":{protocol:true,asset:"token"},
-    "fund-grant":{protocol:true,asset:"token"},
-    "contract-call":{protocol:false,asset:"none"},
-    "custom-action":{protocol:false,asset:"none"}
-  },
-
-  "agent-payment":{
-    pay:{protocol:false,asset:"token"},
-    send:{protocol:false,asset:"token"},
-    transfer:{protocol:false,asset:"token"},
-    "request-payment":{protocol:false,asset:"token"},
-    "split-payment":{protocol:false,asset:"token"},
-    "recurring-payment":{protocol:false,asset:"token"},
-    deposit:{protocol:true,asset:"token"},
-    withdraw:{protocol:true,asset:"token"},
-    refund:{protocol:true,asset:"token"},
-    claim:{protocol:true,asset:"none"},
-    approve:{protocol:false,asset:"token"},
-    "contract-call":{protocol:false,asset:"none"},
-    "custom-action":{protocol:false,asset:"none"}
-  },
-
-  "virtual-card":{
-    purchase:{protocol:false,asset:"none"},
-    authorize:{protocol:false,asset:"none"},
-    capture:{protocol:false,asset:"none"},
-    void:{protocol:false,asset:"none"},
-    refund:{protocol:false,asset:"none"},
-    "partial-refund":{protocol:false,asset:"none"},
-    payment:{protocol:false,asset:"none"},
-    transfer:{protocol:false,asset:"none"},
-    deposit:{protocol:false,asset:"token"},
-    withdraw:{protocol:false,asset:"token"},
-    "fund-card":{protocol:false,asset:"token"},
-    "withdraw-card-balance":{protocol:false,asset:"token"},
-    approve:{protocol:false,asset:"none"},
-    "contract-call":{protocol:false,asset:"none"},
-    "custom-action":{protocol:false,asset:"none"}
-  },
-
-  general:{
-    send:{protocol:false,asset:"any"},
-    transfer:{protocol:false,asset:"any"},
-    approve:{protocol:false,asset:"token"},
-    permit:{protocol:false,asset:"token"},
-    "contract-call":{protocol:false,asset:"none"},
-    deploy:{protocol:false,asset:"none"},
-    upgrade:{protocol:false,asset:"none"},
-    mint:{protocol:false,asset:"none"},
-    burn:{protocol:false,asset:"token"},
-    claim:{protocol:false,asset:"none"},
-    deposit:{protocol:true,asset:"token"},
-    withdraw:{protocol:true,asset:"token"},
-    stake:{protocol:true,asset:"token"},
-    unstake:{protocol:true,asset:"token"},
-    bridge:{protocol:true,asset:"token"},
-    "custom-action":{protocol:false,asset:"none"}
-  }
-
-};
-
-function getAgentContextRule(){
-
- const domain =
-   document.getElementById("agentDomain")?.value;
-
- const action =
-   document.getElementById("agentAction")?.value;
-
- return AGENT_CONTEXT_RULES[domain]?.[action] ||
-   {protocol:false,asset:"none"};
-}
-
-function updateAgentContextFields(){
-
- const rule = getAgentContextRule();
-
- const protocolField =
-   document.getElementById("agentProtocolField");
-
- const assetField =
-   document.getElementById("agentAssetField");
-
- if(protocolField)
-   protocolField.style.display =
-     rule.protocol ? "" : "none";
-
- if(assetField)
-   assetField.style.display =
-     rule.asset !== "none" ? "" : "none";
-
- const protocolSelect =
-   document.getElementById("agentProtocol");
-
- const assetSelect =
-   document.getElementById("agentAsset");
-
- if(protocolSelect)
-   protocolSelect.disabled = !rule.protocol;
-
- if(assetSelect)
-   assetSelect.disabled = !rule.asset;
-
- if(rule.protocol)
-   updateProtocols();
-
- if(rule.asset)
-   updateAssets();
-
-}
-
-function updateProtocols(){
-
- const chain =
-   document.getElementById("agentChain").value;
-
- const select =
-   document.getElementById("agentProtocol");
-
- select.innerHTML = "";
-
- const list = protocols[chain] || [];
-
- list.forEach(protocol => {
-
-   const option = document.createElement("option");
-
-   option.value = protocol;
-
-   option.textContent = protocol;
-
-   select.appendChild(option);
-
- });
-
- if(!list.length){
-
-   const option = document.createElement("option");
-
-   option.value = "";
-
-   option.textContent = "No registered protocol";
-
-   select.appendChild(option);
-
- }
-
-}
-
-
-
-document.getElementById("agentChain")
-.addEventListener("change", updateAgentContextFields);
-
-
-
-/* =========================================================
-   ASSETS
-   ========================================================= */
-
-let assets = {};
-
-async function loadAssets(){
-
- try{
-
-   assets = await api("/api/assets");
-
-   updateAssets();
-
- }catch(error){
-
-   document.getElementById("agentAsset").innerHTML =
-     "<option>Unavailable</option>";
-
- }
-
-}
-
-
-
-function syncAgentProtocolWithAsset(){
-
- const chain =
-   document.getElementById("agentChain").value;
-
- const domain =
-   document.getElementById("agentDomain")?.value;
-
- const action =
-   document.getElementById("agentAction")?.value;
-
- const assetValue =
-   document.getElementById("agentAsset").value;
-
- const protocolSelect =
-   document.getElementById("agentProtocol");
-
- if(!protocolSelect) return;
-
- const rule =
-   AGENT_CONTEXT_RULES[domain]?.[action] ||
-   {protocol:false,asset:false};
-
- if(!rule.protocol){
-
-   protocolSelect.disabled = true;
-   protocolSelect.innerHTML = "";
-
-   return;
- }
-
- protocolSelect.disabled = false;
-
- /*
-  * Native is a protocol value only for a direct
-  * native-asset send. Other protocol-aware actions
-  * must keep their registered protocol context.
-  */
- const isNativeSend =
-   domain === "general" &&
-   action === "send" &&
-   (!assetValue || assetValue === "null");
-
- if(isNativeSend){
-
-   protocolSelect.innerHTML = "";
-
-   const option =
-     document.createElement("option");
-
-   option.value = "Native";
-   option.textContent = "Native";
-
-   protocolSelect.appendChild(option);
-   protocolSelect.value = "Native";
-
-   return;
- }
-
- const selectedAsset =
-   (assets[chain] || []).find(
-     item =>
-       String(item.address) === String(assetValue)
-   );
-
- const registeredProtocol =
-   selectedAsset?.protocol || null;
-
- const list =
-   protocols[chain] || [];
-
- const contextualList =
-   registeredProtocol
-     ? list.filter(
-         protocol =>
-           protocol === registeredProtocol
-       )
-     : list;
-
- protocolSelect.innerHTML = "";
-
- contextualList.forEach(protocol => {
-
-   const option =
-     document.createElement("option");
-
-   option.value = protocol;
-   option.textContent = protocol;
-
-   protocolSelect.appendChild(option);
-
- });
-
- if(!contextualList.length){
-
-   const option =
-     document.createElement("option");
-
-   option.value = "";
-   option.textContent =
-     "No registered protocol";
-
-   protocolSelect.appendChild(option);
-
- }
-
-}
-
-
-function updateAssets(){
-
- const chain =
-   document.getElementById("agentChain").value;
-
- const select =
-   document.getElementById("agentAsset");
-
- if(!select) return;
-
- const rule =
-   getAgentContextRule();
-
- select.innerHTML = "";
-
- const mode =
-   rule.asset || "none";
-
- if(mode === "none"){
-
-   select.disabled = true;
-
-   syncAgentProtocolWithAsset();
-
-   return;
- }
-
- select.disabled = false;
-
- const list =
-   assets[chain] || [];
-
- const filtered =
-   mode === "native"
-     ? list.filter(
-         asset => asset.type === "native"
-       )
-     : mode === "token"
-       ? list.filter(
-           asset => asset.type === "erc20"
-         )
-       : list;
-
- filtered.forEach(asset => {
-
-   const option =
-     document.createElement("option");
-
-   option.value =
-     asset.address === null
-       ? "null"
-       : asset.address;
-
-   option.textContent =
-     `${asset.symbol || asset.name} — ${asset.name || ""}`;
-
-   option.dataset.assetType =
-     asset.type || "";
-
-   select.appendChild(option);
-
- });
-
- if(!filtered.length){
-
-   const option =
-     document.createElement("option");
-
-   option.value = "";
-
-   option.textContent =
-     mode === "native"
-       ? "No registered native asset"
-       : mode === "token"
-         ? "No registered token"
-         : "No registered asset";
-
-   select.appendChild(option);
-
- }
-
- syncAgentProtocolWithAsset();
-}
-
-
-/* =========================================================
-   CHAIN STATUS
-   ========================================================= */
-
-async function loadChainStatus(){
-
- try{
-
-   const data = await api("/chain-status");
-
-   const list =
-     document.getElementById("chainStatusList");
-
-   list.innerHTML = "";
-
-   let connected = 0;
-
-   Object.entries(data.chains || {}).forEach(([key, chain]) => {
-
-     if(chain.connected && chain.chainMatches){
-
-       connected++;
-
-     }
-
-     const row = document.createElement("div");
-
-     row.className = "row";
-
-     row.innerHTML = `
-
-       <div class="row-icon">
-         ${chain.connected && chain.chainMatches ? "✓" : "!"}
-       </div>
-
-       <div>
-         <strong>${escapeHtml(chain.name || key)}</strong>
-         <span>
-           Expected ${escapeHtml(String(chain.expectedChainId))}
-           · Actual ${escapeHtml(String(chain.actualChainId || "—"))}
-         </span>
-       </div>
-
-       <div class="time">
-         ${chain.connected && chain.chainMatches ? "READY" : "ERROR"}
-       </div>
-
-     `;
-
-     list.appendChild(row);
-
-   });
-
-   document.getElementById("verificationChains").textContent =
-     `${connected}/${Object.keys(data.chains || {}).length} connected`;
-
-   document.getElementById("chainBadge").textContent =
-     `${connected}/${Object.keys(data.chains || {}).length} READY`;
-
-   document.getElementById("networkStatus").textContent =
-     connected === Object.keys(data.chains || {}).length
-     ? "◈ Networks Ready"
-     : "◈ Network Issue";
-
- }catch(error){
-
-   document.getElementById("verificationChains").textContent =
-     "Unavailable";
-
-   document.getElementById("chainBadge").textContent =
-     "ERROR";
-
- }
-
-}
-
-
-
-/* =========================================================
-   AUTHORIZATION
-   ========================================================= */
-
-function getAgentSemanticFields(){
-  const domain =
-    document.getElementById("agentDomain")?.value || "";
-
-  const action =
-    document.getElementById("agentAction")?.value || "";
-
-  const schema =
-    AGENT_ACTION_FIELDS[domain]?.[action] || [];
-
-  const fields = {};
-
-  schema.forEach(([key]) => {
-    const element =
-      document.getElementById(`agentAction_${key}`);
-
-    if(!element) return;
-
-    fields[key] =
-      element.value === undefined
-        ? ""
-        : String(element.value).trim();
-  });
-
-  return fields;
-}
-
-function buildAuthorizationRequest(){
-
-  const get = id => {
-    const element = document.getElementById(id);
-    return element ? element.value.trim() : "";
-  };
-
-  const number = id => {
-    const value = Number(get(id));
-    return Number.isFinite(value) ? value : 0;
-  };
-
-  const agent = get("agentName");
-  const wallet = get("agentWallet");
-  const chainKey = get("agentChain");
-  const domain = get("agentDomain");
-  const action = get("agentAction");
-  const protocol = get("agentProtocol");
-  const asset = get("agentAsset");
-
-  const selectedChain =
-    chains.find(chain => chain.key === chainKey);
-
-  const semantic =
-    getAgentSemanticFields();
-
-  const semanticText = key =>
-    semantic[key] !== undefined
-      ? String(semantic[key]).trim()
-      : "";
-
-  const semanticNumber = key => {
-    const value =
-      Number(semanticText(key));
-
-    return Number.isFinite(value)
-      ? value
-      : 0;
-  };
-
-  const amountKeys = [
-    "intentAmount",
-    "amount",
-    "allowance",
-    "approvalAmount"
-  ];
-
-  const amountKey =
-    amountKeys.find(
-      key => semanticText(key) !== ""
-    );
-
-  const amount =
-    amountKey
-      ? semanticNumber(amountKey)
-      : 0;
-
-  const actualAmount =
-    semanticText("actualAmount") !== ""
-      ? semanticNumber("actualAmount")
-      : amount;
-
-  const maximum =
-    number("policyMaximum");
-    const dailyLimit = number("dailyLimit");
-
-  const recipient =
-    semanticText("recipient");
-
-  const spender =
-    semanticText("spender");
-
-  const target =
-    semanticText("target") ||
-    semanticText("contract");
-
-  const tokenIn =
-    semanticText("tokenIn");
-
-  const tokenOut =
-    semanticText("tokenOut");
-
-  const minimumAmountOut =
-    semanticNumber("amountOutMin");
-
-  const destinationChain =
-    semanticText("destinationChain");
-
-  const bridge =
-    semanticText("bridge");
-
-  const functionName =
-    semanticText("function");
-
-  const selector =
-    semanticText("selector");
-
-  const parameters =
-    semanticText("parameters");
-
-  const normalizedAction =
-    action === "approve"
-      ? "approval"
-      : action;
-
-  const selectedAsset =
-    (assets[chainKey] || []).find(
-      item => String(item.address) === String(asset)
-    ) ||
-    (assets[chainKey] || []).find(
-      item =>
-        item.type === "native" &&
-        (!asset || asset === "")
-    );
-
-  const isNativeAsset =
-    selectedAsset?.type === "native" ||
-    selectedAsset?.address === null;
-
-  const isNativeSend =
-    action === "send" &&
-    isNativeAsset;
-
-  const normalizedAsset =
-    isNativeAsset
-      ? ""
-      : asset;
-
-  const intent = {
-    type: normalizedAction,
-    domain,
-    action,
-    protocol,
-    asset: normalizedAsset,
-    assetAddress:
-      isNativeAsset
-        ? undefined
-        : (asset || undefined),
-    amount,
-    chain: chainKey,
-    chainId:
-      selectedChain
-        ? selectedChain.chainId
-        : undefined,
-    recipient:
-      recipient || undefined,
-    spender:
-      spender || undefined,
-    target:
-      target || undefined,
-    tokenIn:
-      tokenIn || undefined,
-    tokenOut:
-      tokenOut || undefined,
-    amountOutMin:
-      action === "swap"
-        ? minimumAmountOut
-        : undefined,
-    destinationChain:
-      destinationChain || undefined,
-    bridge:
-      bridge || undefined,
-    function:
-      functionName || undefined,
-    selector:
-      selector || undefined,
-    parameters:
-      parameters || undefined,
-
-    actionFields:
-      semantic,
-    nativeValue:
-      isNativeSend
-        ? String(amount)
-        : "0"
-  };
-
-  const transaction = {
-    chain: chainKey,
-    chainId:
-      selectedChain
-        ? selectedChain.chainId
-        : undefined,
-    expectedChainId:
-      selectedChain
-        ? selectedChain.chainId
-        : undefined,
-    from: wallet,
-    to:
-      isNativeSend
-        ? recipient
-        : (target || undefined),
-    value:
-      isNativeSend
-        ? String(actualAmount)
-        : "0",
-    amount: actualAmount,
-    calldata:
-      isNativeSend
-        ? "0x"
-        : (selector || "0x"),
-    actionFields:
-      semantic,
-    destinationAllowed: true
-  };
-
-  return {
-    agent: {
-      id: agent,
-      name: agent,
-      wallet,
-      address: wallet
-    },
-
-    action: {
-      type: normalizedAction,
-      name: functionName || action,
-      domain,
-      chain: chainKey,
-      chainId:
-        selectedChain
-          ? selectedChain.chainId
-          : undefined,
-      protocol,
-      asset: normalizedAsset,
-      actionFields:
-        semantic
-    },
-
-    intent,
-
-    policy: {
-      maxTransactionAmount: maximum,
-      dailyLimit: dailyLimit,
-      maxTransaction: maximum,
-      allowedProtocols:
-        protocol
-          ? [protocol]
-          : [],
-      allowedChains: [chainKey]
-    },
-
-    transaction
-  };
-}
-
-document.getElementById("evaluate")
-.addEventListener("click", async () => {
-
- const button =
-   document.getElementById("evaluate");
-
- const result =
-   document.getElementById("authorizationResult");
-
- button.disabled = true;
-
- button.textContent = "Evaluating...";
-
- result.classList.remove("show");
-
- try{
-
-   const payload =
-     buildAuthorizationRequest();
-
-   const data =
-     await api("/authorize",{
-       method:"POST",
-       body:JSON.stringify(payload)
-     });
-
-
-
-   result.classList.add("show");
-
-
-   document.getElementById("resultTitle").textContent =
-     data.authorized
-     ? "AUTHORIZED"
-     : "BLOCKED";
-
-   document.getElementById("resultTitle").className =
-     "result-title " + (data.authorized ? "ok" : "bad");
-
-
-
-   document.getElementById("resultReason").textContent =
-     data.reason || "";
-
-
-
-   setVerdict(
-     "vPolicy",
-     data.verdict?.policy
-   );
-
-   setVerdict(
-     "vIntent",
-     data.verdict?.intent
-   );
-
-   setVerdict(
-     "vParameters",
-     data.verdict?.parameters
-   );
-
-   setVerdict(
-     "vProtocol",
-     data.verdict?.protocol
-   );
-
-   setVerdict(
-     "vContract",
-     data.verdict?.contract
-   );
-
-   setVerdict(
-     "vSecurity",
-     data.verdict?.transactionSecurity
-   );
-
-
-
-   document.getElementById("proofOutput").textContent =
-     JSON.stringify({
-       authorized:data.authorized,
-       risk:data.risk,
-       actualTransactionAmount:data.actualTransactionAmount,
-       declaredIntentAmount:data.declaredIntentAmount,
-       policyMaximum:data.policyMaximum,
-       commitment:data.proof?.commitment,
-       algorithm:data.proof?.algorithm,
-       claim:data.proof?.claim
-     },null,2);
-
-
-
-   addActivity(data);
-
- }catch(error){
-
-   result.classList.add("show");
-
-   document.getElementById("resultTitle").textContent =
-     "Authorization request failed";
-
-   document.getElementById("resultTitle").className =
-     "result-title bad";
-
-   document.getElementById("resultReason").textContent =
-     error.message;
-
-   document.getElementById("proofOutput").textContent = "";
-
- }finally{
-
-   button.disabled = false;
-
-   button.textContent = "Verify & Authorize";
-
- }
-
-});
 
 
 
@@ -8625,6 +6768,510 @@ init();
     buildPayload
   };
 
+})();
+
+
+
+</script>
+
+
+<script>
+/* ============================================================
+   PHORVA AGENT — CLEAN MVP
+   Intent → Execution → Verification → Verdict → Receipt
+   ============================================================ */
+(function () {
+  "use strict";
+
+  const $ = (id) => document.getElementById(id);
+
+  const scenarios = {
+    trading: {
+      name: "AI Trading",
+      agent: "TradingAgent-01",
+      action: "transfer",
+      label: "Transfer",
+      amount: 300,
+      actual: 500,
+      asset: "USDC",
+      description: "Transfer 300 USDC to the trading execution account.",
+      attempt: "The agent attempts to transfer the requested trading funds.",
+      policy: 300
+    },
+
+    treasury: {
+      name: "Treasury Agent",
+      agent: "TreasuryAgent-01",
+      action: "send",
+      label: "Send",
+      amount: 300,
+      actual: 250,
+      asset: "ETH",
+      description: "Send 300 ETH-equivalent units from the treasury.",
+      attempt: "The treasury agent attempts a native blockchain transfer.",
+      policy: 300
+    },
+
+    payments: {
+      name: "AI Payment",
+      agent: "PaymentAgent-01",
+      action: "send",
+      label: "Send",
+      amount: 100,
+      actual: 150,
+      asset: "ETH",
+      description: "Send 100 units to the approved payment recipient.",
+      attempt: "The payment agent attempts to execute the payment.",
+      policy: 100
+    },
+
+    prediction: {
+      name: "Prediction Market",
+      agent: "PredictionAgent-01",
+      action: "transfer",
+      label: "Transfer",
+      amount: 100,
+      actual: 100,
+      asset: "USDC",
+      description: "Transfer 100 USDC to fund a prediction-market position.",
+      attempt: "The prediction agent attempts to fund the position.",
+      policy: 100
+    }
+  };
+
+  let currentResult = null;
+  let chainList = [];
+
+  function setText(id, value) {
+    const node = $(id);
+    if (node) node.textContent = value == null ? "—" : String(value);
+  }
+
+  function setCheck(id, textId, passed, message) {
+    const node = $(id);
+    if (node) {
+      node.className = "status " + (passed ? "ok" : "bad");
+    }
+
+    setText(textId, message || (passed ? "Passed." : "Failed."));
+  }
+
+  function badge(authorized) {
+    const node = $("agentVerificationBadge");
+    if (!node) return;
+
+    node.textContent = authorized ? "AUTHORIZED" : "BLOCKED";
+    node.className = "badge " + (authorized ? "green" : "red");
+  }
+
+  function normalizeChainKey(value) {
+    return value || "base-sepolia";
+  }
+
+  async function loadChainsForAgent() {
+    try {
+      const data = await fetch("/api/chains").then(r => r.json());
+      if (!Array.isArray(data)) return;
+
+      chainList = data;
+
+      const select = $("agentNetwork");
+      if (!select) return;
+
+      select.innerHTML = "";
+
+      data.forEach(chain => {
+        const option = document.createElement("option");
+        option.value = chain.key;
+        option.textContent =
+          `${chain.name} (${chain.chainId})`;
+        select.appendChild(option);
+      });
+
+      if (data.some(c => c.key === "base-sepolia")) {
+        select.value = "base-sepolia";
+      }
+    } catch (error) {
+      console.error("PHORVA Agent chain load failed:", error);
+    }
+  }
+
+  function getScenario() {
+    return scenarios[$("agentScenario")?.value] || scenarios.trading;
+  }
+
+  function updateScenario() {
+    const s = getScenario();
+
+    setText("agentOrderAgent", s.agent);
+    setText("agentIntentAction", s.label);
+    setText("agentIntentAmount", `${s.amount} ${s.asset}`);
+    setText("agentIntentProtocol",
+      s.action === "send" ? "Native transfer" : "Token transfer");
+    setText("agentIntentDescription", s.description);
+
+    const attempted = $("agentAttemptedAmount");
+    const maximum = $("agentPolicyMaximum");
+
+    if (attempted) attempted.value = s.actual;
+    if (maximum) maximum.value = s.policy;
+
+    setText("agentExecutionDescription", s.attempt);
+
+    const verdict = $("agentVerdict");
+    const receipt = $("agentReceipt");
+
+    if (verdict) verdict.style.display = "none";
+    if (receipt) receipt.style.display = "none";
+
+    const badgeNode = $("agentVerificationBadge");
+    if (badgeNode) {
+      badgeNode.textContent = "READY";
+      badgeNode.className = "badge";
+    }
+
+    [
+      ["agentCheckIdentity", "agentCheckIdentityText"],
+      ["agentCheckIntent", "agentCheckIntentText"],
+      ["agentCheckPolicy", "agentCheckPolicyText"],
+      ["agentCheckParameters", "agentCheckParametersText"],
+      ["agentCheckProtocol", "agentCheckProtocolText"],
+      ["agentCheckSecurity", "agentCheckSecurityText"]
+    ].forEach(([id, textId]) => {
+      const node = $(id);
+      if (node) node.className = "status";
+      setText(textId, "Waiting for authorization.");
+    });
+
+    currentResult = null;
+  }
+
+  function address(value) {
+    return String(value).replace(/^0x/, "").padStart(64, "0");
+  }
+
+  function uint256(value) {
+    return BigInt(Math.max(0, Math.floor(Number(value) || 0)))
+      .toString(16)
+      .padStart(64, "0");
+  }
+
+  function findAsset(chainKey, symbol) {
+    const values = window.__phorvaAgentAssets?.[chainKey] || [];
+    return values.find(a =>
+      String(a.symbol || "").toUpperCase() === symbol.toUpperCase()
+    );
+  }
+
+  async function loadAssets() {
+    try {
+      const data = await fetch("/api/assets").then(r => r.json());
+      window.__phorvaAgentAssets = data || {};
+    } catch (error) {
+      window.__phorvaAgentAssets = {};
+      console.warn("PHORVA Agent asset load failed:", error);
+    }
+  }
+
+  function buildRequest() {
+    const s = getScenario();
+    const chainKey = normalizeChainKey($("agentNetwork")?.value);
+
+    const chain =
+      chainList.find(c => c.key === chainKey) ||
+      { key: chainKey };
+
+    const attempted = Number($("agentAttemptedAmount")?.value || 0);
+    const maximum = Number($("agentPolicyMaximum")?.value || 0);
+
+    const recipient =
+      "0x3333333333333333333333333333333333333333";
+
+    let assetAddress;
+    let transaction;
+
+    if (s.action === "send") {
+      transaction = {
+        chain: chainKey,
+        chainId: chain.chainId,
+        expectedChainId: chain.chainId,
+        from: "0x1111111111111111111111111111111111111111",
+        to: recipient,
+        value: String(attempted),
+        amount: attempted,
+        calldata: "0x"
+      };
+    } else {
+      const token = findAsset(chainKey, "USDC");
+
+      if (!token || !token.address) {
+        throw new Error(
+          "USDC is not available on the selected network."
+        );
+      }
+
+      assetAddress = token.address;
+
+      transaction = {
+        chain: chainKey,
+        chainId: chain.chainId,
+        expectedChainId: chain.chainId,
+        from: "0x1111111111111111111111111111111111111111",
+        to: token.address,
+        value: "0",
+        amount: attempted,
+        calldata:
+          "0xa9059cbb" +
+          address(recipient) +
+          uint256(attempted)
+      };
+    }
+
+    const intent = {
+      type: s.action,
+      chain: chainKey,
+      chainId: chain.chainId,
+      asset: s.action === "send" ? "" : "USDC",
+      assetAddress,
+      amount: s.amount,
+      recipient
+    };
+
+    const action = {
+      type: s.action,
+      chain: chainKey,
+      chainId: chain.chainId,
+      asset: s.action === "send" ? "" : "USDC",
+      amount: s.amount
+    };
+
+    return {
+      agent: {
+        id: s.agent,
+        name: s.agent
+      },
+
+      action,
+
+      intent,
+
+      policy: {
+        maxTransactionAmount: maximum,
+        maxTransaction: maximum,
+        dailyLimit: 2000
+      },
+
+      transaction
+    };
+  }
+
+  function renderResult(data) {
+    currentResult = data;
+
+    const authorized = data.authorized === true;
+
+    badge(authorized);
+
+    const checks = [
+      [
+        "agentCheckIdentity",
+        "agentCheckIdentityText",
+        true,
+        "Agent identity accepted."
+      ],
+      [
+        "agentCheckIntent",
+        "agentCheckIntentText",
+        data.intentMatched === true,
+        data.intentMatched
+          ? "Declared intent matches the execution."
+          : "The execution does not match the declared intent."
+      ],
+      [
+        "agentCheckPolicy",
+        "agentCheckPolicyText",
+        data.policyPassed === true,
+        data.policyPassed
+          ? "Transaction is within the configured policy."
+          : "Transaction exceeds the configured policy."
+      ],
+      [
+        "agentCheckParameters",
+        "agentCheckParametersText",
+        data.parameterMatched === true,
+        data.parameterMatched
+          ? "Transaction parameters match the authorization."
+          : "Transaction parameters do not match the authorization."
+      ],
+      [
+        "agentCheckProtocol",
+        "agentCheckProtocolText",
+        data.protocolMatched !== false,
+        data.protocolMatched !== false
+          ? "Execution target matches the authorization."
+          : "Execution target does not match the authorization."
+      ],
+      [
+        "agentCheckSecurity",
+        "agentCheckSecurityText",
+        data.transactionSecuritySafe !== false,
+        data.transactionSecuritySafe !== false
+          ? "No transaction-security violation was reported."
+          : "PHORVA detected a transaction-security violation."
+      ]
+    ];
+
+    checks.forEach(c => setCheck(...c));
+
+    const verdict = $("agentVerdict");
+    if (verdict) verdict.style.display = "block";
+
+    setText(
+      "agentVerdictTitle",
+      authorized ? "AUTHORIZED" : "BLOCKED"
+    );
+
+    const title = $("agentVerdictTitle");
+    if (title) {
+      title.className = "result-title " + (authorized ? "ok" : "bad");
+    }
+
+    setText(
+      "agentVerdictReason",
+      data.reason || (
+        authorized
+          ? "PHORVA authorized the requested execution."
+          : "PHORVA blocked the requested execution."
+      )
+    );
+
+    setText(
+      "agentVerdictIntent",
+      data.intentMatched ? "MATCHED" : "FAILED"
+    );
+    setText(
+      "agentVerdictPolicy",
+      data.policyPassed ? "PASSED" : "FAILED"
+    );
+    setText(
+      "agentVerdictParameters",
+      data.parameterMatched ? "MATCHED" : "FAILED"
+    );
+    setText(
+      "agentVerdictProtocol",
+      data.protocolMatched === false ? "FAILED" : "MATCHED"
+    );
+    setText(
+      "agentVerdictSecurity",
+      data.transactionSecuritySafe === false ? "FAILED" : "PASSED"
+    );
+    setText(
+      "agentVerdictExecution",
+      authorized ? "ALLOWED" : "BLOCKED"
+    );
+
+    const receipt = $("agentReceipt");
+    if (receipt) receipt.style.display = "block";
+
+    const s = getScenario();
+
+    setText("agentReceiptBadge", authorized ? "AUTHORIZED" : "BLOCKED");
+    setText("agentReceiptAgent", s.agent);
+    setText(
+      "agentReceiptIntent",
+      `${s.label} · ${s.amount} ${s.asset}`
+    );
+    setText(
+      "agentReceiptActual",
+      `${$("agentAttemptedAmount")?.value || 0} ${s.asset}`
+    );
+    setText(
+      "agentReceiptNetwork",
+      $("agentNetwork")?.selectedOptions?.[0]?.textContent ||
+        $("agentNetwork")?.value
+    );
+    setText(
+      "agentReceiptAuthorization",
+      authorized ? "Allowed to proceed" : "Execution blocked"
+    );
+
+    const id =
+      data.verificationId ||
+      data.receipt?.id ||
+      data.proof?.id ||
+      data.commitment ||
+      data.proof?.commitment;
+
+    setText(
+      "agentReceiptId",
+      id || "Authorization evidence generated"
+    );
+  }
+
+  async function verify() {
+    const button = $("agentVerifyButton");
+    if (!button) return;
+
+    button.disabled = true;
+    button.textContent = "Verifying…";
+
+    try {
+      const payload = buildRequest();
+
+      const response = await fetch("/authorize", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || `Authorization failed (${response.status})`
+        );
+      }
+
+      renderResult(data);
+    } catch (error) {
+      console.error("PHORVA Agent verification failed:", error);
+
+      const verdict = $("agentVerdict");
+      if (verdict) verdict.style.display = "block";
+
+      setText("agentVerdictTitle", "VERIFICATION ERROR");
+      setText("agentVerdictReason", error.message);
+
+      const title = $("agentVerdictTitle");
+      if (title) title.className = "result-title bad";
+
+      badge(false);
+
+      const receipt = $("agentReceipt");
+      if (receipt) receipt.style.display = "none";
+    } finally {
+      button.disabled = false;
+      button.textContent = "Verify & Authorize";
+    }
+  }
+
+  async function init() {
+    if (!$("agentScenario")) return;
+
+    $("agentScenario").addEventListener("change", updateScenario);
+    $("agentVerifyButton").addEventListener("click", verify);
+
+    await Promise.all([
+      loadChainsForAgent(),
+      loadAssets()
+    ]);
+
+    updateScenario();
+  }
+
+  init();
 })();
 </script>
 
