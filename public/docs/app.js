@@ -501,7 +501,337 @@ PHORVA_PAGES["semantic-drift"]=`<div class="eyebrow">SECURITY PRIMITIVES</div><h
 
 PHORVA_PAGES["uncertainty"]=`<div class="eyebrow">SECURITY PRIMITIVES</div><h1>Uncertainty &amp; Verification States</h1><p>Phorva distinguishes verified, blocked, review-required and unknown states instead of treating uncertainty as approval.</p>`;
 
+
+PHORVA_PAGES["products"] = `
+<div class="eyebrow">PHORVA / PRODUCTS</div>
+<h1>Phorva Product Ecosystem</h1>
+
+<p>
+Phorva is building an execution-security ecosystem for autonomous and
+AI-driven on-chain activity. The products share the same verification
+semantics while serving different layers of the stack.
+</p>
+
+<div class="cards">
+  <div class="card">
+    <h3>Phorva Core</h3>
+    <p>
+      Verification and authorization infrastructure for autonomous
+      economic execution.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Phorva OnchainAI</h3>
+    <p>
+      A consumer AI application for interacting with crypto applications
+      through natural language.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Phorva SDK / API</h3>
+    <p>
+      Developer interfaces for integrating Phorva verification into
+      applications, agents, wallets and protocols.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Phorva MCP</h3>
+    <p>
+      A standardized tool interface through which AI systems can invoke
+      Phorva verification capabilities.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Developer Console</h3>
+    <p>
+      Projects, credentials, agents, policies, verification logs,
+      usage and integration management.
+    </p>
+  </div>
+</div>
+
+<h2>Product architecture</h2>
+
+<div class="architecture">
+  <div>ONCHAIN AI</div>
+  <span>→</span>
+  <div>CRYPTO APPS</div>
+  <span>→</span>
+  <div class="accent">PHORVA CORE</div>
+  <span>→</span>
+  <div>WALLET / SIGNER</div>
+  <span>→</span>
+  <div>BLOCKCHAIN</div>
+</div>
+
+<h2>The separation</h2>
+
+<p>
+The AI interface owns the user experience. Crypto applications provide
+execution capabilities. Wallets and signers execute transactions.
+Phorva independently determines whether an action is authorized and
+whether execution matches the authorized intent.
+</p>
+
+<div class="notice">
+  <strong>Core boundary</strong>
+  <p>
+    Phorva is not a wallet, exchange, protocol, AI agent, blockchain,
+    prover marketplace or execution environment.
+  </p>
+</div>
+`;
+
+PHORVA_PAGES["onchain-ai"] = `
+<div class="eyebrow">PHORVA / ONCHAIN AI</div>
+<h1>Phorva OnchainAI</h1>
+
+<p>
+Phorva OnchainAI is a consumer AI application designed around one
+interface for interacting with many on-chain applications.
+</p>
+
+<p>
+Its model is similar to a general AI assistant, except the connected
+application ecosystem is crypto-native.
+</p>
+
+<h2>What users experience</h2>
+
+<div class="architecture">
+  <div>USER</div>
+  <span>→</span>
+  <div class="accent">ONCHAIN AI</div>
+  <span>→</span>
+  <div>CRYPTO APP</div>
+  <span>→</span>
+  <div>PHORVA</div>
+  <span>→</span>
+  <div>EXECUTION</div>
+</div>
+
+<p>Examples:</p>
+
+<ul>
+  <li>@uniswap swap $1,000 USDC for ETH</li>
+  <li>@polymarket buy $500 YES</li>
+  <li>@aave deposit $5,000 USDC</li>
+  <li>@metamask send $200 to an address</li>
+  <li>@opensea mint this NFT</li>
+</ul>
+
+<h2>Technical architecture</h2>
+
+<p>
+OnchainAI is an orchestration layer. It does not become the security
+boundary and does not directly decide whether an action may execute.
+</p>
+
+<div class="cards">
+  <div class="card">
+    <h3>1. Natural-language request</h3>
+    <p>
+      The user describes an intended on-chain action using normal language.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>2. Intent extraction</h3>
+    <p>
+      The AI converts the request into structured action semantics such as
+      protocol, action, assets, amount, market, recipient and chain.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>3. Capability discovery</h3>
+    <p>
+      OnchainAI identifies the appropriate connected application and
+      selects the capability required to fulfill the request.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>4. Action construction</h3>
+    <p>
+      The selected application produces a quote, API request,
+      transaction or other execution payload.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>5. Phorva verification</h3>
+    <p>
+      Phorva independently evaluates identity, intent, capability,
+      policy, risk, transaction parameters and authorization.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>6. Authorization</h3>
+    <p>
+      Phorva returns an authorization decision. The AI cannot override
+      a BLOCK decision.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>7. Execution</h3>
+    <p>
+      If authorized, the existing wallet, signer, protocol or execution
+      system performs the action.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>8. Execution verification</h3>
+    <p>
+      Phorva compares the resulting execution against the authorized
+      action and verifies the resulting state.
+    </p>
+  </div>
+</div>
+
+<h2>Security boundary</h2>
+
+<div class="architecture">
+  <div>AI PROPOSES</div>
+  <span>→</span>
+  <div class="accent">PHORVA DECIDES</div>
+  <span>→</span>
+  <div>WALLET EXECUTES</div>
+  <span>→</span>
+  <div>PHORVA VERIFIES</div>
+</div>
+
+<h2>Example: protected swap</h2>
+
+<p>
+A user requests:
+</p>
+
+<div class="notice">
+  <strong>@uniswap swap $1,000 USDC for ETH</strong>
+</div>
+
+<p>
+OnchainAI constructs the intended action and asks the Uniswap integration
+to construct the corresponding execution.
+</p>
+
+<p>
+Phorva then independently checks:
+</p>
+
+<ul>
+  <li>Agent or application identity</li>
+  <li>Declared intent</li>
+  <li>Allowed protocol</li>
+  <li>Allowed chain</li>
+  <li>Requested amount</li>
+  <li>Actual transaction amount</li>
+  <li>Contract and function</li>
+  <li>Transaction parameters</li>
+  <li>Policy limits</li>
+  <li>Risk conditions</li>
+</ul>
+
+<p>
+If the intended amount is $1,000 but the actual transaction attempts
+$5,000 and the policy maximum is $2,000, Phorva returns:
+</p>
+
+<div class="notice">
+  <strong>BLOCKED</strong>
+  <p>
+    Transaction exceeds the authorized amount and policy maximum.
+  </p>
+</div>
+
+<h2>Why the AI is not the security boundary</h2>
+
+<p>
+The AI can be highly capable without being trusted to authorize its own
+actions. Its responsibility is to understand the user's request and
+construct an execution plan.
+</p>
+
+<p>
+Phorva independently evaluates that proposed execution against
+authorization semantics and policy.
+</p>
+
+<h2>Multi-application workflows</h2>
+
+<p>
+OnchainAI can eventually coordinate multiple applications in one
+conversation.
+</p>
+
+<div class="architecture">
+  <div>UNISWAP</div>
+  <span>→</span>
+  <div>PHORVA</div>
+  <span>→</span>
+  <div>AAVE</div>
+  <span>→</span>
+  <div>PHORVA</div>
+  <span>→</span>
+  <div>FINAL STATE</div>
+</div>
+
+<p>
+For example:
+</p>
+
+<div class="notice">
+  <strong>
+    Swap $1,000 USDC for ETH, then deposit the ETH into Aave.
+  </strong>
+</div>
+
+<p>
+The AI can construct the multi-step plan, while Phorva evaluates the
+individual actions and, where supported, the relationships between them
+and the expected final state.
+</p>
+
+<h2>MCP integration</h2>
+
+<p>
+MCP provides a standardized interface through which AI systems can call
+Phorva verification capabilities. MCP is an integration mechanism, not
+the security mechanism itself.
+</p>
+
+<div class="architecture">
+  <div>AI</div>
+  <span>→</span>
+  <div>MCP</div>
+  <span>→</span>
+  <div class="accent">PHORVA CORE</div>
+  <span>→</span>
+  <div>ALLOW / BLOCK</div>
+</div>
+
+<h2>Core principle</h2>
+
+<div class="notice">
+  <strong>
+    AI decides what it wants to do.
+    Phorva decides whether it is allowed to happen.
+  </strong>
+</div>
+`;
+
 const PHORVA_ROUTES = {
+  '/docs/products': 'products',
+  '/docs/products/onchain-ai': 'onchain-ai',
+
   '/docs/verification-model':'verification-model',
   '/docs/verification/conditional-authorization':'conditional-authorization',
   '/docs/verification/state-transition':'state-transition',
@@ -531,6 +861,12 @@ const PHORVA_ROUTES = {
   '/docs/status': 'status',
 '/docs': 'introduction', '/docs/': 'introduction', '/docs/introduction': 'introduction', '/docs/architecture': 'architecture', '/docs/core-concepts': 'core-concepts', '/docs/what-is': 'what-is', '/docs/phorva-vs-infrastructure': 'phorva-vs-infrastructure', '/docs/quickstart': 'quickstart', '/docs/sdk': 'sdk', '/docs/api': 'api', '/docs/authentication': 'authentication', '/docs/connect': 'connect', '/docs/verification/intent': 'intent', '/docs/verification/policy': 'policy', '/docs/verification/risk': 'risk', '/docs/verification/authorization': 'authorization', '/docs/verification/transaction': 'transaction', '/docs/verification/transaction-analysis': 'transaction-analysis', '/docs/verification/execution-graph': 'execution-graph', '/docs/verification/final-state': 'final-state', '/docs/verification/trace': 'trace', '/docs/verification/proof': 'proof', '/docs/verification/commitment': 'commitment', '/docs/verification/receipts': 'receipts', '/docs/verification/semantics': 'verification-semantics', '/docs/verification/security-model': 'security-model', '/docs/verification/failure-states': 'failure-states', '/docs/actions/transfers': 'transfers', '/docs/actions/approvals': 'approvals', '/docs/actions/swaps': 'swaps', '/docs/actions/withdrawals': 'withdrawals', '/docs/actions/defi': 'defi', '/docs/actions/bridges': 'bridges', '/docs/actions/custom-calls': 'custom-calls', '/docs/actions/multi-step': 'multi-step', '/docs/use-cases': 'use-cases', '/docs/use-cases/defi': 'defi', '/docs/use-cases/prediction-markets': 'prediction-markets', '/docs/use-cases/autonomous-trading': 'autonomous-trading', '/docs/use-cases/agent-payments': 'agent-payments', '/docs/use-cases/virtual-cards': 'virtual-cards', '/docs/use-cases/gaming': 'gaming', '/docs/use-cases/agent-wallets': 'agent-wallets', '/docs/use-cases/daos-treasuries': 'daos-treasuries', '/docs/use-cases/onchain-automation': 'onchain-automation', '/docs/infrastructure/chains': 'chains', '/docs/infrastructure/protocols': 'protocols', '/docs/infrastructure/providers': 'providers', '/docs/infrastructure/security': 'infrastructure-security', '/docs/developer/sdk': 'sdk', '/docs/developer/api': 'api-reference', '/docs/developer/api-keys': 'api-keys', '/docs/developer/integration': 'integration', '/docs/developer/errors': 'errors', '/docs/security/threat-model': 'threat-model', '/docs/security/architecture': 'security-architecture', '/docs/security/verification-integrity': 'verification-integrity', '/docs/security/auditability': 'auditability', '/docs/roadmap': 'roadmap'};
 const PHORVA_NAV = [
+
+  ['PRODUCTS', [
+    ['Product Ecosystem', '/docs/products'],
+    ['Phorva OnchainAI', '/docs/products/onchain-ai']
+  ]],
+
   ['OVERVIEW', [
     ['Introduction', '/docs'],
     ['What is Phorva', '/docs/what-is-phorva'],
