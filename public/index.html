@@ -2199,172 +2199,171 @@ Prepare an autonomous action and send it through the real PHORVA authorization e
 The agent's wallet remains external to PHORVA; PHORVA evaluates whether the requested execution is authorized.
 </p>
 
-
 <div class="agent">
 
-<div class="card">
+  <div class="card">
 
-<div class="head">
-<div>
-<strong>Agent Context</strong>
-<div class="muted">Execution identity</div>
-</div>
-<span class="badge">PHORVA CORE</span>
-</div>
+    <div class="head">
+      <div>
+        <strong>Agent Context</strong>
+        <div class="muted">Execution identity</div>
+      </div>
+      <span class="badge">PHORVA CORE</span>
+    </div>
 
-<div class="fields">
+    <div class="fields">
 
-<div class="field full">
-<small>Agent</small>
-<input id="agentName" value="TradingAgent-01">
-</div>
+      <div class="field full">
+        <small>Agent</small>
+        <input id="agentName" value="TradingAgent-01">
+      </div>
 
-<div class="field full">
-<small>Agent wallet address</small>
-<input id="agentWallet" value="0x0000000000000000000000000000000000000000">
-</div>
+      <div class="field full">
+        <small>Agent wallet address</small>
+        <input id="agentWallet" value="0x0000000000000000000000000000000000000000">
+      </div>
 
-<div class="field">
-<small>Network</small>
-<select id="agentChain"></select>
-</div>
+      <div class="field">
+        <small>Network</small>
+        <select id="agentChain"></select>
+      </div>
 
-<div class="field">
-<small>Domain</small>
-<select id="agentDomain">
-<option value="defi">DeFi</option>
-<option value="prediction-market">Prediction Market</option>
-<option value="gaming">Gaming</option>
-<option value="dao">DAO / Treasury</option>
-<option value="agent-payment">Agent Payment</option>
-<option value="virtual-card">Virtual Card / Payments</option>
-<option value="general">General On-Chain</option>
-</select>
-</div>
+      <div class="field">
+        <small>Domain</small>
+        <select id="agentDomain">
+          <option value="defi">DeFi</option>
+          <option value="prediction-market">Prediction Market</option>
+          <option value="gaming">Gaming</option>
+          <option value="dao">DAO / Treasury</option>
+          <option value="agent-payment">Agent Payment</option>
+          <option value="virtual-card">Virtual Card / Payments</option>
+          <option value="general">General On-Chain</option>
+        </select>
+      </div>
 
-<div class="field">
-<small>Action</small>
-<select id="agentAction">
-<option value="send">Send</option>
-<option value="swap">Swap</option>
-<option value="bridge">Bridge</option>
-<option value="trade">Trade</option>
-<option value="buy">Buy</option>
-<option value="sell">Sell</option>
-<option value="deposit">Deposit</option>
-<option value="withdraw">Withdraw</option>
-<option value="transfer">Transfer</option>
-<option value="approve">Approve</option>
-<option value="stake">Stake</option>
-<option value="unstake">Unstake</option>
-<option value="lend">Lend</option>
-<option value="borrow">Borrow</option>
-<option value="repay">Repay</option>
-<option value="claim">Claim</option>
-<option value="mint">Mint</option>
-<option value="redeem">Redeem</option>
-<option value="contract-call">Contract Call</option>
-<option value="custom-action">Custom Action</option>
-</select>
-</div>
+      <div class="field full">
+        <small>Action</small>
+        <select id="agentAction"></select>
+      </div>
 
-</div>
+    </div>
 
-</div>
+  </div>
 
 
-<div class="card">
+  <div class="card">
 
-<div class="head">
-<div>
-<strong>Prepare Execution</strong>
-<div class="muted">Evaluated by /authorize</div>
-</div>
+    <div class="head">
+      <div>
+        <strong>Prepare Execution</strong>
+        <div class="muted">Evaluated by the PHORVA authorization engine</div>
+      </div>
 
-<span class="badge green">LIVE</span>
-</div>
+      <span class="badge green">LIVE</span>
+    </div>
+
+    <div class="fields">
+
+      <div class="field" id="agentProtocolField">
+        <small>Protocol</small>
+        <select id="agentProtocol"></select>
+      </div>
+
+      <div class="field" id="agentAssetField">
+        <small>Asset</small>
+        <select id="agentAsset"></select>
+      </div>
+
+      <div class="field full">
+        <small>Action Parameters</small>
+        <div id="agentActionFields"></div>
+      </div>
+
+    </div>
+
+  </div>
 
 
-<div class="fields">
+  <div class="card">
 
-<div class="field" id="agentProtocolField">
-<small>Protocol</small>
-<select id="agentProtocol"></select>
-</div>
+    <div class="head">
+      <div>
+        <strong>Authorization Policy</strong>
+        <div class="muted">Limits inherited by the execution</div>
+      </div>
+    </div>
 
-<div class="field" id="agentAssetField">
-<small>Asset</small>
-<select id="agentAsset"></select>
-</div>
+    <div class="fields">
 
-<div class="field">
-<small>Declared amount</small>
-<div class="field full">
-<small>Action Parameters</small>
-<div id="agentActionFields">
-                  </div>
+      <div class="field">
+        <small>Maximum transaction</small>
+        <input id="policyMaximum" type="number" value="500" min="0" step="1">
+      </div>
 
-</div>
-</div>
-</div>
+      <div class="field">
+        <small>Daily limit</small>
+        <input id="dailyLimit" type="number" value="2000" min="0" step="1">
+      </div>
+
+    </div>
+
+  </div>
 
 </div>
 
 
 <button class="primary" id="evaluate">
-Evaluate Action</button>
+Verify &amp; Authorize
+</button>
 
 <div class="note">
-PHORVA derives the authorization decision from the supplied execution context and its existing security engine.
+PHORVA independently evaluates identity, intent, policy, parameters, protocol, transaction security and execution authorization.
 </div>
 
 
 <div class="result" id="authorizationResult">
 
-<div class="result-title" id="resultTitle">Authorization result</div>
+  <div class="result-title" id="resultTitle">
+    Authorization result
+  </div>
 
-<div class="muted" id="resultReason"></div>
+  <div class="muted" id="resultReason"></div>
 
-<div class="verdict-grid">
+  <div class="verdict-grid">
 
-<div class="verdict">
-<small>Policy</small>
-<b id="vPolicy">—</b>
-</div>
+    <div class="verdict">
+      <small>Policy</small>
+      <b id="vPolicy">—</b>
+    </div>
 
-<div class="verdict">
-<small>Intent</small>
-<b id="vIntent">—</b>
-</div>
+    <div class="verdict">
+      <small>Intent</small>
+      <b id="vIntent">—</b>
+    </div>
 
-<div class="verdict">
-<small>Parameters</small>
-<b id="vParameters">—</b>
-</div>
+    <div class="verdict">
+      <small>Parameters</small>
+      <b id="vParameters">—</b>
+    </div>
 
-<div class="verdict">
-<small>Protocol</small>
-<b id="vProtocol">—</b>
-</div>
+    <div class="verdict">
+      <small>Protocol</small>
+      <b id="vProtocol">—</b>
+    </div>
 
-<div class="verdict">
-<small>Contract</small>
-<b id="vContract">—</b>
-</div>
+    <div class="verdict">
+      <small>Contract</small>
+      <b id="vContract">—</b>
+    </div>
 
-<div class="verdict">
-<small>Transaction security</small>
-<b id="vSecurity">—</b>
-</div>
+    <div class="verdict">
+      <small>Transaction security</small>
+      <b id="vSecurity">—</b>
+    </div>
 
-</div>
+  </div>
 
-<pre id="proofOutput"></pre>
-
-</div>
-
-
-</div>
+  <pre id="proofOutput"></pre>
 
 </div>
 
@@ -2399,38 +2398,38 @@ PHORVA's execution-security controls. These correspond to checks already impleme
 <div class="guard-grid">
 
 <div class="guard-item">
-<span class="status"></span>
-<b>Transaction limits</b>
+<span class="status" id="guardPolicyStatus"></span>
+<b id="guardPolicy">Transaction limits</b>
 <p>Maximum value per execution and policy limits.</p>
 </div>
 
 <div class="guard-item">
-<span class="status"></span>
-<b>Intent matching</b>
+<span class="status" id="guardIntentStatus"></span>
+<b id="guardIntent">Intent matching</b>
 <p>Compare declared intent against actual execution.</p>
 </div>
 
 <div class="guard-item">
-<span class="status"></span>
-<b>Parameter verification</b>
+<span class="status" id="guardParametersStatus"></span>
+<b id="guardParameters">Parameter verification</b>
 <p>Verify actual calldata parameters against authorized values.</p>
 </div>
 
 <div class="guard-item">
-<span class="status"></span>
-<b>Protocol verification</b>
+<span class="status" id="guardProtocolStatus"></span>
+<b id="guardProtocol">Protocol verification</b>
 <p>Check that execution targets the declared protocol.</p>
 </div>
 
 <div class="guard-item">
-<span class="status"></span>
-<b>Transaction security</b>
+<span class="status" id="guardSecurityStatus"></span>
+<b id="guardSecurity">Transaction security</b>
 <p>Detect transaction-security threats before authorization.</p>
 </div>
 
 <div class="guard-item">
-<span class="status"></span>
-<b>Proof evidence</b>
+<span class="status" id="guardProofStatus"></span>
+<b id="guardProof">Proof evidence</b>
 <p>Generate commitments and authorization proof statements.</p>
 </div>
 
@@ -6222,44 +6221,6 @@ function renderAgentActionFields(){
 
   policy.className = "fields";
 
-  const policyField =
-    document.createElement("div");
-
-  policyField.className = "field";
-
-  const policyLabel =
-    document.createElement("small");
-
-  policyLabel.textContent =
-    "Policy Maximum";
-
-  const policyInput =
-    document.createElement("input");
-
-  policyInput.id = "policyMaximum";
-  policyInput.type = "number";
-  policyInput.value = "500";
-
-  policyField.appendChild(policyLabel);
-  policyField.appendChild(policyInput);
-  policy.appendChild(policyField);
-
-
-      const dailyField = document.createElement("div");
-      dailyField.className = "field";
-
-      const dailyLabel = document.createElement("small");
-      dailyLabel.textContent = "Daily Limit";
-
-      const dailyInput = document.createElement("input");
-      dailyInput.id = "dailyLimit";
-      dailyInput.type = "number";
-      dailyInput.value = "2000";
-
-      dailyField.appendChild(dailyLabel);
-      dailyField.appendChild(dailyInput);
-      policy.appendChild(dailyField);
-  container.appendChild(policy);
 }
 
 function updateAgentActions(){
@@ -7235,7 +7196,7 @@ document.getElementById("evaluate")
 
    button.disabled = false;
 
-   button.textContent = "Evaluate Action";
+   button.textContent = "Verify & Authorize";
 
  }
 
@@ -7259,6 +7220,35 @@ function setVerdict(id,value){
 }
 
 
+
+
+function updateGuardState(data){
+  const map = [
+    ["guardPolicyStatus", data.verdict?.policy],
+    ["guardIntentStatus", data.verdict?.intent],
+    ["guardParametersStatus", data.verdict?.parameters],
+    ["guardProtocolStatus", data.verdict?.protocol],
+    ["guardSecurityStatus", data.verdict?.transactionSecurity],
+    ["guardProofStatus", data.proof ? "VERIFIED" : "PENDING"]
+  ];
+
+  map.forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const failed = /FAILED|MISMATCH|UNKNOWN|THREAT|BLOCKED/i.test(
+      String(value || "")
+    );
+
+    el.style.background = failed
+      ? "var(--red)"
+      : "var(--green)";
+
+    el.style.boxShadow = failed
+      ? "0 0 9px var(--red)"
+      : "0 0 9px var(--green)";
+  });
+}
 
 function addActivity(data){
 
@@ -8587,7 +8577,7 @@ init();
 
     } finally {
       button.disabled = false;
-      button.textContent = "Evaluate Action";
+      button.textContent = "Verify & Authorize";
     }
   }
 
