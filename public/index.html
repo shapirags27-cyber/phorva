@@ -1321,6 +1321,8 @@ button{
 </style>
 
 <style id="phorva-docs-css">
+.doc{display:none}
+.doc.active{display:block}
 .docs-shell{display:grid;grid-template-columns:250px 1fr;min-height:calc(100vh - 70px)}
 .docs-sidebar{border-right:1px solid rgba(255,255,255,.08);padding:24px 14px;overflow:auto}
 .docs-sidebar-title{font-size:13px;font-weight:800;letter-spacing:.16em;padding:0 10px 22px}
@@ -1720,6 +1722,228 @@ main,
   /* Give the page enough room above the bottom navigation */
   .view {
     padding-bottom: 145px !important;
+  }
+}
+</style>
+
+
+<style id="phorva-mobile-final">
+@media (max-width:700px){
+
+  .app{
+    padding-bottom:72px;
+  }
+
+  .header{
+    height:58px!important;
+    min-height:58px!important;
+    padding:0 10px!important;
+  }
+
+  .brand img{
+    width:34px!important;
+    height:34px!important;
+    padding:5px!important;
+    border-radius:9px!important;
+  }
+
+  #theme{
+    width:32px!important;
+    min-width:32px!important;
+    height:32px!important;
+  }
+
+  .header-actions .network{
+    height:30px!important;
+    min-width:0!important;
+    padding:0 7px!important;
+    font-size:9px!important;
+  }
+
+  .main{
+    width:100%!important;
+    padding:12px 10px 20px!important;
+  }
+
+  .view{
+    padding-left:0!important;
+    padding-right:0!important;
+    padding-bottom:88px!important;
+  }
+
+  .view > .title,
+  .view h1{
+    font-size:26px!important;
+    line-height:1.12!important;
+    margin:6px 0 8px!important;
+  }
+
+  .view h2{
+    font-size:20px!important;
+  }
+
+  .view h3{
+    font-size:16px!important;
+  }
+
+  .view .sub,
+  .view p{
+    font-size:12px!important;
+    line-height:1.5!important;
+  }
+
+  .view .card{
+    padding:12px!important;
+    border-radius:12px!important;
+  }
+
+  .head{
+    padding:11px 12px!important;
+  }
+
+  .head strong{
+    font-size:12px!important;
+  }
+
+  .fields{
+    gap:8px!important;
+    padding:12px!important;
+  }
+
+  .field{
+    padding:10px!important;
+    border-radius:10px!important;
+  }
+
+  .field small{
+    font-size:8px!important;
+  }
+
+  .view input,
+  .view select,
+  .view textarea{
+    min-height:40px!important;
+    font-size:12px!important;
+    padding:8px 9px!important;
+  }
+
+  .view button{
+    min-height:38px!important;
+    font-size:11px!important;
+  }
+
+  .primary{
+    width:calc(100% - 24px)!important;
+    margin:0 12px 8px!important;
+    padding:10px!important;
+  }
+
+  .home-hero{
+    padding:18px 15px!important;
+    border-radius:14px!important;
+  }
+
+  .home-hero h1{
+    font-size:29px!important;
+  }
+
+  .home-hero p{
+    font-size:12px!important;
+  }
+
+  .home-actions{
+    gap:7px!important;
+    margin-top:16px!important;
+  }
+
+  .home-actions button{
+    min-height:38px!important;
+    font-size:11px!important;
+  }
+
+  .home-flow{
+    margin-top:17px!important;
+    gap:4px!important;
+  }
+
+  .flow-node{
+    padding:5px 7px!important;
+    font-size:9px!important;
+  }
+
+  .bottom{
+    height:68px!important;
+    padding:4px 6px!important;
+  }
+
+  .nav{
+    min-height:58px!important;
+    gap:2px!important;
+  }
+
+  .nav .ico{
+    font-size:18px!important;
+  }
+
+  .nav small{
+    font-size:8px!important;
+  }
+
+  .persistent-actions{
+    bottom:80px!important;
+    left:10px!important;
+    right:10px!important;
+  }
+
+  .persistent-actions button{
+    height:34px!important;
+    min-height:34px!important;
+    padding:0 9px!important;
+    font-size:10px!important;
+  }
+
+  /* Docs stay compact and isolated. */
+  #docs .docs{
+    grid-template-columns:1fr!important;
+    gap:10px!important;
+    margin-top:14px!important;
+  }
+
+  #docs .docs-nav{
+    max-height:112px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    gap:5px!important;
+    padding:7px!important;
+  }
+
+  #docs .docs-nav button{
+    width:auto!important;
+    min-width:max-content!important;
+    padding:7px 9px!important;
+    font-size:9px!important;
+  }
+
+  #docs .docs-content{
+    padding:14px!important;
+  }
+
+  #docs .docs-content h2{
+    font-size:20px!important;
+  }
+
+  #docs .docs-content p,
+  #docs .docs-content li{
+    font-size:11px!important;
+    line-height:1.55!important;
+  }
+
+  #docs .doc pre{
+    font-size:9px!important;
+    line-height:1.45!important;
+    overflow:auto;
   }
 }
 </style>
@@ -4598,10 +4822,6 @@ This section remains available as the testnet access surface without pretending 
 <div class="label">Chains</div>
 <div class="value" id="dashChains">—</div>
 </div>
-<div class="card stat">
-<div class="label">Chains</div>
-<div class="value" id="dashChains">—</div>
-</div>
 
 <div class="card stat">
 <div class="label">Analyzer</div>
@@ -5082,6 +5302,826 @@ async function loadProtocols(){
 };
 
 
+
+const AGENT_ACTIONS = {
+  defi: [
+    ["swap","Swap"],
+    ["approve","Approve"],
+    ["permit","Permit"],
+    ["deposit","Deposit"],
+    ["withdraw","Withdraw"],
+    ["supply","Supply"],
+    ["redeem","Redeem"],
+    ["lend","Lend"],
+    ["borrow","Borrow"],
+    ["repay","Repay"],
+    ["stake","Stake"],
+    ["unstake","Unstake"],
+    ["lp-add","Add Liquidity"],
+    ["lp-remove","Remove Liquidity"],
+    ["claim","Claim"],
+    ["bridge","Bridge"],
+    ["wrap","Wrap"],
+    ["unwrap","Unwrap"],
+    ["mint","Mint"],
+    ["burn","Burn"],
+    ["liquidate","Liquidate"],
+    ["rebalance","Rebalance"],
+    ["contract-call","Contract Call"],
+    ["custom-action","Custom Action"]
+  ],
+
+  "prediction-market": [
+    ["buy-position","Buy Position"],
+    ["sell-position","Sell Position"],
+    ["add-position","Add Position"],
+    ["reduce-position","Reduce Position"],
+    ["close-position","Close Position"],
+    ["deposit-collateral","Deposit Collateral"],
+    ["withdraw-collateral","Withdraw Collateral"],
+    ["claim-winnings","Claim Winnings"],
+    ["redeem-position","Redeem Position"],
+    ["split-position","Split Position"],
+    ["merge-position","Merge Position"],
+    ["trade","Trade"],
+    ["approve","Approve"],
+    ["contract-call","Contract Call"],
+    ["custom-action","Custom Action"]
+  ],
+
+  gaming: [
+    ["purchase","Purchase"],
+    ["sell","Sell"],
+    ["trade","Trade"],
+    ["transfer","Transfer"],
+    ["upgrade","Upgrade"],
+    ["craft","Craft"],
+    ["equip","Equip"],
+    ["unequip","Unequip"],
+    ["marketplace-listing","Marketplace Listing"],
+    ["marketplace-bid","Marketplace Bid"],
+    ["marketplace-offer","Marketplace Offer"],
+    ["mint","Mint"],
+    ["burn","Burn"],
+    ["claim","Claim"],
+    ["stake","Stake"],
+    ["unstake","Unstake"],
+    ["deposit","Deposit"],
+    ["withdraw","Withdraw"],
+    ["approve","Approve"],
+    ["contract-call","Contract Call"],
+    ["custom-action","Custom Action"]
+  ],
+
+  dao: [
+    ["transfer","Transfer Funds"],
+    ["deposit","Deposit Funds"],
+    ["withdraw","Withdraw Funds"],
+    ["approve","Approve"],
+    ["delegate","Delegate"],
+    ["undelegate","Undelegate"],
+    ["propose","Create Proposal"],
+    ["vote","Vote"],
+    ["queue","Queue Proposal"],
+    ["execute","Execute Proposal"],
+    ["cancel-proposal","Cancel Proposal"],
+    ["claim","Claim"],
+    ["stream","Stream Funds"],
+    ["create-grant","Create Grant"],
+    ["fund-grant","Fund Grant"],
+    ["contract-call","Contract Call"],
+    ["custom-action","Custom Action"]
+  ],
+
+  "agent-payment": [
+    ["pay","Pay"],
+    ["send","Send Payment"],
+    ["transfer","Transfer"],
+    ["request-payment","Request Payment"],
+    ["split-payment","Split Payment"],
+    ["recurring-payment","Recurring Payment"],
+    ["deposit","Deposit"],
+    ["withdraw","Withdraw"],
+    ["refund","Refund"],
+    ["claim","Claim"],
+    ["approve","Approve"],
+    ["contract-call","Contract Call"],
+    ["custom-action","Custom Action"]
+  ],
+
+  "virtual-card": [
+    ["purchase","Purchase"],
+    ["authorize","Authorize"],
+    ["capture","Capture"],
+    ["void","Void"],
+    ["refund","Refund"],
+    ["partial-refund","Partial Refund"],
+    ["payment","Payment"],
+    ["transfer","Transfer"],
+    ["deposit","Deposit"],
+    ["withdraw","Withdraw"],
+    ["fund-card","Fund Card"],
+    ["withdraw-card-balance","Withdraw Card Balance"],
+    ["approve","Approve"],
+    ["contract-call","Contract Call"],
+    ["custom-action","Custom Action"]
+  ],
+
+  general: [
+    ["send","Send"],
+    ["transfer","Transfer"],
+    ["approve","Approve"],
+    ["permit","Permit"],
+    ["contract-call","Contract Call"],
+    ["deploy","Deploy Contract"],
+    ["upgrade","Upgrade Contract"],
+    ["mint","Mint"],
+    ["burn","Burn"],
+    ["claim","Claim"],
+    ["deposit","Deposit"],
+    ["withdraw","Withdraw"],
+    ["stake","Stake"],
+    ["unstake","Unstake"],
+    ["bridge","Bridge"],
+    ["custom-action","Custom Action"]
+  ]
+};
+
+
+const AGENT_ACTION_FIELDS = {
+
+  defi: {
+    swap: [
+      ["sellAsset","Sell Asset","text","USDC"],
+      ["buyAsset","Buy Asset","text","ETH"],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"],
+      ["minimumOutput","Minimum Output","number","0"]
+    ],
+
+    approve: [
+      ["spender","Spender Address","text",""],
+      ["approvalAmount","Approval Amount","number","500"],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    permit: [
+      ["spender","Spender Address","text",""],
+      ["approvalAmount","Permit Amount","number","500"],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    bridge: [
+      ["recipient","Recipient Address","text",""],
+      ["destinationChain","Destination Chain","select",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    deposit: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    withdraw: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    supply: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    redeem: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    lend: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    borrow: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    repay: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    stake: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    unstake: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "lp-add": [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "lp-remove": [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    claim: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    wrap: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    unwrap: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    mint: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    burn: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    liquidate: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    rebalance: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "contract-call": [
+      ["target","Target Contract","text",""],
+      ["functionName","Function","text",""],
+      ["selector","Selector","text",""]
+    ],
+
+    "custom-action": [
+      ["target","Target Contract","text",""],
+      ["functionName","Function","text",""],
+      ["selector","Selector","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ]
+  },
+
+  "prediction-market": {
+    "buy-position": [
+      ["market","Market","text",""],
+      ["outcome","Outcome","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "sell-position": [
+      ["market","Market","text",""],
+      ["outcome","Outcome","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "add-position": [
+      ["market","Market","text",""],
+      ["outcome","Outcome","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "reduce-position": [
+      ["market","Market","text",""],
+      ["outcome","Outcome","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "close-position": [
+      ["market","Market","text",""],
+      ["outcome","Outcome","text",""]
+    ],
+
+    "deposit-collateral": [
+      ["market","Market","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "withdraw-collateral": [
+      ["market","Market","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "claim-winnings": [
+      ["market","Market","text",""],
+      ["outcome","Outcome","text",""]
+    ],
+
+    "redeem-position": [
+      ["market","Market","text",""],
+      ["outcome","Outcome","text",""]
+    ],
+
+    "split-position": [
+      ["market","Market","text",""],
+      ["outcome","Outcome","text",""]
+    ],
+
+    "merge-position": [
+      ["market","Market","text",""],
+      ["outcome","Outcome","text",""]
+    ],
+
+    trade: [
+      ["market","Market","text",""],
+      ["outcome","Outcome","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    approve: [
+      ["spender","Spender Address","text",""],
+      ["approvalAmount","Approval Amount","number","500"]
+    ],
+
+    "contract-call": [
+      ["target","Target Contract","text",""],
+      ["functionName","Function","text",""],
+      ["selector","Selector","text",""]
+    ],
+
+    "custom-action": [
+      ["market","Market","text",""],
+      ["outcome","Outcome","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ]
+  },
+
+  gaming: {
+    purchase: [
+      ["itemId","Item / Asset ID","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    sell: [
+      ["itemId","Item / Asset ID","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    trade: [
+      ["itemId","Item / Asset ID","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    transfer: [
+      ["recipient","Recipient Address","text",""],
+      ["itemId","Item / Asset ID","text",""]
+    ],
+
+    upgrade: [
+      ["itemId","Item / Asset ID","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    craft: [
+      ["itemId","Item / Asset ID","text",""]
+    ],
+
+    equip: [
+      ["itemId","Item / Asset ID","text",""]
+    ],
+
+    unequip: [
+      ["itemId","Item / Asset ID","text",""]
+    ],
+
+    "marketplace-listing": [
+      ["itemId","Item / Asset ID","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "marketplace-bid": [
+      ["itemId","Item / Asset ID","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "marketplace-offer": [
+      ["itemId","Item / Asset ID","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    mint: [
+      ["itemId","Item / Asset ID","text",""]
+    ],
+
+    burn: [
+      ["itemId","Item / Asset ID","text",""]
+    ],
+
+    claim: [
+      ["itemId","Item / Asset ID","text",""]
+    ],
+
+    stake: [
+      ["itemId","Item / Asset ID","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    unstake: [
+      ["itemId","Item / Asset ID","text",""]
+    ],
+
+    deposit: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    withdraw: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    approve: [
+      ["spender","Spender Address","text",""],
+      ["approvalAmount","Approval Amount","number","500"]
+    ],
+
+    "contract-call": [
+      ["target","Target Contract","text",""],
+      ["functionName","Function","text",""],
+      ["selector","Selector","text",""]
+    ],
+
+    "custom-action": [
+      ["itemId","Item / Asset ID","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ]
+  },
+
+  dao: {
+    transfer: [
+      ["recipient","Recipient Address","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    deposit: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    withdraw: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    approve: [
+      ["spender","Spender Address","text",""],
+      ["approvalAmount","Approval Amount","number","500"]
+    ],
+
+    delegate: [
+      ["delegatee","Delegatee Address","text",""]
+    ],
+
+    undelegate: [
+      ["delegatee","Delegatee Address","text",""]
+    ],
+
+    propose: [
+      ["proposalId","Proposal ID","text",""]
+    ],
+
+    vote: [
+      ["proposalId","Proposal ID","text",""],
+      ["vote","Vote","select",""]
+    ],
+
+    queue: [
+      ["proposalId","Proposal ID","text",""]
+    ],
+
+    execute: [
+      ["proposalId","Proposal ID","text",""]
+    ],
+
+    "cancel-proposal": [
+      ["proposalId","Proposal ID","text",""]
+    ],
+
+    claim: [
+      ["proposalId","Proposal / Grant ID","text",""]
+    ],
+
+    stream: [
+      ["recipient","Recipient Address","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "create-grant": [
+      ["recipient","Grant Recipient","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "fund-grant": [
+      ["proposalId","Grant ID","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "contract-call": [
+      ["target","Target Contract","text",""],
+      ["functionName","Function","text",""],
+      ["selector","Selector","text",""]
+    ],
+
+    "custom-action": [
+      ["target","Target Contract","text",""],
+      ["functionName","Function","text",""],
+      ["selector","Selector","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ]
+  },
+
+  "agent-payment": {
+    pay: [
+      ["recipient","Recipient Address","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    send: [
+      ["recipient","Recipient Address","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    transfer: [
+      ["recipient","Recipient Address","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "request-payment": [
+      ["recipient","Recipient Address","text",""],
+      ["intentAmount","Declared Amount","number","300"]
+    ],
+
+    "split-payment": [
+      ["recipient","Recipient Address","text",""],
+      ["intentAmount","Declared Amount","number","300"]
+    ],
+
+    "recurring-payment": [
+      ["recipient","Recipient Address","text",""],
+      ["intentAmount","Declared Amount","number","300"]
+    ],
+
+    deposit: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    withdraw: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    refund: [
+      ["recipient","Recipient Address","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    claim: [
+      ["recipient","Recipient Address","text",""]
+    ],
+
+    approve: [
+      ["spender","Spender Address","text",""],
+      ["approvalAmount","Approval Amount","number","500"]
+    ],
+
+    "contract-call": [
+      ["target","Target Contract","text",""],
+      ["functionName","Function","text",""],
+      ["selector","Selector","text",""]
+    ],
+
+    "custom-action": [
+      ["recipient","Recipient Address","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ]
+  },
+
+  "virtual-card": {
+    purchase: [
+      ["merchant","Merchant","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    authorize: [
+      ["merchant","Merchant","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    capture: [
+      ["merchant","Merchant","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    void: [
+      ["merchant","Merchant","text",""]
+    ],
+
+    refund: [
+      ["merchant","Merchant","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "partial-refund": [
+      ["merchant","Merchant","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    payment: [
+      ["merchant","Merchant","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    transfer: [
+      ["recipient","Recipient Address","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    deposit: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    withdraw: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "fund-card": [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "withdraw-card-balance": [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    approve: [
+      ["spender","Spender Address","text",""],
+      ["approvalAmount","Approval Amount","number","500"]
+    ],
+
+    "contract-call": [
+      ["target","Target Contract","text",""],
+      ["functionName","Function","text",""],
+      ["selector","Selector","text",""]
+    ],
+
+    "custom-action": [
+      ["merchant","Merchant","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ]
+  },
+
+  general: {
+    send: [
+      ["recipient","Recipient Address","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    transfer: [
+      ["recipient","Recipient Address","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    approve: [
+      ["spender","Spender Address","text",""],
+      ["approvalAmount","Approval Amount","number","500"]
+    ],
+
+    permit: [
+      ["spender","Spender Address","text",""],
+      ["approvalAmount","Permit Amount","number","500"]
+    ],
+
+    "contract-call": [
+      ["target","Target Contract","text",""],
+      ["functionName","Function","text",""],
+      ["selector","Selector","text",""]
+    ],
+
+    deploy: [
+      ["target","Contract Target","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    upgrade: [
+      ["target","Contract Target","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    mint: [
+      ["target","Target Contract","text",""]
+    ],
+
+    burn: [
+      ["target","Target Contract","text",""]
+    ],
+
+    claim: [
+      ["target","Target Contract","text",""]
+    ],
+
+    deposit: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    withdraw: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    stake: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    unstake: [
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    bridge: [
+      ["recipient","Recipient Address","text",""],
+      ["destinationChain","Destination Chain","select",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ],
+
+    "custom-action": [
+      ["target","Target Contract","text",""],
+      ["functionName","Function","text",""],
+      ["selector","Selector","text",""],
+      ["intentAmount","Declared Amount","number","300"],
+      ["actualAmount","Actual Attempt","number","500"]
+    ]
+  }
+};
+
 function renderAgentActionFields(){
 
   const domain =
@@ -5224,6 +6264,21 @@ function renderAgentActionFields(){
   policyField.appendChild(policyInput);
   policy.appendChild(policyField);
 
+
+      const dailyField = document.createElement("div");
+      dailyField.className = "field";
+
+      const dailyLabel = document.createElement("small");
+      dailyLabel.textContent = "Daily Limit";
+
+      const dailyInput = document.createElement("input");
+      dailyInput.id = "dailyLimit";
+      dailyInput.type = "number";
+      dailyInput.value = "2000";
+
+      dailyField.appendChild(dailyLabel);
+      dailyField.appendChild(dailyInput);
+      policy.appendChild(dailyField);
   container.appendChild(policy);
 }
 
@@ -5882,8 +6937,10 @@ function buildAuthorizationRequest(){
   };
 
   const amountKeys = [
+    "intentAmount",
     "amount",
-    "allowance"
+    "allowance",
+    "approvalAmount"
   ];
 
   const amountKey =
@@ -5896,8 +6953,14 @@ function buildAuthorizationRequest(){
       ? semanticNumber(amountKey)
       : 0;
 
+  const actualAmount =
+    semanticText("actualAmount") !== ""
+      ? semanticNumber("actualAmount")
+      : amount;
+
   const maximum =
     number("policyMaximum");
+    const dailyLimit = number("dailyLimit");
 
   const recipient =
     semanticText("recipient");
@@ -6027,8 +7090,9 @@ function buildAuthorizationRequest(){
         : (target || undefined),
     value:
       isNativeSend
-        ? String(amount)
+        ? String(actualAmount)
         : "0",
+    amount: actualAmount,
     calldata:
       isNativeSend
         ? "0x"
@@ -6065,6 +7129,7 @@ function buildAuthorizationRequest(){
 
     policy: {
       maxTransactionAmount: maximum,
+      dailyLimit: dailyLimit,
       maxTransaction: maximum,
       allowedProtocols:
         protocol
@@ -6379,306 +7444,9 @@ async function askAgentGuard(){
 
 /* =========================================================
    DOCS
+   =========================================================
+   Documentation uses the 65-page article system below.
    ========================================================= */
-
-const docs = {
-
- overview:{
-
-  title:"What is PHORVA?",
-
-  html:`
-  <h2>What is PHORVA?</h2>
-
-  <p>
-  PHORVA provides verifiable execution control for autonomous agents.
-  It sits between agent intent and blockchain execution.
-  </p>
-
-  <h3>Core principle</h3>
-
-  <p>
-  An agent can request an action, but the requested action should not automatically become an authorized blockchain execution.
-  PHORVA evaluates the execution context first.
-  </p>
-
-  <div class="code">Agent
-  ↓
-PHORVA API / SDK
-  ↓
-Identity → Intent → Policy → Risk → Transaction Analysis
-  ↓
-Authorization
-  ↓
-Agent Wallet / Signer
-  ↓
-Blockchain</div>
-
-  <h3>Product boundary</h3>
-
-  <ul>
-  <li>PHORVA is not an agent wallet.</li>
-  <li>PHORVA does not custody private keys.</li>
-  <li>PHORVA is not a prover marketplace.</li>
-  <li>PHORVA defines execution verification semantics.</li>
-  </ul>
-  `
-
- },
-
-
-
- architecture:{
-
-  title:"Architecture",
-
-  html:`
-  <h2>Architecture</h2>
-
-  <p>
-  PHORVA is designed as a provider- and protocol-agnostic execution control plane.
-  </p>
-
-  <h3>Execution path</h3>
-
-  <div class="code">Autonomous Agent
-       ↓
-   PHORVA API / SDK
-       ↓
- Agent Identity
-       ↓
- Declared Intent
-       ↓
- Policy
-       ↓
- Risk Analysis
-       ↓
- Transaction Analysis
-       ↓
- Authorization
-       ↓
- Agent Wallet / Signer
-       ↓
- Blockchain</div>
-
-  <h3>Infrastructure providers</h3>
-
-  <p>
-  PHORVA defines verification semantics while proving or verification providers can supply the underlying proving and verification machinery.
-  </p>
-  `
-
- },
-
-
-
- authorization:{
-
-  title:"Authorization",
-
-  html:`
-  <h2>Authorization</h2>
-
-  <p>
-  The authorization engine evaluates an execution against the supplied agent, action, intent, policy and transaction context.
-  </p>
-
-  <h3>Checks</h3>
-
-  <ul>
-  <li>Policy limits</li>
-  <li>Intent matching</li>
-  <li>Parameter matching</li>
-  <li>Execution type matching</li>
-  <li>Native value matching</li>
-  <li>Asset address matching</li>
-  <li>Protocol matching</li>
-  <li>Transaction-security analysis</li>
-  </ul>
-
-  <p>
-  The resulting decision is returned as an authorization verdict together with verification evidence.
-  </p>
-  `
-
- },
-
-
-
- "verification-doc":{
-
-  title:"Verification",
-
-  html:`
-  <h2>Verification</h2>
-
-  <p>
-  PHORVA exposes verification primitives for execution graphs, verification traces, proof statements and execution evidence.
-  </p>
-
-  <h3>Proof statement</h3>
-
-  <p>
-  The proof-statement path independently constructs and validates execution context rather than blindly trusting caller-supplied authorization claims.
-  </p>
-
-  <h3>Commitments</h3>
-
-  <p>
-  PHORVA can produce authoritative commitments over verified execution information.
-  </p>
-  `
-
- },
-
-
-
- api:{
-
-  title:"API",
-
-  html:`
-  <h2>API</h2>
-
-  <p>
-  PHORVA exposes HTTP interfaces for authorization, verification and infrastructure inspection.
-  </p>
-
-  <h3>Authorization</h3>
-
-  <div class="code">POST /authorize</div>
-
-  <h3>Verification</h3>
-
-  <div class="code">POST /proof-statement
-POST /verify-proof
-POST /verify-execution
-POST /execution-graph
-POST /verification-trace</div>
-
-  <h3>Infrastructure</h3>
-
-  <div class="code">GET /health
-GET /api/chains
-GET /api/protocols
-GET /api/assets
-GET /chain-status
-GET /provider-status</div>
-  `
-
- },
-
-
-
- sdk:{
-
-  title:"SDK integration",
-
-  html:`
-  <h2>SDK integration</h2>
-
-  <p>
-  The SDK layer should allow agent developers to submit execution context to PHORVA without moving custody or signing responsibility into PHORVA.
-  </p>
-
-  <h3>Conceptual integration</h3>
-
-  <div class="code">agent
-  ↓
-phorva.verify(...)
-  ↓
-authorized?
-  ↓
-wallet/signer
-  ↓
-blockchain</div>
-  `
- },
-
-
-
- security:{
-
-  title:"Security model",
-
-  html:`
-  <h2>Security model</h2>
-
-  <p>
-  PHORVA treats authorization as a verification problem rather than simply trusting the agent's declared action.
-  </p>
-
-  <h3>Important principle</h3>
-
-  <p>
-  Caller-provided authorization claims are not treated as authoritative proof of authorization. PHORVA's verification logic recomputes the relevant execution conditions.
-  </p>
-  `
-
- },
-
-
-
- usecases:{
-
-  title:"Use cases",
-
-  html:`
-  <h2>Use cases</h2>
-
-  <ul>
-  <li>Agent wallet security</li>
-  <li>DeFi execution</li>
-  <li>Prediction markets</li>
-  <li>Autonomous trading</li>
-  <li>Agent payments</li>
-  <li>Gaming</li>
-  <li>DAOs and treasuries</li>
-  <li>On-chain automation</li>
-  </ul>
-
-  <p>
-  The common requirement is the same: autonomous execution should be evaluated against explicit verification semantics before it proceeds.
-  </p>
-  `
-
- }
-
-};
-
-
-
-document.querySelectorAll("[data-doc]").forEach(button => {
-
- button.addEventListener("click",() => {
-
-   document.querySelectorAll("[data-doc]").forEach(x =>
-     x.classList.remove("active")
-   );
-
-   button.classList.add("active");
-
-   const doc =
-     docs[button.dataset.doc];
-
-   if(doc){
-
-     document.getElementById("docsContent").innerHTML =
-       doc.html;
-
-   }
-
-   if(button.dataset.doc === "ask"){
-
-     show("ask");
-
-   }
-
- });
-
-});
-
-
 
 /* =========================================================
    STARTUP
@@ -7004,157 +7772,62 @@ init();
 
 
 <script id="phorva-docs-nav">
-(function(){
-  const content = document.getElementById("docsContent");
-  if (!content) return;
+(() => {
+  const docs = document.getElementById("docs");
+  if (!docs) return;
 
-  const pages = {
-    overview: {
-      title: "PHORVA Overview",
-      body: `
-        <p>PHORVA is verification infrastructure for autonomous economic activity.</p>
-        <h3>Core question</h3>
-        <p>Was this autonomous action actually authorized, consistent with intent, and correctly executed?</p>
-        <div class="code">Agent → Intent → PHORVA → Verification → Proof → Execution</div>
-      `
-    },
+  const buttons = [
+    ...docs.querySelectorAll(".docs-nav button[data-doc]")
+  ];
 
-    architecture: {
-      title: "Architecture",
-      body: `
-        <p>PHORVA operates as a control and verification layer between autonomous agents and execution systems.</p>
-        <div class="code">Agent
-  ↓
-PHORVA API / SDK
-  ↓
-Identity → Intent → Policy → Risk → Transaction Analysis
-  ↓
-Authorization
-  ↓
-External Agent Wallet / Signer
-  ↓
-Blockchain / Execution Rail
-  ↓
-Verification + Evidence</div>
-        <h3>Trust boundary</h3>
-        <p>PHORVA does not require custody of the agent's private keys. The external signer remains responsible for signing.</p>
-      `
-    },
+  const pages = [
+    ...docs.querySelectorAll(".doc[data-doc-page]")
+  ];
 
-    authorization: {
-      title: "Authorization",
-      body: `
-        <p>Authorization determines whether a proposed execution satisfies the applicable policy, intent and security conditions.</p>
-        <h3>Evaluation</h3>
-        <div class="code">Intent
-Policy
-Execution Type
-Parameters
-Protocol / Target
-Native Value
-Transaction Security
-        ↓
-Authorization Decision</div>
-        <p>The authorization result can be allowed or blocked with supporting reasons and verification evidence.</p>
-      `
-    },
+  function showDoc(id) {
+    const page = pages.find(
+      el => el.dataset.docPage === id
+    );
 
-    "verification-doc": {
-      title: "Verification",
-      body: `
-        <p>Verification checks whether the actual execution matched what was authorized.</p>
-        <h3>Verification evidence</h3>
-        <div class="code">Execution
-   ↓
-Execution Graph
-   ↓
-Verification Trace
-   ↓
-Proof Statement
-   ↓
-Canonical Commitment</div>
-        <p>This allows autonomous actions to carry verifiable execution evidence.</p>
-      `
-    },
+    if (!page) return;
 
-    api: {
-      title: "API",
-      body: `
-        <p>Applications integrate with PHORVA through API endpoints for authorization, execution verification and proof workflows.</p>
-        <h3>Core endpoint</h3>
-        <div class="code">POST /authorize</div>
-        <p>The authorization response contains the decision, verification checks, transaction analysis, risk information and proof-related evidence.</p>
-      `
-    },
+    pages.forEach(el => {
+      el.classList.toggle("active", el === page);
+    });
 
-    sdk: {
-      title: "SDK Integration",
-      body: `
-        <p>The SDK layer is intended to make PHORVA integration straightforward for autonomous-agent developers and execution infrastructure.</p>
-        <h3>Integration model</h3>
-        <div class="code">Agent
-  ↓
-PHORVA SDK
-  ↓
-Intent + Policy + Execution Context
-  ↓
-PHORVA Verification
-  ↓
-External Wallet / Signer</div>
-      `
-    },
+    buttons.forEach(btn => {
+      btn.classList.toggle(
+        "active",
+        btn.dataset.doc === id
+      );
+    });
 
-    security: {
-      title: "Security Model",
-      body: `
-        <p>PHORVA is designed around explicit verification rather than trusting an agent's declared claims.</p>
-        <h3>Security principles</h3>
-        <ul>
-          <li>Verify execution independently.</li>
-          <li>Do not treat caller-supplied authorization claims as authoritative.</li>
-          <li>Compare declared intent with actual execution.</li>
-          <li>Analyze transaction parameters and security conditions.</li>
-          <li>Produce traceable verification evidence.</li>
-        </ul>
-      `
-    },
+    history.replaceState(
+      null,
+      "",
+      "#docs/" + encodeURIComponent(id)
+    );
+  }
 
-    usecases: {
-      title: "Use Cases",
-      body: `
-        <p>PHORVA is designed to operate across different execution environments rather than being tied to one protocol or action type.</p>
-        <div class="docs-grid">
-          <div class="docs-card"><b>Agent Wallets</b><p>Verify autonomous wallet actions.</p></div>
-          <div class="docs-card"><b>DeFi</b><p>Verify protocol interactions and execution parameters.</p></div>
-          <div class="docs-card"><b>Prediction Markets</b><p>Verify autonomous market actions.</p></div>
-          <div class="docs-card"><b>Gaming</b><p>Verify autonomous on-chain game actions.</p></div>
-          <div class="docs-card"><b>Agent Payments</b><p>Verify machine-to-machine economic actions.</p></div>
-          <div class="docs-card"><b>DAOs & Treasuries</b><p>Add verification controls to autonomous treasury activity.</p></div>
-        </div>
-      `
-    },
-
-    ask: {
-      title: "Ask Agent Guard",
-      body: `
-        <p>Ask Agent Guard is PHORVA's documentation and product assistant for questions about architecture, authorization, verification, security and integrations.</p>
-      `
-    }
-  };
-
-  document.querySelectorAll("[data-doc]").forEach(btn => {
-    btn.addEventListener("click", function(){
-      const page = pages[this.dataset.doc];
-      if (!page) return;
-
-      document.querySelectorAll("[data-doc]").forEach(b => b.classList.remove("active"));
-      this.classList.add("active");
-
-      content.innerHTML =
-        "<h2>" + page.title + "</h2>" +
-        page.body;
+  buttons.forEach(button => {
+    button.addEventListener("click", event => {
+      event.preventDefault();
+      showDoc(button.dataset.doc);
     });
   });
+
+  const requested = decodeURIComponent(
+    location.hash.replace(/^#docs\//, "")
+  );
+
+  const first =
+    pages[0]?.dataset.docPage;
+
+  showDoc(
+    pages.some(p => p.dataset.docPage === requested)
+      ? requested
+      : first
+  );
 })();
 </script>
 
