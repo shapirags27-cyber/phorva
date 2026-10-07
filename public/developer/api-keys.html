@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Keys — Phorva</title>
+  <style>
+    :root{
+      --bg:#06070b;
+      --panel:#0c0f17;
+      --panel2:#101420;
+      --border:#1d2433;
+      --text:#f5f7fb;
+      --muted:#8c96aa;
+      --accent:#7c6cff;
+      --success:#45d483;
+      --danger:#ff647c;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 70% -10%,rgba(93,76,255,.15),transparent 35%),
+        var(--bg);
+      color:var(--text);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+
+    a{color:inherit;text-decoration:none}
+
+    .shell{
+      display:flex;
+      min-height:100vh;
+    }
+
+    .sidebar{
+      width:230px;
+      border-right:1px solid var(--border);
+      padding:26px 16px;
+      background:rgba(7,9,14,.92);
+    }
+
+    .brand{
+      font-size:20px;
+      font-weight:800;
+      letter-spacing:.08em;
+      margin:0 10px 32px;
+    }
+
+    .section-label{
+      color:#596378;
+      font-size:10px;
+      font-weight:700;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      margin:0 10px 10px;
+    }
+
+    .nav{
+      display:grid;
+      gap:4px;
+    }
+
+    .nav a{
+      padding:11px 12px;
+      border-radius:9px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .nav a:hover,
+    .nav a.active{
+      background:#111521;
+      color:var(--text);
+    }
+
+    .main{
+      flex:1;
+      min-width:0;
+      padding:34px 42px 70px;
+      max-width:1250px;
+    }
+
+    .topline{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:20px;
+      margin-bottom:30px;
+    }
+
+    .eyebrow{
+      color:#747f95;
+      font-size:12px;
+      margin-bottom:8px;
+    }
+
+    h1{
+      margin:0;
+      font-size:30px;
+      letter-spacing:-.03em;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      margin-top:8px;
+      max-width:680px;
+      line-height:1.55;
+    }
+
+    .project-bar{
+      background:linear-gradient(180deg,#0e121c,#0a0d14);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:18px;
+      margin-bottom:20px;
+    }
+
+    .project-label{
+      color:#737d92;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+      margin-bottom:8px;
+    }
+
+    select,input{
+      width:100%;
+      background:#080b11;
+      border:1px solid var(--border);
+      color:var(--text);
+      border-radius:9px;
+      padding:11px 12px;
+      outline:none;
+    }
+
+    select:focus,input:focus{
+      border-color:#5047a5;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+
+    .card{
+      background:linear-gradient(180deg,rgba(16,20,32,.96),rgba(10,13,20,.96));
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:20px;
+    }
+
+    .card.full{
+      grid-column:1 / -1;
+    }
+
+    .card-title{
+      font-size:16px;
+      font-weight:700;
+      margin-bottom:6px;
+    }
+
+    .card-text{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+      margin-bottom:18px;
+    }
+
+    .create-row{
+      display:grid;
+      grid-template-columns:1fr 150px auto;
+      gap:10px;
+    }
+
+    button{
+      border:1px solid var(--border);
+      background:#151a27;
+      color:var(--text);
+      border-radius:9px;
+      padding:10px 14px;
+      cursor:pointer;
+      font-weight:600;
+    }
+
+    button:hover{border-color:#4a5270}
+    button.primary{background:#6257df;border-color:#7166ee}
+    button.danger{color:#ff8193}
+
+    .key{
+      border:1px solid var(--border);
+      border-radius:11px;
+      padding:15px;
+      margin-top:12px;
+      background:#090c13;
+    }
+
+    .key-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+    }
+
+    .key-name{
+      font-weight:650;
+    }
+
+    .badge{
+      display:inline-flex;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:10px;
+      font-weight:700;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+
+    .badge.test{
+      color:#9d93ff;
+      background:rgba(124,108,255,.12);
+    }
+
+    .badge.live{
+      color:#67e59b;
+      background:rgba(69,212,131,.10);
+    }
+
+    .badge.revoked{
+      color:#ff8092;
+      background:rgba(255,100,124,.10);
+    }
+
+    .key-prefix{
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      color:#aab3c5;
+      font-size:12px;
+      margin-top:9px;
+    }
+
+    .key-meta{
+      color:#69748a;
+      font-size:11px;
+      margin-top:8px;
+    }
+
+    .key-actions{
+      display:flex;
+      gap:8px;
+      margin-top:13px;
+    }
+
+    .notice{
+      display:none;
+      padding:11px 13px;
+      border-radius:9px;
+      margin-bottom:16px;
+      font-size:13px;
+    }
+
+    .notice.show{display:block}
+    .notice.success{
+      color:#7ae6a6;
+      background:rgba(69,212,131,.08);
+      border:1px solid rgba(69,212,131,.2);
+    }
+
+    .notice.error{
+      color:#ff8b9b;
+      background:rgba(255,100,124,.08);
+      border:1px solid rgba(255,100,124,.2);
+    }
+
+    .secret{
+      display:none;
+      margin-top:16px;
+      padding:14px;
+      border:1px solid rgba(124,108,255,.3);
+      background:rgba(124,108,255,.07);
+      border-radius:10px;
+    }
+
+    .secret.show{display:block}
+
+    .secret-label{
+      color:#aaa2ff;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      margin-bottom:8px;
+    }
+
+    .secret-row{
+      display:flex;
+      gap:8px;
+    }
+
+    .secret-row input{
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-size:12px;
+    }
+
+    @media(max-width:800px){
+      .sidebar{width:190px}
+      .main{padding:25px 20px}
+      .grid{grid-template-columns:1fr}
+      .card.full{grid-column:auto}
+      .create-row{grid-template-columns:1fr}
+    }
+
+    @media(max-width:620px){
+      .sidebar{display:none}
+      .main{padding:22px 16px}
+    }
+  </style>
+</head>
+
+<body>
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="brand">PHORVA</div>
+
+    <div class="section-label">Developer</div>
+
+    <nav class="nav">
+      <a href="/developer/index.html">Overview</a>
+      <a href="/developer/projects.html">Applications</a>
+      <a href="/developer/api-keys.html" class="active">API Keys</a>
+      <a href="/developer/agents.html">Agents</a>
+      <a href="/developer/verification.html">Verification</a>
+      <a href="/developer/policies.html">Policies</a>
+      <a href="/developer/integrations.html">Integrations</a>
+      <a href="/developer/settings.html">Settings</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <div class="topline">
+      <div>
+        <div class="eyebrow">Developer Platform / Credentials</div>
+        <h1>API Keys</h1>
+        <div class="subtitle">
+          Manage project-scoped credentials used to authenticate
+          API, SDK, and MCP integrations with Phorva.
+        </div>
+      </div>
+    </div>
+
+    <div id="notice" class="notice"></div>
+
+    <section class="project-bar">
+      <div class="project-label">Application</div>
+      <select id="projectSelector">
+        <option value="">Loading applications…</option>
+      </select>
+    </section>
+
+    <div class="grid">
+
+      <section class="card">
+        <div class="card-title">Create credential</div>
+        <div class="card-text">
+          Credentials belong to the application, not to an integration
+          method. The same credential can authenticate API, SDK, or MCP.
+        </div>
+
+        <div class="create-row">
+          <input id="keyName" value="Default" placeholder="Credential name">
+          <select id="environment">
+            <option value="test">Test</option>
+            <option value="live">Live</option>
+          </select>
+          <button id="createButton" class="primary">
+            Create credential
+          </button>
+        </div>
+
+        <div id="secret" class="secret">
+          <div class="secret-label">
+            Copy this credential now
+          </div>
+          <div class="secret-row">
+            <input id="secretValue" readonly>
+            <button id="copyButton">Copy</button>
+            <button id="useForIntegrationButton" type="button">
+              Use for integration
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-title">How credentials work</div>
+        <div class="card-text">
+          API, SDK, and MCP are integration interfaces. They all
+          authenticate against the same project credential and reach
+          the same Phorva security core.
+        </div>
+
+        <div style="color:#aeb7c8;font-size:13px;line-height:1.8">
+          Application<br>
+          ↓<br>
+          API / SDK / MCP<br>
+          ↓<br>
+          Project credential<br>
+          ↓<br>
+          Phorva Security Core
+        </div>
+      </section>
+
+      <section class="card full">
+        <div class="card-title">Credentials</div>
+        <div class="card-text">
+          Plaintext credentials are never stored by Phorva and cannot
+          be recovered after creation. Revoke a credential immediately
+          if it is exposed.
+        </div>
+
+        <div id="keys">
+          Loading credentials…
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+
+  const $ = id => document.getElementById(id);
+
+  let applications = [];
+  let selectedProject = null;
+
+  function showNotice(message, type){
+    const el = $("notice");
+    el.textContent = message || "";
+    el.className = "notice" + (message ? " show " + type : "");
+  }
+
+  async function request(url, options = {}){
+    const response = await fetch(url, {
+      credentials: "same-origin",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      }
+    });
+
+    let body = null;
+
+    try {
+      body = await response.json();
+    } catch (_) {}
+
+    if (!response.ok) {
+      throw new Error(
+        body?.error?.message ||
+        body?.message ||
+        "Request failed"
+      );
+    }
+
+    return body;
+  }
+
+  function renderApplications(){
+    const selector = $("projectSelector");
+
+    selector.innerHTML = "";
+
+    if (!applications.length) {
+      selector.innerHTML =
+        '<option value="">No applications yet</option>';
+      $("keys").textContent =
+        "Create an application first.";
+      return;
+    }
+
+    applications.forEach(project => {
+      const option = document.createElement("option");
+      option.value = project.id;
+      option.textContent = project.name || project.id;
+      selector.appendChild(option);
+    });
+
+    if (selectedProject) {
+      selector.value = selectedProject.id;
+    }
+  }
+
+  async function loadApplications(){
+    const result =
+      await request("/v1/developer/projects");
+
+    applications =
+      Array.isArray(result?.projects)
+        ? result.projects
+        : [];
+
+    selectedProject =
+      applications[0] || null;
+
+    renderApplications();
+
+    if (selectedProject) {
+      await loadKeys();
+    }
+  }
+
+  async function loadKeys(){
+    if (!selectedProject) return;
+
+    $("keys").textContent =
+      "Loading credentials…";
+
+    try {
+      const result =
+        await request(
+          "/v1/developer/projects/" +
+          encodeURIComponent(selectedProject.id) +
+          "/api-keys"
+        );
+
+      renderKeys(
+        Array.isArray(result?.keys)
+          ? result.keys
+          : []
+      );
+    } catch (error) {
+      $("keys").textContent = error.message;
+    }
+  }
+
+  function renderKeys(keys){
+    const container = $("keys");
+
+    if (!keys.length) {
+      container.innerHTML =
+        '<div style="color:#68738a;font-size:13px">No credentials created yet.</div>';
+      return;
+    }
+
+    container.innerHTML = "";
+
+    keys.forEach(key => {
+      const item =
+        document.createElement("div");
+
+      item.className = "key";
+
+      const status =
+        key.revoked_at
+          ? '<span class="badge revoked">Revoked</span>'
+          : "";
+
+      const environment =
+        key.environment === "test"
+          ? '<span class="badge test">Test</span>'
+          : '<span class="badge live">Live</span>';
+
+      const lastUsed =
+        key.last_used_at
+          ? "Last used " +
+            new Date(key.last_used_at).toLocaleString()
+          : "Never used";
+
+      item.innerHTML = `
+        <div class="key-head">
+          <div class="key-name">
+            ${escapeHtml(key.name || "Default")}
+          </div>
+          <div>
+            ${environment}
+            ${status}
+          </div>
+        </div>
+
+        <div class="key-prefix">
+          ${escapeHtml(key.key_prefix || "")}••••••••••••
+        </div>
+
+        <div class="key-meta">
+          Created ${new Date(key.created_at).toLocaleString()}
+          · ${escapeHtml(lastUsed)}
+        </div>
+
+        <div class="key-actions">
+          ${
+            key.revoked_at
+              ? ""
+              : `<button class="danger"
+                   data-revoke="${escapeHtml(key.id)}">
+                   Revoke
+                 </button>`
+          }
+        </div>
+      `;
+
+      container.appendChild(item);
+    });
+
+    container
+      .querySelectorAll("[data-revoke]")
+      .forEach(button => {
+        button.addEventListener(
+          "click",
+          () => revokeKey(button.dataset.revoke)
+        );
+      });
+  }
+
+  async function createKey(){
+    if (!selectedProject) {
+      showNotice(
+        "Select an application first.",
+        "error"
+      );
+      return;
+    }
+
+    const button = $("createButton");
+
+    button.disabled = true;
+    button.textContent = "Creating…";
+    showNotice("", "");
+
+    try {
+      const result =
+        await request(
+          "/v1/developer/projects/" +
+          encodeURIComponent(selectedProject.id) +
+          "/api-keys",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              name: $("keyName").value.trim() ||
+                "Default",
+              environment:
+                $("environment").value
+            })
+          }
+        );
+
+      const key = result?.key;
+
+      if (!key?.apiKey) {
+        throw new Error(
+          "Phorva did not return the new credential."
+        );
+      }
+
+      $("secretValue").value = key.apiKey;
+      $("secret").classList.add("show");
+
+      showNotice(
+        "Credential created. Copy it now; Phorva will not show the plaintext credential again.",
+        "success"
+      );
+
+      await loadKeys();
+
+    } catch (error) {
+      showNotice(error.message, "error");
+    } finally {
+      button.disabled = false;
+      button.textContent = "Create credential";
+    }
+  }
+
+  async function revokeKey(id){
+    if (!selectedProject) return;
+
+    if (!confirm(
+      "Revoke this credential? Existing integrations using it will stop authenticating."
+    )) {
+      return;
+    }
+
+    try {
+      await request(
+        "/v1/developer/projects/" +
+        encodeURIComponent(selectedProject.id) +
+        "/api-keys/" +
+        encodeURIComponent(id) +
+        "/revoke",
+        {
+          method: "POST",
+          body: JSON.stringify({})
+        }
+      );
+
+      showNotice(
+        "Credential revoked.",
+        "success"
+      );
+
+      await loadKeys();
+
+    } catch (error) {
+      showNotice(error.message, "error");
+    }
+  }
+
+  $("projectSelector")
+    .addEventListener("change", async function(){
+      selectedProject =
+        applications.find(
+          project => project.id === this.value
+        ) || null;
+
+      $("secret").classList.remove("show");
+      $("secretValue").value = "";
+
+      await loadKeys();
+    });
+
+  $("createButton")
+    .addEventListener("click", createKey);
+
+  $("copyButton")
+    .addEventListener("click", async function(){
+      const value = $("secretValue").value;
+      if (!value) return;
+
+      try {
+        await navigator.clipboard.writeText(value);
+      } catch (_) {
+        $("secretValue").select();
+        document.execCommand("copy");
+      }
+
+      showNotice(
+        "Credential copied to clipboard.",
+        "success"
+      );
+    });
+
+  $("useForIntegrationButton")
+    .addEventListener("click", function(){
+      const value = $("secretValue").value;
+
+      if (!value || !selectedProject) {
+        showNotice(
+          "Create a credential first.",
+          "error"
+        );
+        return;
+      }
+
+      sessionStorage.setItem(
+        "phorva.integration.credential",
+        value
+      );
+
+      sessionStorage.setItem(
+        "phorva.integration.project",
+        selectedProject.id
+      );
+
+      window.location.href =
+        "/developer/integrations.html?project=" +
+        encodeURIComponent(selectedProject.id);
+    });
+
+  function escapeHtml(value){
+    return String(value)
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#039;");
+  }
+
+  loadApplications()
+    .catch(error => {
+      showNotice(
+        error.message,
+        "error"
+      );
+    });
+
+})();
+</script>
+</body>
+</html>

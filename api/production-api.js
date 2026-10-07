@@ -121,6 +121,12 @@ function normalizeVerificationResult(result) {
     capabilityAllowed:
       verification.capabilityAllowed === true,
 
+    applicationCapabilityKnown:
+      verification.applicationCapabilityKnown ?? null,
+
+    applicationCapabilityStatus:
+      verification.applicationCapabilityStatus || "UNSPECIFIED",
+
     velocityAllowed:
       verification.velocityAllowed === true,
 
@@ -148,6 +154,18 @@ function normalizeVerificationResult(result) {
     actualTransactionAmount:
       verification.actualTransactionAmount,
 
+    dailyLimitAllowed:
+      verification.dailyLimitAllowed !== false,
+
+    dailyUsage:
+      verification.dailyUsage ?? 0,
+
+    dailyLimit:
+      verification.dailyLimit ?? null,
+
+    dailyRemaining:
+      verification.dailyRemaining ?? null,
+
     parameterChecks:
       verification.parameterChecks || {},
 
@@ -171,6 +189,7 @@ function createProductionApi({
   agentStore,
   recordExecution,
   listExecutions,
+  getDailyAgentUsage,
   listReviews,
   getReview,
   updateReview,
@@ -582,6 +601,92 @@ function createProductionApi({
           });
         }
 
+        /*
+         * Re-check the cumulative daily transaction limit
+         * before approving a pending review.
+         *
+         * REVIEW_REQUIRED records are intentionally excluded
+         * from daily usage until they are approved.
+         */
+        const pendingReview =
+          typeof getReview === "function"
+            ? getReview({
+                projectId,
+                verificationId:
+                  req.params.verificationId
+              })
+            : null;
+
+        if (!pendingReview) {
+          return res.status(404).json({
+            error: "Pending review not found."
+          });
+        }
+
+        const pendingDailyLimit =
+          Number(pendingReview.daily_limit);
+
+        const pendingAmount =
+          Number(
+            pendingReview.actual_transaction_amount
+          );
+
+        const pendingAgentId =
+          pendingReview.agent_id || null;
+
+        if (
+          Number.isFinite(pendingDailyLimit) &&
+          pendingDailyLimit >= 0
+        ) {
+          if (
+            typeof getDailyAgentUsage !== "function" ||
+            !pendingAgentId
+          ) {
+            return res.status(409).json({
+              error:
+                "Daily transaction limit is configured but daily usage tracking is unavailable."
+            });
+          }
+
+          const currentDailyUsage =
+            Number(
+              getDailyAgentUsage({
+                projectId,
+                agentId: pendingAgentId
+              })
+            ) || 0;
+
+          const projectedDailyUsage =
+            Number.isFinite(pendingAmount) &&
+            pendingAmount >= 0
+              ? currentDailyUsage + pendingAmount
+              : currentDailyUsage;
+
+          if (
+            projectedDailyUsage >
+            pendingDailyLimit
+          ) {
+            return res.status(409).json({
+              error:
+                "Approval would exceed the agent's cumulative daily transaction limit.",
+              dailyUsage:
+                currentDailyUsage,
+              dailyLimit:
+                pendingDailyLimit,
+              transactionAmount:
+                Number.isFinite(pendingAmount)
+                  ? pendingAmount
+                  : null,
+              dailyRemaining:
+                Math.max(
+                  0,
+                  pendingDailyLimit -
+                    currentDailyUsage
+                )
+            });
+          }
+        }
+
         const updated = updateReview({
           projectId,
           verificationId:
@@ -839,7 +944,22 @@ function createProductionApi({
       requestedAgent.agentId ??
       null;
 
-    const verifiedAgent =
+    if (
+      !requestedAgentId ||
+      typeof requestedAgentId !== "string"
+    ) {
+      return res.status(400).json({
+        requestId,
+        verificationId,
+        error: {
+          code: "AGENT_ID_REQUIRED",
+          message:
+            "Agent ID is required for automatic agent detection"
+        }
+      });
+    }
+
+    let verifiedAgent =
       typeof agentStore?.getAgent === "function"
         ? agentStore.getAgent(
             projectId,
@@ -847,16 +967,49 @@ function createProductionApi({
           )
         : null;
 
+    /*
+     * First-seen agents are detected automatically.
+     *
+     * The authenticated Phorva project is the trust boundary.
+     * Caller-supplied capabilities and policy are never used
+     * to establish the agent's security authority.
+     *
+     * The new agent intentionally has no registered capability
+     * list, so the existing capability evaluation continues to
+     * use Phorva's normal execution-capability rules.
+     */
     if (!verifiedAgent) {
-      return res.status(403).json({
-        requestId,
-        verificationId,
-        error: {
-          code: "AGENT_NOT_AUTHORIZED",
-          message:
-            "Agent is not registered, is revoked, or is not authorized for this project"
-        }
-      });
+      const requestedName =
+        typeof requestedAgent.name === "string"
+          ? requestedAgent.name.trim()
+          : "";
+
+      const detectedName =
+        requestedName || requestedAgentId;
+
+      if (
+        typeof agentStore?.createAgent !== "function"
+      ) {
+        return res.status(503).json({
+          requestId,
+          verificationId,
+          error: {
+            code: "AGENT_STORE_UNAVAILABLE",
+            message:
+              "Agent detection service is unavailable"
+          }
+        });
+      }
+
+      const detectedAgent =
+        agentStore.createAgent({
+          projectId,
+          name: detectedName,
+          externalId: requestedAgentId,
+          policy: {}
+        });
+
+      verifiedAgent = detectedAgent;
     }
 
     /*
@@ -876,6 +1029,118 @@ function createProductionApi({
 
       const normalized =
         normalizeVerificationResult(result);
+
+      /*
+       * Daily transaction limit.
+       *
+       * This is cumulative per project + agent and is
+       * intentionally separate from the short-window
+       * velocity protection in the verification engine.
+       *
+       * The current transaction is checked against the
+       * persistent usage accumulated by this agent today.
+       */
+      let dailyLimitAllowed = true;
+      let dailyUsage = 0;
+      let dailyLimit = null;
+      let dailyRemaining = null;
+
+      const securityContext =
+        result?.securityContext ||
+        normalized.securityContext ||
+        {};
+
+      const explicitLimits =
+        securityContext.explicitLimits &&
+        typeof securityContext.explicitLimits === "object" &&
+        !Array.isArray(securityContext.explicitLimits)
+          ? securityContext.explicitLimits
+          : {};
+
+      const configuredDailyLimit =
+        Number(explicitLimits.dailyLimit);
+
+      if (
+        Number.isFinite(configuredDailyLimit) &&
+        configuredDailyLimit >= 0
+      ) {
+        dailyLimit = configuredDailyLimit;
+
+        const agent =
+          req.phorvaAgent || {};
+
+        const agentId =
+          agent.id ??
+          agent.agentId ??
+          null;
+
+        if (
+          typeof getDailyAgentUsage === "function" &&
+          agentId
+        ) {
+          dailyUsage = Number(
+            getDailyAgentUsage({
+              projectId,
+              agentId
+            })
+          ) || 0;
+
+          const currentAmount =
+            Number(
+              normalized.actualTransactionAmount
+            );
+
+          const projectedUsage =
+            Number.isFinite(currentAmount) &&
+            currentAmount >= 0
+              ? dailyUsage + currentAmount
+              : dailyUsage;
+
+          dailyRemaining =
+            Math.max(
+              0,
+              dailyLimit - dailyUsage
+            );
+
+          dailyLimitAllowed =
+            projectedUsage <= dailyLimit;
+
+          if (
+            !dailyLimitAllowed &&
+            normalized.verdict !== "REVIEW_REQUIRED"
+          ) {
+            normalized.verdict = "BLOCKED";
+            normalized.reviewRequired = false;
+            normalized.authorizationPassed = false;
+            normalized.policyPassed = false;
+            normalized.dailyLimitAllowed = false;
+            normalized.dailyUsage = dailyUsage;
+            normalized.dailyLimit = dailyLimit;
+            normalized.dailyRemaining = dailyRemaining;
+            normalized.message =
+              "Transaction would exceed the agent's cumulative daily transaction limit.";
+          }
+        } else {
+          dailyLimitAllowed = false;
+
+          normalized.verdict = "BLOCKED";
+          normalized.reviewRequired = false;
+          normalized.authorizationPassed = false;
+          normalized.policyPassed = false;
+          normalized.dailyLimitAllowed = false;
+          normalized.message =
+            "Daily transaction limit is configured but daily usage tracking is unavailable.";
+        }
+      }
+
+      normalized.dailyLimitAllowed =
+        dailyLimitAllowed;
+      normalized.dailyUsage =
+        dailyUsage;
+      normalized.dailyLimit =
+        dailyLimit;
+      normalized.dailyRemaining =
+        dailyRemaining;
 
       if (typeof recordExecution === "function") {
         try {
@@ -966,6 +1231,16 @@ function createProductionApi({
 
             baselineDecision:
               normalized.baselineDecision || null,
+
+            dailyLimit:
+              normalized.dailyLimit,
+
+            dailyUsage:
+              normalized.dailyUsage,
+
+            dailyRemaining:
+              normalized.dailyRemaining,
+
             policyPassed:
               normalized.policyPassed,
 
@@ -983,6 +1258,9 @@ function createProductionApi({
 
             protocolMatched:
               normalized.protocolMatched,
+
+            capabilityAllowed:
+              normalized.capabilityAllowed,
 
             transactionSecuritySafe:
               normalized.transactionSecuritySafe,

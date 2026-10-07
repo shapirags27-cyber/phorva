@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
   <title>Phorva Dashboard</title>
   <link rel="icon" href="/phorva-logo.png">
 
@@ -26,6 +26,16 @@
     .card{border:1px solid #182238;background:#0a0f1b;border-radius:12px;padding:20px;min-height:130px}
     .label{font-size:11px;letter-spacing:.12em;color:#68748d}
     .value{font-size:20px;margin-top:12px}
+    .nav a{
+      transition:background .15s ease,color .15s ease,transform .15s ease
+    }
+    .nav a:active{
+      transform:translateY(1px)
+    }
+    .dashboard-more{
+      max-width:900px;
+    }
+
     input,select{
       display:block;
       width:100%;
@@ -43,6 +53,115 @@
       .main{padding:20px}
     }
   </style>
+
+<style>
+/* PHORVA LARGE MOBILE REFERENCE OVERRIDES */
+
+@media (max-width: 768px) {
+
+  body {
+    padding-bottom: 118px !important;
+  }
+
+  /* Large-mobile bottom navigation */
+  nav.bottom,
+  .bottom-nav,
+  .mobile-nav,
+  .bottom-navigation {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 106px !important;
+    min-height: 106px !important;
+    z-index: 9999 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+
+    padding:
+      8px
+      8px
+      max(8px, env(safe-area-inset-bottom))
+      8px !important;
+
+    box-sizing: border-box !important;
+  }
+
+  nav.bottom > *,
+  .bottom-nav > *,
+  .mobile-nav > *,
+  .bottom-navigation > * {
+    min-height: 88px !important;
+    height: 88px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 6px !important;
+    font-size: 13px !important;
+    line-height: 1.1 !important;
+  }
+
+  nav.bottom .ico,
+  .bottom-nav .ico,
+  .mobile-nav .ico,
+  .bottom-navigation .ico {
+    font-size: 30px !important;
+    line-height: 30px !important;
+  }
+
+  nav.bottom small,
+  .bottom-nav small,
+  .mobile-nav small,
+  .bottom-navigation small {
+    font-size: 13px !important;
+    line-height: 16px !important;
+  }
+
+  /* Keep content clear of the larger navigation */
+  main,
+  .main,
+  .content,
+  .page,
+  .app-content {
+    padding-bottom: 20px !important;
+  }
+}
+
+/* Extra-small phones */
+@media (max-width: 390px) {
+  nav.bottom,
+  .bottom-nav,
+  .mobile-nav,
+  .bottom-navigation {
+    height: 102px !important;
+    min-height: 102px !important;
+  }
+
+  nav.bottom > *,
+  .bottom-nav > *,
+  .mobile-nav > *,
+  .bottom-navigation > * {
+    min-height: 84px !important;
+    height: 84px !important;
+  }
+
+  nav.bottom .ico,
+  .bottom-nav .ico,
+  .mobile-nav .ico,
+  .bottom-navigation .ico {
+    font-size: 28px !important;
+  }
+}
+</style>
+
+
+
+
 </head>
 
 <body>
@@ -55,16 +174,11 @@
       </a>
 
       <nav class="nav" aria-label="Dashboard navigation">
-        <a class="active" href="/dashboard">Dashboard</a>
-        <a href="/dashboard#agents">Agents</a>
-        <a href="/dashboard#activity">Activity</a>
-        <a href="/dashboard#actions">Actions</a>
-        <a href="/dashboard#policies">Policies</a>
-        <a href="/dashboard#verification">Verification</a>
-        <a href="/dashboard#integrations">Integrations</a>
-        <a href="/dashboard#settings">Settings</a>
-        <a href="/investor-mvp/">Investor MVP</a>
-        <a href="/docs">Docs</a>
+        <a href="#home" data-view="home" class="active">⌂ Home</a>
+        <a href="#agent" data-view="agent">⇄ Agent</a>
+        <a href="#guard" data-view="guard">◈ Guard</a>
+        <a href="#verify" data-view="verify">✓ Verify</a>
+        <a href="#more" data-view="more">☰ More</a>
       </nav>
     </aside>
 
@@ -76,9 +190,9 @@
           <div class="subtitle">Execution control for autonomous agents</div>
         </div>
 
-        <button class="connect" type="button">
-          Connect Wallet
-        </button>
+        <a class="connect" href="/developer/">
+          Developer
+        </a>
       </header>
 
       <section class="grid">
@@ -216,6 +330,97 @@
 
         </div>
 
+        <div class="card" id="verificationEvidence" style="grid-column:1/-1">
+
+          <div class="label">PHORVA VERIFICATION EVIDENCE</div>
+
+          <div
+            id="evidenceSummary"
+            class="value"
+            style="margin-bottom:18px"
+          >
+            Awaiting verification
+          </div>
+
+          <div
+            id="verificationChecks"
+            style="
+              display:grid;
+              grid-template-columns:repeat(4,minmax(0,1fr));
+              gap:10px;
+            "
+          ></div>
+
+          <div
+            id="transactionEvidence"
+            style="
+              margin-top:18px;
+              display:grid;
+              grid-template-columns:repeat(4,minmax(0,1fr));
+              gap:10px;
+            "
+          ></div>
+
+          <div
+            id="verificationReason"
+            style="
+              margin-top:18px;
+              padding:14px;
+              border:1px solid #182238;
+              border-radius:10px;
+              background:#080d18;
+              color:#aab4c9;
+              font-size:13px;
+              line-height:1.6;
+            "
+          >
+            Phorva will explain the authorization decision here.
+          </div>
+
+          <div
+            id="proofEvidence"
+            style="
+              margin-top:14px;
+              color:#68748d;
+              font-size:11px;
+              line-height:1.6;
+              word-break:break-word;
+            "
+          ></div>
+
+        </div>
+
+      </section>
+
+      <section
+        id="more"
+        class="dashboard-more"
+        style="display:none;margin-top:16px"
+      >
+        <div class="card">
+          <div class="label">MORE</div>
+
+          <div class="value">Phorva Platform</div>
+
+          <div style="margin-top:16px;display:grid;gap:10px">
+
+            <a href="/docs"
+              style="padding:12px;border:1px solid #182238;border-radius:9px;background:#080d18">
+              Documentation
+            </a>
+
+            <a href="/developer/"
+              style="padding:12px;border:1px solid #182238;border-radius:9px;background:#080d18">
+              Developer Console
+            </a>
+
+            <a href="/"
+              style="padding:12px;border:1px solid #182238;border-radius:9px;background:#080d18">
+              Phorva Home
+            </a>
+
+          </div>
+        </div>
       </section>
 
     </main>
@@ -244,6 +449,21 @@
 
     const authorizationDetails =
       document.getElementById("authorizationDetails");
+
+    const evidenceSummary =
+      document.getElementById("evidenceSummary");
+
+    const verificationChecks =
+      document.getElementById("verificationChecks");
+
+    const transactionEvidence =
+      document.getElementById("transactionEvidence");
+
+    const verificationReason =
+      document.getElementById("verificationReason");
+
+    const proofEvidence =
+      document.getElementById("proofEvidence");
 
     const chainSelect = document.getElementById("chain");
     const protocolSelect =
@@ -299,6 +519,82 @@
           '<option value="">Failed to load chains</option>';
       }
     }
+
+    async function loadEngineStatus() {
+      try {
+        const response = await fetch("/health");
+
+        if (!response.ok) {
+          throw new Error("Engine unavailable");
+        }
+
+        const health = await response.json();
+
+        const subtitle =
+          document.querySelector(".subtitle");
+
+        if (subtitle) {
+          subtitle.textContent =
+            "Execution control for autonomous agents · ONLINE";
+        }
+
+        const statusCards = document.querySelectorAll(".card");
+
+        statusCards.forEach(card => {
+          const label =
+            card.querySelector(".label")?.textContent?.trim();
+
+          if (label === "RISK" && !riskValue.textContent) {
+            riskValue.textContent = "Ready";
+          }
+        });
+
+        return health;
+      } catch (error) {
+        const subtitle =
+          document.querySelector(".subtitle");
+
+        if (subtitle) {
+          subtitle.textContent =
+            "Execution control for autonomous agents · ENGINE UNAVAILABLE";
+        }
+      }
+    }
+
+    async function loadChainStatus() {
+      try {
+        const response = await fetch("/chain-status");
+
+        if (!response.ok) {
+          throw new Error("Chain status unavailable");
+        }
+
+        const data = await response.json();
+
+        const connected =
+          Array.isArray(data.chains)
+            ? data.chains.filter(
+                chain =>
+                  chain.status === "connected" ||
+                  chain.connected === true
+              ).length
+            : 0;
+
+        console.log(
+          "Phorva chain connectivity:",
+          connected,
+          data.chains
+        );
+      } catch (error) {
+        console.warn(
+          "Phorva chain connectivity unavailable:",
+          error.message
+        );
+      }
+    }
+
+    loadEngineStatus();
+    loadChainStatus();
 
     loadChains();
     chainSelect.addEventListener("change", updateProtocols);
@@ -655,10 +951,12 @@
             );
           }
 
-          verificationValue.textContent =
+          const decision =
             result.authorized
               ? "AUTHORIZED"
               : "BLOCKED";
+
+          verificationValue.textContent = decision;
 
           verificationStatus.textContent =
             result.authorized
@@ -666,22 +964,111 @@
               : "Action blocked by Phorva.";
 
           riskValue.textContent =
-            result.risk?.level ||
-            result.risk ||
-            "Evaluated";
+            result.risk || "Evaluated";
 
           riskDetails.textContent =
             result.reason ||
             "Risk evaluation completed.";
 
           authorizationValue.textContent =
-            result.authorized
-              ? "AUTHORIZED"
-              : "BLOCKED";
+            decision;
 
           authorizationDetails.textContent =
             result.reason ||
             "Authorization decision returned by Phorva.";
+
+          evidenceSummary.textContent =
+            result.authorized
+              ? "✓ PHORVA AUTHORIZED THIS EXECUTION"
+              : "✕ PHORVA BLOCKED THIS EXECUTION";
+
+          const checks = [
+            ["Policy", result.verdict?.policy],
+            ["Intent", result.verdict?.intent],
+            ["Parameters", result.verdict?.parameters],
+            ["Protocol", result.verdict?.protocol],
+            ["Contract", result.verdict?.contract],
+            ["Transaction security", result.verdict?.transactionSecurity],
+            ["Execution type", result.executionTypeMatched ? "MATCHED" : "MISMATCH"],
+            ["Native value", result.nativeValueMatched ? "MATCHED" : "MISMATCH"]
+          ];
+
+          verificationChecks.innerHTML =
+            checks.map(([label, value]) => `
+              <div style="
+                border:1px solid #182238;
+                border-radius:10px;
+                padding:12px;
+                background:#080d18;
+              ">
+                <div style="
+                  color:#68748d;
+                  font-size:10px;
+                  letter-spacing:.08em;
+                  text-transform:uppercase;
+                ">
+                  ${label}
+                </div>
+                <div style="
+                  margin-top:7px;
+                  color:${String(value || "").includes("FAILED") ||
+                         String(value || "").includes("MISMATCH") ||
+                         String(value || "").includes("THREAT")
+                    ? "#ff7d8a"
+                    : "#dfe7f7"};
+                  font-weight:600;
+                  font-size:13px;
+                ">
+                  ${value || "UNKNOWN"}
+                </div>
+              </div>
+            `).join("");
+
+          const decoded =
+            result.decodedTransaction || {};
+
+          transactionEvidence.innerHTML = `
+            <div>
+              <div class="label">CONTRACT</div>
+              <div class="value" style="font-size:14px">
+                ${decoded.contract || "Unknown"}
+              </div>
+            </div>
+
+            <div>
+              <div class="label">FUNCTION</div>
+              <div class="value" style="font-size:14px">
+                ${decoded.function || "Unknown"}
+              </div>
+            </div>
+
+            <div>
+              <div class="label">SELECTOR</div>
+              <div class="value" style="font-size:14px">
+                ${decoded.selector || "—"}
+              </div>
+            </div>
+
+            <div>
+              <div class="label">AMOUNT</div>
+              <div class="value" style="font-size:14px">
+                ${result.actualTransactionAmount ?? "—"}
+              </div>
+            </div>
+          `;
+
+          verificationReason.textContent =
+            result.reason ||
+            "Phorva completed the verification.";
+
+          const commitment =
+            result.proof?.commitment || "";
+
+          proofEvidence.innerHTML =
+            commitment
+              ? `<strong>VERIFICATION COMMITMENT</strong><br>${commitment}`
+              : "No proof commitment returned.";
+
 
         } catch (error) {
 
@@ -704,6 +1091,170 @@
             "No authorization decision was produced.";
         }
       });
+
+    /*
+     * PUBLIC DASHBOARD VIEW CONTROLLER
+     *
+     * These views are presentation states over the same
+     * Phorva Security Core. They do not create separate
+     * authorization or security logic.
+     */
+
+    const dashboardViews = {
+      home: [
+        "#agents",
+        "#actions",
+        "#policies",
+        "#parameters",
+        "#risk",
+        "#authorization",
+        "#verification",
+        "#verificationEvidence"
+      ],
+
+      agent: [
+        "#agents",
+        "#actions",
+        "#parameters"
+      ],
+
+      guard: [
+        "#policies",
+        "#risk",
+        "#authorization"
+      ],
+
+      verify: [
+        "#parameters",
+        "#verification",
+        "#verificationEvidence",
+        "#risk",
+        "#authorization"
+      ]
+    };
+
+    function setDashboardView(view) {
+      const cards = [
+        "#agents",
+        "#actions",
+        "#policies",
+        "#parameters",
+        "#risk",
+        "#authorization",
+        "#verification",
+        "#verificationEvidence"
+      ];
+
+      const more = document.querySelector(".dashboard-more");
+
+      cards.forEach(selector => {
+        const element = document.querySelector(selector);
+
+        if (!element) return;
+
+        element.style.display =
+          view === "home" ||
+          dashboardViews[view]?.includes(selector)
+            ? ""
+            : "none";
+      });
+
+      if (more) {
+        more.style.display =
+          view === "more" ? "block" : "none";
+      }
+
+      document
+        .querySelectorAll(".nav a[data-view]")
+        .forEach(link => {
+          link.classList.toggle(
+            "active",
+            link.dataset.view === view
+          );
+        });
+
+      const title = document.querySelector(".title");
+      const subtitle = document.querySelector(".subtitle");
+
+      const labels = {
+        home: [
+          "Dashboard",
+          "Execution control for autonomous agents"
+        ],
+
+        agent: [
+          "Agent",
+          "Agent context and execution parameters"
+        ],
+
+        guard: [
+          "Guard",
+          "Policy, risk and authorization controls"
+        ],
+
+        verify: [
+          "Verify",
+          "Verify an intended execution before it proceeds"
+        ],
+
+        more: [
+          "More",
+          "Phorva platform resources"
+        ]
+      };
+
+      const current = labels[view] || labels.home;
+
+      if (title) {
+        title.textContent = current[0];
+      }
+
+      if (subtitle) {
+        subtitle.textContent =
+          current[1] + " · PHORVA CORE";
+      }
+    }
+
+    function getRequestedView() {
+      const hash =
+        window.location.hash.replace("#", "").trim();
+
+      return [
+        "home",
+        "agent",
+        "guard",
+        "verify",
+        "more"
+      ].includes(hash)
+        ? hash
+        : "home";
+    }
+
+    document
+      .querySelectorAll(".nav a[data-view]")
+      .forEach(link => {
+        link.addEventListener("click", event => {
+          event.preventDefault();
+
+          const view =
+            link.dataset.view || "home";
+
+          window.history.replaceState(
+            null,
+            "",
+            "#" + view
+          );
+
+          setDashboardView(view);
+        });
+      });
+
+    window.addEventListener("hashchange", () => {
+      setDashboardView(getRequestedView());
+    });
+
+    setDashboardView(getRequestedView());
+
   </script>
 
 </body>

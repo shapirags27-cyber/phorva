@@ -481,7 +481,37 @@ PHORVA_PAGES["virtual-cards"] = `
 <div class="notice"><strong>Status</strong><p>Virtual Card is on the longer-term roadmap. It is not a current Phorva product.</p></div>
 `;
 
+
+PHORVA_PAGES["verification-model"]=`<div class="eyebrow">VERIFICATION MODEL</div><h1>Onchain Verification Model</h1><p>Phorva verifies authority, conditions, objectives, execution, final state and evidence.</p><div class="architecture vertical"><div>AUTHORITY</div><span>↓</span><div>CONDITIONS</div><span>↓</span><div>OBJECTIVE</div><span>↓</span><div>AUTHORIZATION</div><span>↓</span><div>EXECUTION</div><span>↓</span><div>FINAL STATE</div><span>↓</span><div class="accent">EVIDENCE</div></div>`;
+
+PHORVA_PAGES["conditional-authorization"]=`<div class="eyebrow">VERIFICATION MODEL</div><h1>Conditional Authorization</h1><p>Authorization depends on identity, intent, policy, risk and execution conditions.</p>`;
+
+PHORVA_PAGES["state-transition"]=`<div class="eyebrow">VERIFICATION MODEL</div><h1>State-Transition Verification</h1><p>Phorva verifies the transition from the expected pre-state through execution to the resulting post-state.</p>`;
+
+PHORVA_PAGES["objective-verification"]=`<div class="eyebrow">VERIFICATION MODEL</div><h1>Objective Verification</h1><p>Phorva compares the intended objective with the actual execution outcome.</p>`;
+
+PHORVA_PAGES["evidence-graph"]=`<div class="eyebrow">VERIFICATION MODEL</div><h1>Evidence Graph</h1><p>Identity, intent, policy, transaction and outcome evidence are connected to the verification decision.</p>`;
+
+
+PHORVA_PAGES["security-invariants"]=`<div class="eyebrow">SECURITY PRIMITIVES</div><h1>Security Invariants</h1><p>Phorva enforces security properties that should remain true across applications, protocols and execution rails.</p>`;
+
+PHORVA_PAGES["dependency-aware"]=`<div class="eyebrow">SECURITY PRIMITIVES</div><h1>Dependency-Aware Authorization</h1><p>Phorva can evaluate dependencies such as protocols, oracles, bridges, tokens and other components that affect execution security.</p>`;
+
+PHORVA_PAGES["semantic-drift"]=`<div class="eyebrow">SECURITY PRIMITIVES</div><h1>Semantic &amp; Policy Drift</h1><p>Phorva detects changes in application execution surfaces and policy assumptions without silently widening authority.</p>`;
+
+PHORVA_PAGES["uncertainty"]=`<div class="eyebrow">SECURITY PRIMITIVES</div><h1>Uncertainty &amp; Verification States</h1><p>Phorva distinguishes verified, blocked, review-required and unknown states instead of treating uncertainty as approval.</p>`;
+
 const PHORVA_ROUTES = {
+  '/docs/verification-model':'verification-model',
+  '/docs/verification/conditional-authorization':'conditional-authorization',
+  '/docs/verification/state-transition':'state-transition',
+  '/docs/verification/objective':'objective-verification',
+  '/docs/verification/evidence-graph':'evidence-graph',
+  '/docs/security/invariants':'security-invariants',
+  '/docs/security/dependency-aware':'dependency-aware',
+  '/docs/security/semantic-drift':'semantic-drift',
+  '/docs/security/uncertainty':'uncertainty',
+
 
   '/docs/what-is-phorva': 'what-is-phorva',
   '/docs/trust-boundaries': 'trust-boundaries',

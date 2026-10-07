@@ -4,8 +4,9 @@ function createAgentStore(db) {
   function createAgent({
     projectId,
     name,
-    capabilities = [],
-    policy = {}
+    capabilities,
+    policy = {},
+    externalId = null
   }) {
     if (!projectId) {
       throw new Error("projectId is required");
@@ -25,7 +26,7 @@ function createAgentStore(db) {
               )
             )
           ]
-        : [];
+        : null;
 
     const normalizedPolicy =
       policy &&
@@ -38,11 +39,22 @@ function createAgentStore(db) {
       id: `agent_${crypto.randomUUID()}`,
       project_id: projectId,
       name: name.trim(),
-      capabilities: normalizedCapabilities,
       policy: normalizedPolicy,
       created_at: new Date().toISOString(),
       revoked_at: null
     };
+
+    if (
+      typeof externalId === "string" &&
+      externalId.trim()
+    ) {
+      agent.external_id =
+        externalId.trim();
+    }
+
+    if (normalizedCapabilities !== null) {
+      agent.capabilities = normalizedCapabilities;
+    }
 
     let projectExists = false;
 
@@ -76,8 +88,11 @@ function createAgentStore(db) {
       data.agents.find(
         (agent) =>
           agent.project_id === projectId &&
-          agent.id === agentId &&
-          !agent.revoked_at
+          !agent.revoked_at &&
+          (
+            agent.id === agentId ||
+            agent.external_id === agentId
+          )
       ) || null
     );
   }

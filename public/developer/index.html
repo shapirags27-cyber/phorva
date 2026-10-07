@@ -255,6 +255,21 @@
       font-weight: 600;
     }
 
+    .project-selector {
+      width: min(460px, 100%);
+      margin-top: 7px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      outline: none;
+    }
+
+    .project-selector:focus {
+      border-color: var(--accent);
+    }
+
     .environment {
       padding: 5px 9px;
       border: 1px solid #26334f;
@@ -415,7 +430,7 @@
 
       <nav class="nav" aria-label="Developer navigation">
         <a class="active" href="/developer">Overview</a>
-        <a href="/developer/projects.html">Projects</a>
+        <a href="/developer/projects.html">Applications</a>
         <a href="/developer/api-keys.html">API Keys</a>
         <a href="/developer/agents.html">Agents</a>
         <a href="/developer/verification.html">Verification</a>
@@ -452,16 +467,30 @@
 
       <section class="project-bar">
         <div class="project-meta">
-          <div class="project-label">Active project</div>
-          <div id="projectName" class="project-name">
-            No project selected
+          <div class="project-label">Application</div>
+
+          <select
+            id="projectSelector"
+            class="project-selector"
+            aria-label="Select application"
+          >
+            <option value="">Loading applications...</option>
+          </select>
+
+          <div id="projectUseCase" class="project-use-case">
+            No application selected
           </div>
         </div>
 
         <div style="display:flex;align-items:center;gap:12px">
           <span id="environment" class="environment">—</span>
-          <button id="createProject" class="create-project" type="button">
-            New project
+
+          <button
+            id="connectApplication"
+            class="create-project"
+            type="button"
+          >
+            Connect application
           </button>
         </div>
       </section>
@@ -469,7 +498,7 @@
       <section class="grid">
 
         <article class="card">
-          <div class="card-label">Projects</div>
+          <div class="card-label">Applications</div>
           <div id="projectCount" class="card-value">—</div>
           <div class="card-description">
             Applications and environments connected to your Phorva account.
@@ -489,6 +518,30 @@
           <div id="agentCount" class="card-value">—</div>
           <div class="card-description">
             Autonomous agents registered to the active project.
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-label">Use Case</div>
+          <div id="useCaseValue" class="card-value">—</div>
+          <div id="useCaseDescription" class="card-description">
+            The security profile established for this project.
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-label">Adaptive Baseline</div>
+          <div id="baselineValue" class="card-value">—</div>
+          <div id="baselineDescription" class="card-description">
+            Phorva's behavioral execution baseline.
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-label">Security Limits</div>
+          <div id="limitsValue" class="card-value">—</div>
+          <div id="limitsDescription" class="card-description">
+            Explicit transaction and account controls.
           </div>
         </article>
 
@@ -541,12 +594,32 @@
 
     const accountEmail =
       document.getElementById("accountEmail");
-
-    const projectName =
-      document.getElementById("projectName");
+    const projectSelector =
+      document.getElementById("projectSelector");
 
     const environment =
       document.getElementById("environment");
+
+    const projectUseCase =
+      document.getElementById("projectUseCase");
+
+    const useCaseValue =
+      document.getElementById("useCaseValue");
+
+    const useCaseDescription =
+      document.getElementById("useCaseDescription");
+
+    const baselineValue =
+      document.getElementById("baselineValue");
+
+    const baselineDescription =
+      document.getElementById("baselineDescription");
+
+    const limitsValue =
+      document.getElementById("limitsValue");
+
+    const limitsDescription =
+      document.getElementById("limitsDescription");
 
     const projectCount =
       document.getElementById("projectCount");
@@ -606,6 +679,163 @@
       return me;
     }
 
+    let developerProjects = [];
+    let selectedProject = null;
+
+    function selectProject(project) {
+      selectedProject = project || null;
+
+      if (!selectedProject) {        projectUseCase.textContent =
+          "Select an application to continue.";
+
+        environment.textContent =
+          "—";
+
+        useCaseValue.textContent =
+          "—";
+
+        baselineValue.textContent =
+          "—";
+
+        limitsValue.textContent =
+          "—";
+
+        return;
+      }
+      const useCases =
+        Array.isArray(selectedProject.use_cases)
+          ? selectedProject.use_cases
+          : Array.isArray(selectedProject.useCases)
+            ? selectedProject.useCases
+            : [];
+
+      projectUseCase.textContent =
+        useCases[0]
+          ? useCases[0]
+              .replace(/[-_]/g, " ")
+              .replace(/\b\w/g, c => c.toUpperCase())
+          : "Security profile configured";
+
+      loadProjectDetail(selectedProject);
+    }
+
+    async function loadProjectDetail(activeProject) {
+      if (!activeProject?.id) {
+        return;
+      }
+
+      try {
+        const detail =
+          await api(
+            `/v1/developer/projects/${encodeURIComponent(activeProject.id)}`
+          );
+
+        const project =
+          detail?.project || {};
+
+        const integration =
+          project.integration || {};
+
+        const connectButton =
+          document.getElementById("connectApplication");
+
+        if (connectButton) {
+          const connected =
+            integration.status === "VERIFIED";
+
+          connectButton.textContent =
+            connected
+              ? "Connected"
+              : "Connect application";
+
+          connectButton.disabled =
+            connected;
+
+          connectButton.setAttribute(
+            "aria-label",
+            connected
+              ? "Application connected"
+              : "Connect application"
+          );
+        }
+
+        const detailUseCases =
+          Array.isArray(project.useCases)
+            ? project.useCases
+            : [];
+
+        const useCase =
+          detailUseCases[0] || null;
+
+        if (useCase) {
+          const formatted =
+            useCase
+              .replace(/[-_]/g, " ")
+              .replace(/\b\w/g, c => c.toUpperCase());
+
+          projectUseCase.textContent =
+            formatted;
+
+          useCaseValue.textContent =
+            formatted;
+
+          useCaseDescription.textContent =
+            "Security posture established for this application.";
+        }
+
+        const profile =
+          project.securityProfile || {};
+
+        const baseline =
+          profile.adaptiveBaseline || {};
+
+        const baselineStatus =
+          baseline.status ||
+          "INITIALIZING";
+
+        baselineValue.textContent =
+          baselineStatus;
+
+        if (
+          baselineStatus === "ESTABLISHED" &&
+          baseline.normalRange
+        ) {
+          baselineDescription.textContent =
+            `Observed range: ${baseline.normalRange.min}–${baseline.normalRange.max}.`;
+        } else {
+          baselineDescription.textContent =
+            `${baseline.observationCount || 0} observations collected.`;
+        }
+
+        const limits =
+          profile.explicitLimits || {};
+
+        const max =
+          limits.maxTransactionAmount;
+
+        const agentLimit =
+          limits.agentTransactionLimit;
+
+        const daily =
+          limits.dailyLimit;
+
+        limitsValue.textContent =
+          max != null
+            ? String(max)
+            : "None";
+
+        limitsDescription.textContent =
+          `Max tx: ${max ?? "—"} · Agent: ${agentLimit ?? "—"} · Daily: ${daily ?? "—"}`;
+
+        await loadProjectResources(project);
+
+      } catch {
+        projectUseCase.textContent =
+          projectUseCase.textContent ||
+          "Application configured";
+      }
+    }
+
     async function loadProjects() {
       const result =
         await api("/v1/developer/projects");
@@ -621,24 +851,91 @@
         projects.length;
 
       if (!projects.length) {
-        projectName.textContent =
-          "No project created yet";
+        projectSelector.innerHTML =
+          '<option value="">No applications yet</option>';
+
+        projectUseCase.textContent =
+          "Create your first application to connect it to Phorva.";
 
         environment.textContent =
           "—";
 
+        useCaseValue.textContent =
+          "—";
+
+        baselineValue.textContent =
+          "—";
+
+        limitsValue.textContent =
+          "—";
+
+        const connectButton =
+          document.getElementById("connectApplication");
+
+        if (connectButton) {
+          connectButton.textContent =
+            "Create application";
+        }
+
+        showNotice(
+          "You do not have an application yet. Create one to start the Phorva integration flow."
+        );
+
         return;
       }
 
+      developerProjects =
+        projects;
+
+      projectSelector.innerHTML =
+        projects
+          .map(project => `
+            <option value="${String(project.id)
+              .replace(/&/g, "&amp;")
+              .replace(/"/g, "&quot;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")}">
+              ${String(project.name || project.id)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")}
+            </option>
+          `)
+          .join("");
+
+      const savedProjectId =
+        localStorage.getItem("phorva.activeProject");
+
+      selectedProject =
+        projects.find(project =>
+          String(project.id) ===
+          String(savedProjectId)
+        ) || projects[0];
+
+      projectSelector.value =
+        selectedProject.id;
+
+      localStorage.setItem(
+        "phorva.activeProject",
+        selectedProject.id
+      );
+
+      selectProject(selectedProject);
+
       const activeProject =
-        projects[0];
+        selectedProject;
 
-      projectName.textContent =
-        activeProject.name ||
-        activeProject.id;
+      const useCases =
+        Array.isArray(activeProject.use_cases)
+          ? activeProject.use_cases
+          : Array.isArray(activeProject.useCases)
+            ? activeProject.useCases
+            : [];
 
-      environment.textContent =
-        "TEST";
+      projectUseCase.textContent =
+        useCases[0]
+          ? useCases[0].replace(/[-_]/g, " ")
+          : "Security profile configured";
 
       return activeProject;
     }
@@ -646,7 +943,7 @@
     async function loadProjectResources(project) {
       if (!project?.id) {
         apiKeyCount.textContent = "0";
-        agentCount.textContent = "0";
+        agentCount.textContent = "—";
         return;
       }
 
@@ -659,24 +956,67 @@
         const keys =
           Array.isArray(result)
             ? result
-            : Array.isArray(result.apiKeys)
-              ? result.apiKeys
-              : [];
+            : Array.isArray(result.keys)
+              ? result.keys
+              : Array.isArray(result.apiKeys)
+                ? result.apiKeys
+                : [];
 
-        apiKeyCount.textContent =
+        const activeKeys =
           keys.filter(
             key => !key.revoked_at
-          ).length;
+          );
+
+        apiKeyCount.textContent =
+          activeKeys.length;
+
+        const hasTest =
+          activeKeys.some(
+            key => key.environment === "test"
+          );
+
+        const hasLive =
+          activeKeys.some(
+            key => key.environment === "live"
+          );
+
+        if (hasTest && hasLive) {
+          environment.textContent =
+            "TEST + LIVE";
+        } else if (hasLive) {
+          environment.textContent =
+            "LIVE";
+        } else if (hasTest) {
+          environment.textContent =
+            "TEST";
+        } else {
+          environment.textContent =
+            "NO KEYS";
+        }
       } catch {
         apiKeyCount.textContent =
           "—";
       }
 
-      /*
-       * Agent management will be connected here when the
-       * developer-facing agent registration surface is built.
-       */
-      agentCount.textContent = "0";
+      try {
+        const result =
+          await api(
+            `/v1/developer/projects/${encodeURIComponent(project.id)}/agents`
+          );
+
+        const agents =
+          Array.isArray(result)
+            ? result
+            : Array.isArray(result.agents)
+              ? result.agents
+              : [];
+
+        agentCount.textContent =
+          agents.length;
+      } catch {
+        agentCount.textContent =
+          "—";
+      }
     }
 
     document
@@ -695,11 +1035,65 @@
       });
 
     document
-      .getElementById("createProject")
-      .addEventListener("click", () => {
-        window.location.href =
-          "/developer/projects.html";
+      .getElementById("connectApplication")
+      .addEventListener("click", async () => {
+        try {
+          const result =
+            await api("/v1/developer/projects");
+
+          const projects =
+            Array.isArray(result)
+              ? result
+              : Array.isArray(result.projects)
+                ? result.projects
+                : [];
+
+          if (!projects.length) {
+            window.location.href =
+              "/developer/projects.html";
+            return;
+          }
+
+          if (!selectedProject?.id) {
+            showNotice(
+              "Select an application before connecting.",
+              true
+            );
+            return;
+          }
+
+          window.location.href =
+            "/developer/integrations.html?project=" +
+            encodeURIComponent(selectedProject.id);
+        } catch (error) {
+          showNotice(
+            error.message ||
+            "Unable to start application connection.",
+            true
+          );
+        }
       });
+
+    projectSelector.addEventListener(
+      "change",
+      async event => {
+        const project =
+          developerProjects.find(
+            item =>
+              String(item.id) ===
+              String(event.target.value)
+          );
+
+        if (project) {
+          localStorage.setItem(
+            "phorva.activeProject",
+            project.id
+          );
+        }
+
+        selectProject(project);
+      }
+    );
 
     async function boot() {
       try {

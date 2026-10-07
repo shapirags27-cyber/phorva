@@ -35,7 +35,8 @@ const securityAlertStore =
 const {
   getUseCases,
   isValidUseCase,
-  getUseCase
+  getUseCase,
+  getUseCaseApplicationCapabilities
 } = require("./api/use-cases");
 
 const {
@@ -1446,16 +1447,32 @@ const AGENT_CAPABILITIES = new Set([
   "deploy"
 ]);
 
-function isAgentCapabilityAllowed(actionType) {
+function getCapabilityAliases(actionType) {
   const normalized =
     String(actionType || "").toLowerCase();
 
-  return AGENT_CAPABILITIES.has(normalized);
+  const aliases = {
+    send: ["send", "transfer"],
+    transfer: ["transfer", "send"],
+    contractcall: ["contractcall", "contract-call"],
+    "contract-call": ["contract-call", "contractcall"],
+    customaction: ["customaction", "custom-action"],
+    "custom-action": ["custom-action", "customaction"]
+  };
+
+  return aliases[normalized] || [normalized];
+}
+
+function isAgentCapabilityAllowed(actionType) {
+  const aliases = getCapabilityAliases(actionType);
+
+  return aliases.some(
+    capability => AGENT_CAPABILITIES.has(capability)
+  );
 }
 
 function isPolicyCapabilityAllowed(actionType, policy) {
-  const normalized =
-    String(actionType || "").toLowerCase();
+  const aliases = getCapabilityAliases(actionType);
 
   const capabilities =
     Array.isArray(policy?.capabilities)
@@ -1465,12 +1482,14 @@ function isPolicyCapabilityAllowed(actionType, policy) {
       : null;
 
   if (!capabilities) {
-    return isAgentCapabilityAllowed(normalized);
+    return isAgentCapabilityAllowed(actionType);
   }
 
   return (
-    isAgentCapabilityAllowed(normalized) &&
-    capabilities.includes(normalized)
+    isAgentCapabilityAllowed(actionType) &&
+    aliases.some(
+      capability => capabilities.includes(capability)
+    )
   );
 }
 
@@ -1483,7 +1502,7 @@ function isPolicyTargetAllowed(transaction, policy) {
           )
       : null;
 
-  if (!allowedTargets) {
+  if (!allowedTargets || allowedTargets.length === 0) {
     return true;
   }
 
@@ -1505,7 +1524,7 @@ function isPolicySelectorAllowed(transaction, policy) {
           )
       : null;
 
-  if (!allowedSelectors) {
+  if (!allowedSelectors || allowedSelectors.length === 0) {
     return true;
   }
 
@@ -1571,6 +1590,7 @@ function isPolicyApprovalAllowed(decodedFunction, decodedParameters, policy) {
 
   if (
     allowedSpenders &&
+    allowedSpenders.length > 0 &&
     (
       !spender ||
       !allowedSpenders.includes(
@@ -2809,7 +2829,8 @@ function verifyExecutionAuthorization({
   action,
   intent,
   policy,
-  transaction
+  transaction,
+  applicationCapabilities = []
 }) {
   if (!agent || !action || !intent || !policy || !transaction) {
     throw new Error(
@@ -2969,8 +2990,7 @@ function verifyExecutionAuthorization({
   const policyPassed =
     Number.isFinite(actualTransactionAmount) &&
     Number.isFinite(maximum) &&
-    actualTransactionAmount <= maximum &&
-    actualTransactionAmount <= dailyLimit;
+    actualTransactionAmount <= maximum;
 
   const hasRegisteredCapabilities =
     Array.isArray(agent.capabilities);
@@ -2982,15 +3002,54 @@ function verifyExecutionAuthorization({
         )
       : [];
 
+  const capabilityAliases =
+    getCapabilityAliases(intent.type);
+
   const capabilityAllowed =
     hasRegisteredCapabilities
       ? (
           isAgentCapabilityAllowed(intent.type) &&
-          registeredCapabilities.includes(
-            String(intent.type || "").toLowerCase()
+          capabilityAliases.some(
+            capability =>
+              registeredCapabilities.includes(capability)
           )
         )
       : isAgentCapabilityAllowed(intent.type);
+
+  /*
+   * Application execution surface.
+   *
+   * These capabilities come from the project's selected use case.
+   * They describe the application's expected execution surface,
+   * but they are NOT a permanent authorization whitelist.
+   *
+   * If the application evolves and introduces a new action,
+   * Phorva detects that change while still evaluating the action
+   * through the normal intent, policy, risk, and transaction checks.
+   */
+  const normalizedApplicationCapabilities =
+    Array.isArray(applicationCapabilities)
+      ? applicationCapabilities
+          .map(value =>
+            String(value || "").trim().toLowerCase()
+          )
+          .filter(Boolean)
+      : [];
+
+  const applicationCapabilityKnown =
+    normalizedApplicationCapabilities.length === 0
+      ? null
+      : capabilityAliases.some(
+          capability =>
+            normalizedApplicationCapabilities.includes(capability)
+        );
+
+  const applicationCapabilityStatus =
+    applicationCapabilityKnown === true
+      ? "KNOWN"
+      : applicationCapabilityKnown === false
+        ? "NEW_APPLICATION_CAPABILITY"
+        : "UNSPECIFIED";
 
   const targetAllowed =
     isPolicyTargetAllowed(
@@ -3283,6 +3342,8 @@ function verifyExecutionAuthorization({
 
   return {
     authorized,
+    applicationCapabilityKnown,
+    applicationCapabilityStatus,
     policyPassed,
     velocityAllowed,
     quarantineAllowed,
@@ -8953,6 +9014,11 @@ app.post(
        */
       const actions = [];
 
+      const applicationCapabilities =
+        getUseCaseApplicationCapabilities(
+          selectedUseCase.id
+        );
+
       const policy =
         req.body?.policy &&
         typeof req.body.policy === "object" &&
@@ -8967,6 +9033,7 @@ app.post(
             req.developerIdentity.developerId,
           useCases,
           actions,
+          applicationCapabilities,
           policy,
           securityProfile
         });
@@ -9026,6 +9093,13 @@ app.get(
         actions: Array.isArray(project.actions)
           ? project.actions
           : [],
+
+        applicationCapabilities:
+          Array.isArray(project.application_capabilities)
+            ? project.application_capabilities
+            : Array.isArray(project.applicationCapabilities)
+              ? project.applicationCapabilities
+              : [],
         policy:
           project.policy &&
           typeof project.policy === "object" &&
@@ -9039,6 +9113,11 @@ app.get(
           !Array.isArray(project.security_profile)
             ? project.security_profile
             : null,
+
+        integration:
+          apiKeyStore.getProjectIntegration(
+            project.id
+          ),
 
         createdAt:
           project.created_at,
@@ -9056,6 +9135,209 @@ app.get(
  * Developers configure the security posture here.
  * Action types are intentionally not accepted.
  */
+/*
+ * Start project integration.
+ *
+ * API, SDK and MCP are integration interfaces into
+ * the same canonical Phorva security engine.
+ */
+app.post(
+  "/v1/developer/projects/:id/integration",
+  requireTrustedOrigin,
+  developerAuth,
+  requireOwnedProject,
+  (req, res) => {
+    try {
+      const method =
+        typeof req.body?.method === "string"
+          ? req.body.method.trim().toLowerCase()
+          : "";
+
+      if (!["api", "sdk", "mcp"].includes(method)) {
+        return res.status(400).json({
+          error: {
+            code: "INVALID_INTEGRATION_METHOD",
+            message:
+              "Integration method must be api, sdk, or mcp"
+          }
+        });
+      }
+
+      const integration =
+        apiKeyStore.updateProjectIntegration(
+          req.developerProjectId,
+          {
+            method,
+            status: "PENDING",
+            verificationId: null,
+            verifiedAt: null
+          }
+        );
+
+      return res.status(200).json({
+        projectId: req.developerProjectId,
+        integration
+      });
+    } catch (error) {
+      console.error(
+        "Developer integration start error:",
+        error
+      );
+
+      return res.status(400).json({
+        error: {
+          code: "INTEGRATION_START_FAILED",
+          message:
+            error.message ||
+            "Could not start integration"
+        }
+      });
+    }
+  }
+);
+
+/*
+ * Verify project integration.
+ *
+ * The credential must authenticate to the same
+ * project being verified.
+ */
+app.post(
+  "/v1/developer/projects/:id/integration/verify",
+  requireTrustedOrigin,
+  developerAuth,
+  requireOwnedProject,
+  (req, res) => {
+    try {
+      const projectId =
+        req.developerProjectId;
+
+      const project =
+        apiKeyStore.getProject(projectId);
+
+      if (!project) {
+        return res.status(404).json({
+          error: {
+            code: "PROJECT_NOT_FOUND",
+            message: "Project not found"
+          }
+        });
+      }
+
+      const integration =
+        apiKeyStore.getProjectIntegration(
+          projectId
+        );
+
+      if (!integration) {
+        return res.status(404).json({
+          error: {
+            code: "INTEGRATION_NOT_FOUND",
+            message:
+              "Project integration was not found"
+          }
+        });
+      }
+
+      if (
+        !["api", "sdk", "mcp"].includes(
+          integration.method
+        )
+      ) {
+        return res.status(400).json({
+          error: {
+            code: "INTEGRATION_NOT_STARTED",
+            message:
+              "Start an API, SDK, or MCP integration first"
+          }
+        });
+      }
+
+      const suppliedKey =
+        typeof req.body?.apiKey === "string"
+          ? req.body.apiKey.trim()
+          : "";
+
+      if (!suppliedKey) {
+        return res.status(400).json({
+          error: {
+            code: "INTEGRATION_CREDENTIAL_REQUIRED",
+            message:
+              "A project API key is required to verify the integration"
+          }
+        });
+      }
+
+      const identity =
+        apiKeyStore.authenticate(
+          suppliedKey
+        );
+
+      if (!identity) {
+        return res.status(401).json({
+          error: {
+            code: "INVALID_INTEGRATION_CREDENTIAL",
+            message:
+              "The integration credential is invalid or revoked"
+          }
+        });
+      }
+
+      if (
+        identity.projectId !== projectId
+      ) {
+        return res.status(403).json({
+          error: {
+            code: "INTEGRATION_PROJECT_MISMATCH",
+            message:
+              "The credential does not belong to this project"
+          }
+        });
+      }
+
+      const crypto =
+        require("crypto");
+
+      const verificationId =
+        `int_${crypto.randomUUID()}`;
+
+      const verifiedAt =
+        new Date().toISOString();
+
+      const verifiedIntegration =
+        apiKeyStore.updateProjectIntegration(
+          projectId,
+          {
+            status: "VERIFIED",
+            verificationId,
+            verifiedAt
+          }
+        );
+
+      return res.status(200).json({
+        projectId,
+        verified: true,
+        integration:
+          verifiedIntegration
+      });
+    } catch (error) {
+      console.error(
+        "Developer integration verification error:",
+        error
+      );
+
+      return res.status(400).json({
+        error: {
+          code: "INTEGRATION_VERIFICATION_FAILED",
+          message:
+            error.message ||
+            "Could not verify integration"
+        }
+      });
+    }
+  }
+);
+
 app.patch(
   "/v1/developer/projects/:id",
   requireTrustedOrigin,
@@ -9231,6 +9513,358 @@ app.patch(
  * List API keys belonging to an
  * authenticated developer's project.
  */
+app.get(
+  "/v1/developer/projects/:id/agents",
+  developerAuth,
+  requireOwnedProject,
+  (req, res) => {
+    const project =
+      apiKeyStore.getProject(
+        req.developerProjectId
+      );
+
+    if (!project) {
+      return res.status(404).json({
+        error: {
+          code: "PROJECT_NOT_FOUND",
+          message: "Project not found"
+        }
+      });
+    }
+
+    return res.json({
+      agents:
+        agentStore.list(
+          req.developerProjectId
+        )
+    });
+  }
+);
+
+app.get(
+  "/v1/developer/projects/:id/policies",
+  developerAuth,
+  requireOwnedProject,
+  (req, res) => {
+    const projectId = req.developerProjectId;
+
+    const agents =
+      typeof agentStore.list === "function"
+        ? agentStore.list(projectId)
+        : [];
+
+    return res.json({
+      projectId,
+      policies: agents.map(agent => ({
+        agent: {
+          id: agent.id,
+          name: agent.name,
+          external_id: agent.external_id || null,
+          revoked_at: agent.revoked_at || null
+        },
+        policy: agent.policy || {}
+      }))
+    });
+  }
+);
+
+app.get(
+  "/v1/developer/projects/:id/agents/:agentId/policy",
+  developerAuth,
+  requireOwnedProject,
+  (req, res) => {
+    const projectId = req.developerProjectId;
+
+    const agent =
+      agentStore.getAgent(
+        projectId,
+        req.params.agentId
+      );
+
+    if (!agent) {
+      return res.status(404).json({
+        error: {
+          code: "AGENT_NOT_FOUND",
+          message: "Agent not found or revoked"
+        }
+      });
+    }
+
+    return res.json({
+      agent: {
+        id: agent.id,
+        name: agent.name,
+        external_id: agent.external_id || null,
+        revoked_at: agent.revoked_at || null
+      },
+      policy: agent.policy || {}
+    });
+  }
+);
+
+app.patch(
+  "/v1/developer/projects/:id/agents/:agentId/policy",
+  developerAuth,
+  requireOwnedProject,
+  (req, res) => {
+    const projectId = req.developerProjectId;
+
+    const agent =
+      agentStore.getAgent(
+        projectId,
+        req.params.agentId
+      );
+
+    if (!agent) {
+      return res.status(404).json({
+        error: {
+          code: "AGENT_NOT_FOUND",
+          message: "Agent not found or revoked"
+        }
+      });
+    }
+
+    if (
+      !req.body?.policy ||
+      typeof req.body.policy !== "object" ||
+      Array.isArray(req.body.policy)
+    ) {
+      return res.status(400).json({
+        error: {
+          code: "INVALID_REQUEST",
+          message: "policy must be an object"
+        }
+      });
+    }
+
+    /*
+     * Developer console policy controls.
+     *
+     * These configure the existing Phorva policy engine.
+     * Mandatory verification semantics and the agent capability
+     * boundary remain outside developer-editable policy.
+     */
+    const source = req.body.policy;
+
+    const allowedFields = [
+      "maxTransactionAmount",
+      "dailyLimit",
+      "maxTransactionsPerWindow",
+      "maxValuePerWindow",
+      "velocityWindowMs",
+      "quarantineOnVelocityViolation",
+      "quarantineOnCriticalRisk",
+      "allowedTargets",
+      "allowedSelectors",
+      "allowedSpenders",
+      "allowUnlimitedApprovals",
+      "maxApprovalAmount"
+    ];
+
+    const policy = {};
+
+    for (const field of allowedFields) {
+      if (!Object.prototype.hasOwnProperty.call(source, field)) {
+        continue;
+      }
+
+      const value = source[field];
+
+      if (
+        [
+          "allowedTargets",
+          "allowedSelectors",
+          "allowedSpenders"
+        ].includes(field)
+      ) {
+        if (!Array.isArray(value)) {
+          return res.status(400).json({
+            error: {
+              code: "INVALID_POLICY",
+              message: `${field} must be an array`
+            }
+          });
+        }
+
+        policy[field] = [
+          ...new Set(
+            value
+              .map(item =>
+                String(item || "").trim().toLowerCase()
+              )
+              .filter(Boolean)
+          )
+        ];
+
+        continue;
+      }
+
+      if (
+        [
+          "quarantineOnVelocityViolation",
+          "quarantineOnCriticalRisk",
+          "allowUnlimitedApprovals"
+        ].includes(field)
+      ) {
+        if (typeof value !== "boolean") {
+          return res.status(400).json({
+            error: {
+              code: "INVALID_POLICY",
+              message: `${field} must be boolean`
+            }
+          });
+        }
+
+        policy[field] = value;
+        continue;
+      }
+
+      const numeric = Number(value);
+
+      if (
+        !Number.isFinite(numeric) ||
+        numeric < 0
+      ) {
+        return res.status(400).json({
+          error: {
+            code: "INVALID_POLICY",
+            message: `${field} must be a non-negative number`
+          }
+        });
+      }
+
+      policy[field] = numeric;
+    }
+
+    const updated =
+      agentStore.updatePolicy(
+        projectId,
+        agent.id,
+        policy
+      );
+
+    return res.json({
+      agent: updated
+    });
+  }
+);
+
+app.get(
+  "/v1/developer/projects/:id/agents/:agentId/activity",
+  developerAuth,
+  requireOwnedProject,
+  (req, res) => {
+    const projectId = req.developerProjectId;
+    const agentId = req.params.agentId;
+
+    const project =
+      apiKeyStore.getProject(projectId);
+
+    if (!project) {
+      return res.status(404).json({
+        error: {
+          code: "PROJECT_NOT_FOUND",
+          message: "Project not found"
+        }
+      });
+    }
+
+    const agent =
+      agentStore.getAgent(
+        projectId,
+        agentId
+      );
+
+    if (!agent) {
+      return res.status(404).json({
+        error: {
+          code: "AGENT_NOT_FOUND",
+          message: "Agent not found"
+        }
+      });
+    }
+
+    const limit = Math.min(
+      Math.max(
+        Number(req.query.limit) || 100,
+        1
+      ),
+      500
+    );
+
+    const records =
+      executionRecordStore.listByAgent(
+        agent.id,
+        limit
+      );
+
+    return res.json({
+      agent,
+      records
+    });
+  }
+);
+
+app.get(
+  "/v1/developer/projects/:id/verification",
+  developerAuth,
+  requireOwnedProject,
+  (req, res) => {
+    const projectId = req.developerProjectId;
+
+    const limit = Math.min(
+      Math.max(
+        Number(req.query.limit) || 100,
+        1
+      ),
+      500
+    );
+
+    const records =
+      executionRecordStore.listByProject(
+        projectId,
+        limit
+      );
+
+    return res.json({
+      projectId,
+      records
+    });
+  }
+);
+
+app.get(
+  "/v1/developer/projects/:id/verification/:verificationId",
+  developerAuth,
+  requireOwnedProject,
+  (req, res) => {
+    const projectId = req.developerProjectId;
+    const verificationId =
+      req.params.verificationId;
+
+    const record =
+      executionRecordStore.getByVerificationId(
+        verificationId
+      );
+
+    if (
+      !record ||
+      record.project_id !== projectId
+    ) {
+      return res.status(404).json({
+        error: {
+          code: "VERIFICATION_NOT_FOUND",
+          message: "Verification not found"
+        }
+      });
+    }
+
+    return res.json({
+      record
+    });
+  }
+);
+
 app.get(
   "/v1/developer/projects/:id/api-keys",
   developerAuth,
@@ -9429,6 +10063,14 @@ const productionApi = createProductionApi({
         : {};
 
     const finiteLimit = value => {
+      if (
+        value === undefined ||
+        value === null ||
+        value === ""
+      ) {
+        return null;
+      }
+
       const number = Number(value);
 
       return Number.isFinite(number) &&
@@ -9514,7 +10156,13 @@ const productionApi = createProductionApi({
         action,
         intent,
         policy: effectivePolicy,
-        transaction
+        transaction,
+        applicationCapabilities:
+          Array.isArray(project.application_capabilities)
+            ? project.application_capabilities
+            : Array.isArray(project.applicationCapabilities)
+              ? project.applicationCapabilities
+              : []
       });
 
     let baselineDecision = null;
@@ -9699,6 +10347,16 @@ const productionApi = createProductionApi({
     return executionRecordStore.listByProject(
       projectId,
       limit
+    );
+  },
+
+  getDailyAgentUsage: ({
+    projectId,
+    agentId
+  }) => {
+    return executionRecordStore.getDailyAgentUsage(
+      projectId,
+      agentId
     );
   },
 

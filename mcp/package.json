@@ -1,0 +1,19 @@
+{
+  "name": "@phorva/mcp",
+  "version": "0.1.0",
+  "description": "MCP integration for Phorva verification infrastructure",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node src/index.js",
+    "test:load": "node --input-type=module -e \"import('./src/index.js').then(() => console.log('MCP loaded: true'))\""
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.2.0",
+    "@phorva/sdk": "file:../sdk",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "^2.2.0"
+  }
+}

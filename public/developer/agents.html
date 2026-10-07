@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agents — Phorva</title>
+
+  <style>
+    :root{
+      --bg:#06070b;
+      --panel:#0c0f17;
+      --panel2:#101420;
+      --border:#1d2433;
+      --text:#f5f7fb;
+      --muted:#8c96aa;
+      --accent:#7c6cff;
+      --success:#45d483;
+      --danger:#ff647c;
+      --warning:#f3c969;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 70% -10%,rgba(93,76,255,.15),transparent 35%),
+        var(--bg);
+      color:var(--text);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+
+    a{
+      color:inherit;
+      text-decoration:none;
+    }
+
+    .shell{
+      display:flex;
+      min-height:100vh;
+    }
+
+    .sidebar{
+      width:230px;
+      border-right:1px solid var(--border);
+      padding:26px 16px;
+      background:rgba(7,9,14,.92);
+    }
+
+    .brand{
+      font-size:20px;
+      font-weight:800;
+      letter-spacing:.08em;
+      margin:0 10px 32px;
+    }
+
+    .section-label{
+      color:#596378;
+      font-size:10px;
+      font-weight:700;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      margin:0 10px 10px;
+    }
+
+    .nav{
+      display:grid;
+      gap:4px;
+    }
+
+    .nav a{
+      padding:11px 12px;
+      border-radius:9px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .nav a:hover,
+    .nav a.active{
+      background:#111521;
+      color:var(--text);
+    }
+
+    .main{
+      flex:1;
+      min-width:0;
+      padding:34px 42px 70px;
+      max-width:1250px;
+    }
+
+    .topline{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:20px;
+      margin-bottom:30px;
+    }
+
+    .eyebrow{
+      color:#747f95;
+      font-size:12px;
+      margin-bottom:8px;
+    }
+
+    h1{
+      margin:0;
+      font-size:30px;
+      letter-spacing:-.03em;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      margin-top:8px;
+      max-width:720px;
+      line-height:1.55;
+    }
+
+    .project-bar{
+      background:linear-gradient(180deg,#0e121c,#0a0d14);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:18px;
+      margin-bottom:20px;
+    }
+
+    .project-label{
+      color:#737d92;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+      margin-bottom:8px;
+    }
+
+    select{
+      width:100%;
+      background:#080b11;
+      border:1px solid var(--border);
+      color:var(--text);
+      border-radius:9px;
+      padding:11px 12px;
+      outline:none;
+    }
+
+    select:focus{
+      border-color:#5047a5;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin-bottom:18px;
+    }
+
+    .stat{
+      background:linear-gradient(180deg,rgba(16,20,32,.96),rgba(10,13,20,.96));
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:18px;
+    }
+
+    .stat-label{
+      color:#737d92;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .stat-value{
+      margin-top:8px;
+      font-size:25px;
+      font-weight:750;
+    }
+
+    .stat-description{
+      color:#69748a;
+      font-size:11px;
+      margin-top:5px;
+    }
+
+    .card{
+      background:linear-gradient(180deg,rgba(16,20,32,.96),rgba(10,13,20,.96));
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:20px;
+    }
+
+    .card-title{
+      font-size:16px;
+      font-weight:700;
+      margin-bottom:6px;
+    }
+
+    .card-text{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+      margin-bottom:18px;
+    }
+
+    .agents{
+      display:grid;
+      gap:10px;
+    }
+
+    .agent{
+      border:1px solid var(--border);
+      border-radius:11px;
+      padding:16px;
+      background:#090c13;
+    }
+
+    .agent-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:15px;
+    }
+
+    .agent-name{
+      font-weight:650;
+      font-size:14px;
+    }
+
+    .agent-id{
+      color:#707b91;
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-size:11px;
+      margin-top:6px;
+      word-break:break-all;
+    }
+
+    .agent-meta{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin-top:15px;
+      padding-top:14px;
+      border-top:1px solid #171d29;
+    }
+
+    .meta-label{
+      color:#68738a;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:.07em;
+    }
+
+    .meta-value{
+      color:#b9c1d0;
+      font-size:12px;
+      margin-top:5px;
+    }
+
+    .badge{
+      display:inline-flex;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:10px;
+      font-weight:700;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+
+    .badge.active{
+      color:#67e59b;
+      background:rgba(69,212,131,.10);
+    }
+
+    .badge.revoked{
+      color:#ff8092;
+      background:rgba(255,100,124,.10);
+    }
+
+    .badge.detected{
+      color:#aaa2ff;
+      background:rgba(124,108,255,.10);
+    }
+
+    .empty{
+      border:1px dashed #273047;
+      border-radius:11px;
+      padding:34px 20px;
+      text-align:center;
+      color:#69748a;
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    .notice{
+      display:none;
+      padding:11px 13px;
+      border-radius:9px;
+      margin-bottom:16px;
+      font-size:13px;
+    }
+
+    .notice.show{
+      display:block;
+    }
+
+    .notice.error{
+      color:#ff8b9b;
+      background:rgba(255,100,124,.08);
+      border:1px solid rgba(255,100,124,.2);
+    }
+
+    @media(max-width:800px){
+      .sidebar{width:190px}
+      .main{padding:25px 20px}
+      .stats{grid-template-columns:1fr}
+      .agent-meta{grid-template-columns:1fr}
+    }
+
+    @media(max-width:620px){
+      .sidebar{display:none}
+      .main{padding:22px 16px}
+    }
+  
+    .agent {
+      cursor: pointer;
+      transition: border-color .18s ease, transform .18s ease;
+    }
+
+    .agent:hover {
+      transform: translateY(-1px);
+      border-color: rgba(120, 130, 255, .35);
+    }
+
+    .agent-detail {
+      margin-top: 20px;
+      padding: 24px;
+      border: 1px solid rgba(120, 130, 255, .18);
+      border-radius: 16px;
+      background: rgba(10, 12, 24, .72);
+      display: none;
+    }
+
+    .agent-detail.visible {
+      display: block;
+    }
+
+    .detail-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 22px;
+    }
+
+    .detail-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .detail-subtitle {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    .detail-close {
+      border: 1px solid rgba(255,255,255,.1);
+      background: transparent;
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 7px 11px;
+      cursor: pointer;
+    }
+
+    .detail-close:hover {
+      color: #fff;
+      border-color: rgba(255,255,255,.2);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .detail-stat {
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 12px;
+      background: rgba(255,255,255,.025);
+    }
+
+    .detail-stat .meta-label {
+      margin-bottom: 7px;
+    }
+
+    .detail-stat .meta-value {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .activity-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .security-decision {
+      margin: 0 0 24px;
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+      background: rgba(255,255,255,.025);
+    }
+
+    .security-decision-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .decision-result {
+      margin-top: 4px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .decision-authorization {
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .security-checks {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .security-check {
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.025);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .security-check span {
+      display: block;
+      margin-bottom: 6px;
+      color: rgba(255,255,255,.52);
+      font-size: 11px;
+    }
+
+    .security-check strong {
+      font-size: 13px;
+    }
+
+    .check-pass {
+      color: #7ee2a8;
+    }
+
+    .check-fail {
+      color: #ff7d8a;
+    }
+
+    .check-neutral {
+      color: rgba(255,255,255,.55);
+    }
+
+    .decision-verified {
+      color: #7ee2a8;
+    }
+
+    .decision-blocked {
+      color: #ff7d8a;
+    }
+
+    .decision-review {
+      color: #f4c96b;
+    }
+
+    .authorization-allow {
+      color: #7ee2a8;
+      border-color: rgba(126,226,168,.2);
+    }
+
+    .authorization-block {
+      color: #ff7d8a;
+      border-color: rgba(255,125,138,.2);
+    }
+
+    .authorization-review {
+      color: #f4c96b;
+      border-color: rgba(244,201,107,.2);
+    }
+
+    .activity-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .activity-table th,
+    .activity-table td {
+      text-align: left;
+      padding: 11px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      font-size: 12px;
+    }
+
+    .activity-table th {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .activity-table td {
+      color: rgba(255,255,255,.86);
+    }
+
+    .result-verified {
+      color: #8df0b1;
+    }
+
+    .result-blocked {
+      color: #ff8f9c;
+    }
+
+    .result-review {
+      color: #ffd27a;
+    }
+
+    .detail-loading,
+    .detail-empty {
+      color: var(--muted);
+      padding: 16px 0;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .detail-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 600px) {
+      .detail-head {
+        flex-direction: column;
+      }
+
+      .detail-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .activity-table {
+        min-width: 700px;
+      }
+
+      .agent-detail {
+        overflow-x: auto;
+      }
+    }
+
+</style>
+</head>
+
+<body>
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="brand">PHORVA</div>
+
+    <div class="section-label">Developer</div>
+
+    <nav class="nav">
+      <a href="/developer/index.html">Overview</a>
+      <a href="/developer/projects.html">Applications</a>
+      <a href="/developer/api-keys.html">API Keys</a>
+      <a href="/developer/agents.html" class="active">Agents</a>
+      <a href="/developer/verification.html">Verification</a>
+      <a href="/developer/policies.html">Policies</a>
+      <a href="/developer/integrations.html">Integrations</a>
+      <a href="/developer/settings.html">Settings</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <div class="topline">
+      <div>
+        <div class="eyebrow">Developer Platform / Runtime</div>
+        <h1>Agents</h1>
+        <div class="subtitle">
+          Phorva automatically detects agents when they interact with your
+          connected application. Agents do not need to be manually registered.
+        </div>
+      </div>
+    </div>
+
+    <div id="notice" class="notice"></div>
+
+    <section class="project-bar">
+      <div class="project-label">Application</div>
+      <select id="projectSelector">
+        <option value="">Loading applications…</option>
+      </select>
+    </section>
+
+    <section class="stats">
+      <div class="stat">
+        <div class="stat-label">Detected agents</div>
+        <div id="totalAgents" class="stat-value">—</div>
+        <div class="stat-description">Agents discovered automatically</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">Active</div>
+        <div id="activeAgents" class="stat-value">—</div>
+        <div class="stat-description">Currently registered agents</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">Revoked</div>
+        <div id="revokedAgents" class="stat-value">—</div>
+        <div class="stat-description">Agents no longer authorized</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-title">Detected agents</div>
+
+      <div class="card-text">
+        Agent identity is established from the authenticated application
+        integration. Phorva keeps the agent capability boundary enforced
+        during verification.
+      </div>
+
+      <div id="agents" class="agents">
+        Loading agents…
+      </div>
+
+      <div id="agentDetail" class="agent-detail">
+        <div class="detail-head">
+          <div>
+            <div id="detailTitle" class="detail-title">
+              Agent details
+            </div>
+            <div id="detailSubtitle" class="detail-subtitle">
+              Select an agent to inspect its activity.
+            </div>
+          </div>
+
+          <button
+            id="detailClose"
+            class="detail-close"
+            type="button"
+          >
+            Close
+          </button>
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-stat">
+            <div class="meta-label">Status</div>
+            <div id="detailStatus" class="meta-value">—</div>
+          </div>
+
+          <div class="detail-stat">
+            <div class="meta-label">Total activity</div>
+            <div id="detailTotal" class="meta-value">—</div>
+          </div>
+
+          <div class="detail-stat">
+            <div class="meta-label">Verified</div>
+            <div id="detailVerified" class="meta-value">—</div>
+          </div>
+
+          <div class="detail-stat">
+            <div class="meta-label">Blocked / Review</div>
+            <div id="detailBlockedReview" class="meta-value">—</div>
+          </div>
+        </div>
+
+        <div class="activity-title">
+          Security decision
+        </div>
+
+        <div id="securityDecision" class="security-decision">
+          <div class="security-decision-head">
+            <div>
+              <div class="meta-label">Decision</div>
+              <div id="decisionResult" class="decision-result">—</div>
+            </div>
+
+            <div
+              id="decisionAuthorization"
+              class="decision-authorization"
+            >
+              —
+            </div>
+          </div>
+
+          <div class="security-checks">
+            <div class="security-check">
+              <span>Policy</span>
+              <strong id="checkPolicy">—</strong>
+            </div>
+
+            <div class="security-check">
+              <span>Intent</span>
+              <strong id="checkIntent">—</strong>
+            </div>
+
+            <div class="security-check">
+              <span>Parameters</span>
+              <strong id="checkParameters">—</strong>
+            </div>
+
+            <div class="security-check">
+              <span>Execution type</span>
+              <strong id="checkExecutionType">—</strong>
+            </div>
+
+            <div class="security-check">
+              <span>Native value</span>
+              <strong id="checkNativeValue">—</strong>
+            </div>
+
+            <div class="security-check">
+              <span>Protocol</span>
+              <strong id="checkProtocol">—</strong>
+            </div>
+
+            <div class="security-check">
+              <span>Transaction</span>
+              <strong id="checkTransaction">—</strong>
+            </div>
+
+            <div class="security-check">
+              <span>Agent capability</span>
+              <strong id="checkCapability">—</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity-title">
+          Recent verification activity
+        </div>
+
+        <div id="detailActivity">
+          <div class="detail-loading">
+            Select an agent to load activity.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+
+  const $ = id => document.getElementById(id);
+
+  let applications = [];
+  let selectedProject = null;
+
+  function showNotice(message, type){
+    const el = $("notice");
+
+    el.textContent = message || "";
+
+    el.className =
+      "notice" +
+      (message ? " show " + type : "");
+  }
+
+  async function request(url, options = {}){
+    const response = await fetch(url, {
+      credentials: "same-origin",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      }
+    });
+
+    let body = null;
+
+    try {
+      body = await response.json();
+    } catch (_) {}
+
+    if (!response.ok) {
+      throw new Error(
+        body?.error?.message ||
+        body?.message ||
+        "Request failed"
+      );
+    }
+
+    return body;
+  }
+
+  function renderApplications(){
+
+    const selector =
+      $("projectSelector");
+
+    selector.innerHTML = "";
+
+    if (!applications.length) {
+
+      selector.innerHTML =
+        '<option value="">No applications yet</option>';
+
+      renderAgents([]);
+
+      return;
+    }
+
+    applications.forEach(project => {
+
+      const option =
+        document.createElement("option");
+
+      option.value = project.id;
+
+      option.textContent =
+        project.name || project.id;
+
+      selector.appendChild(option);
+
+    });
+
+    if (selectedProject) {
+      selector.value =
+        selectedProject.id;
+    }
+  }
+
+  async function loadApplications(){
+
+    const result =
+      await request(
+        "/v1/developer/projects"
+      );
+
+    applications =
+      Array.isArray(result?.projects)
+        ? result.projects
+        : [];
+
+    selectedProject =
+      applications[0] || null;
+
+    renderApplications();
+
+    if (selectedProject) {
+      await loadAgents();
+    }
+  }
+
+  async function loadAgents(){
+
+    if (!selectedProject) {
+      renderAgents([]);
+      return;
+    }
+
+    $("agents").textContent =
+      "Loading agents…";
+
+    try {
+
+      const result =
+        await request(
+          "/v1/developer/projects/" +
+          encodeURIComponent(selectedProject.id) +
+          "/agents"
+        );
+
+      const agents =
+        Array.isArray(result?.agents)
+          ? result.agents
+          : [];
+
+      renderAgents(agents);
+
+    } catch (error) {
+
+      $("agents").textContent =
+        error.message;
+
+      $("totalAgents").textContent = "—";
+      $("activeAgents").textContent = "—";
+      $("revokedAgents").textContent = "—";
+    }
+  }
+
+  function setSecurityCheck(id, value){
+    const element = $(id);
+
+    if (!element) {
+      return;
+    }
+
+    if (value === true) {
+      element.textContent = "PASS";
+      element.className = "check-pass";
+      return;
+    }
+
+    if (value === false) {
+      element.textContent = "FAIL";
+      element.className = "check-fail";
+      return;
+    }
+
+    element.textContent = "—";
+    element.className = "check-neutral";
+  }
+
+  function renderSecurityDecision(record){
+    const status =
+      record?.status || "UNKNOWN";
+
+    const checks =
+      record?.checks || {};
+
+    const result =
+      $("decisionResult");
+
+    const authorization =
+      $("decisionAuthorization");
+
+    if (!result || !authorization) {
+      return;
+    }
+
+    result.className =
+      "decision-result";
+
+    authorization.className =
+      "decision-authorization";
+
+    if (status === "VERIFIED" || status === "APPROVED") {
+      result.textContent = "VERIFIED";
+      result.classList.add("decision-verified");
+
+      authorization.textContent = "ALLOW";
+      authorization.classList.add("authorization-allow");
+    } else if (status === "BLOCKED") {
+      result.textContent = "BLOCKED";
+      result.classList.add("decision-blocked");
+
+      authorization.textContent = "BLOCK";
+      authorization.classList.add("authorization-block");
+    } else if (status === "REVIEW_REQUIRED") {
+      result.textContent = "REVIEW REQUIRED";
+      result.classList.add("decision-review");
+
+      authorization.textContent = "REVIEW";
+      authorization.classList.add("authorization-review");
+    } else {
+      result.textContent = status;
+      result.classList.add("check-neutral");
+
+      authorization.textContent = "—";
+      authorization.classList.add("check-neutral");
+    }
+
+    setSecurityCheck(
+      "checkPolicy",
+      checks.policyPassed
+    );
+
+    setSecurityCheck(
+      "checkIntent",
+      checks.intentMatched
+    );
+
+    setSecurityCheck(
+      "checkParameters",
+      checks.parameterMatched
+    );
+
+    setSecurityCheck(
+      "checkExecutionType",
+      checks.executionTypeMatched
+    );
+
+    setSecurityCheck(
+      "checkNativeValue",
+      checks.nativeValueMatched
+    );
+
+    setSecurityCheck(
+      "checkProtocol",
+      checks.protocolMatched
+    );
+
+    setSecurityCheck(
+      "checkTransaction",
+      checks.transactionSecuritySafe
+    );
+
+    setSecurityCheck(
+      "checkCapability",
+      checks.capabilityAllowed
+    );
+  }
+
+  async function loadAgentActivity(agent){
+    const detail = $("agentDetail");
+
+    detail.classList.add("visible");
+
+    $("detailTitle").textContent =
+      agent.name || "Unnamed agent";
+
+    $("detailSubtitle").textContent =
+      [
+        agent.id || "",
+        agent.external_id
+          ? `External: ${agent.external_id}`
+          : ""
+      ]
+      .filter(Boolean)
+      .join(" · ");
+
+    $("detailStatus").textContent =
+      agent.revoked_at
+        ? "Revoked"
+        : "Active";
+
+    $("detailTotal").textContent = "…";
+    $("detailVerified").textContent = "…";
+    $("detailBlockedReview").textContent = "…";
+
+    $("detailActivity").innerHTML = `
+      <div class="detail-loading">
+        Loading verification activity…
+      </div>
+    `;
+
+    try {
+      const response = await request(
+        `/v1/developer/projects/${encodeURIComponent(
+          selectedProject.id
+        )}/agents/${encodeURIComponent(
+          agent.id
+        )}/activity?limit=100`
+      );
+
+      const records =
+        Array.isArray(response.records)
+          ? response.records
+          : [];
+
+      const verified =
+        records.filter(
+          record =>
+            record.status === "VERIFIED" ||
+            record.status === "APPROVED"
+        ).length;
+
+      const blocked =
+        records.filter(
+          record =>
+            record.status === "BLOCKED"
+        ).length;
+
+      const review =
+        records.filter(
+          record =>
+            record.status === "REVIEW_REQUIRED"
+        ).length;
+
+      $("detailTotal").textContent =
+        String(records.length);
+
+      $("detailVerified").textContent =
+        String(verified);
+
+      $("detailBlockedReview").textContent =
+        `${blocked} / ${review}`;
+
+      const latestRecord =
+        records[0] || null;
+
+      renderSecurityDecision(
+        latestRecord
+      );
+
+      if (!records.length) {
+        $("detailActivity").innerHTML = `
+          <div class="detail-empty">
+            No verification activity recorded yet.
+          </div>
+        `;
+        return;
+      }
+
+      const rows = records.map(record => {
+        const status =
+          record.status || "UNKNOWN";
+
+        const statusClass =
+          status === "VERIFIED" ||
+          status === "APPROVED"
+            ? "result-verified"
+            : status === "BLOCKED"
+              ? "result-blocked"
+              : status === "REVIEW_REQUIRED"
+                ? "result-review"
+                : "";
+
+        const time =
+          record.created_at
+            ? new Date(
+                record.created_at
+              ).toLocaleString()
+            : "Unknown";
+
+        const action =
+          record.action_type ||
+          record.intent_type ||
+          "Unknown";
+
+        const chain =
+          record.chain || "—";
+
+        const protocol =
+          record.protocol || "—";
+
+        const amount =
+          record.actual_transaction_amount ??
+          record.requested_amount ??
+          "—";
+
+        return `
+          <tr>
+            <td>${escapeHtml(time)}</td>
+            <td>${escapeHtml(action)}</td>
+            <td>${escapeHtml(chain)}</td>
+            <td>${escapeHtml(protocol)}</td>
+            <td>${escapeHtml(String(amount))}</td>
+            <td class="${statusClass}">
+              ${escapeHtml(status)}
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      $("detailActivity").innerHTML = `
+        <div style="overflow-x:auto;">
+          <table class="activity-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Action</th>
+                <th>Chain</th>
+                <th>Protocol</th>
+                <th>Amount</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+        </div>
+      `;
+    } catch (error) {
+      $("detailTotal").textContent = "—";
+      $("detailVerified").textContent = "—";
+      $("detailBlockedReview").textContent = "—";
+
+      $("detailActivity").innerHTML = `
+        <div class="detail-empty">
+          ${escapeHtml(
+            error.message ||
+            "Failed to load agent activity."
+          )}
+        </div>
+      `;
+    }
+  }
+
+  function renderAgents(agents){
+
+    const total =
+      agents.length;
+
+    const revoked =
+      agents.filter(
+        agent => Boolean(agent.revoked_at)
+      ).length;
+
+    const active =
+      total - revoked;
+
+    $("totalAgents").textContent =
+      String(total);
+
+    $("activeAgents").textContent =
+      String(active);
+
+    $("revokedAgents").textContent =
+      String(revoked);
+
+    const container =
+      $("agents");
+
+    if (!agents.length){
+
+      container.innerHTML = `
+        <div class="empty">
+          <strong>No agents detected yet.</strong><br>
+          Agents will appear automatically when they interact
+          with your connected application through Phorva.
+        </div>
+      `;
+
+      return;
+    }
+
+    container.innerHTML = "";
+
+    agents.forEach(agent => {
+
+      const item =
+        document.createElement("div");
+
+      item.className = "agent";
+
+      item.addEventListener(
+        "click",
+        () => loadAgentActivity(agent)
+      );
+
+      const revoked =
+        Boolean(agent.revoked_at);
+
+      const status =
+        revoked
+          ? '<span class="badge revoked">Revoked</span>'
+          : '<span class="badge active">Active</span>';
+
+      const detected =
+        agent.created_at
+          ? new Date(agent.created_at).toLocaleString()
+          : "Unknown";
+
+      const externalId =
+        agent.external_id || "—";
+
+      item.innerHTML = `
+        <div class="agent-head">
+          <div>
+            <div class="agent-name">
+              ${escapeHtml(agent.name || "Unnamed agent")}
+            </div>
+
+            <div class="agent-id">
+              ${escapeHtml(agent.id || "")}
+            </div>
+          </div>
+
+          <div>
+            ${status}
+            <span class="badge detected">Auto-detected</span>
+          </div>
+        </div>
+
+        <div class="agent-meta">
+
+          <div>
+            <div class="meta-label">
+              External agent ID
+            </div>
+
+            <div class="meta-value">
+              ${escapeHtml(externalId)}
+            </div>
+          </div>
+
+          <div>
+            <div class="meta-label">
+              First detected
+            </div>
+
+            <div class="meta-value">
+              ${escapeHtml(detected)}
+            </div>
+          </div>
+
+          <div>
+            <div class="meta-label">
+              Capabilities
+            </div>
+
+            <div class="meta-value">
+              Runtime-defined
+            </div>
+          </div>
+
+        </div>
+      `;
+
+      container.appendChild(item);
+    });
+  }
+
+  $("detailClose")
+    .addEventListener(
+      "click",
+      () => {
+        $("agentDetail")
+          .classList.remove("visible");
+      }
+    );
+
+  $("projectSelector")
+    .addEventListener(
+      "change",
+      async function(){
+
+        selectedProject =
+          applications.find(
+            project =>
+              project.id === this.value
+          ) || null;
+
+        await loadAgents();
+      }
+    );
+
+  function escapeHtml(value){
+
+    return String(value)
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#039;");
+  }
+
+  loadApplications()
+    .catch(error => {
+
+      showNotice(
+        error.message,
+        "error"
+      );
+
+      $("agents").textContent =
+        "Unable to load agents.";
+    });
+
+})();
+</script>
+
+</body>
+</html>

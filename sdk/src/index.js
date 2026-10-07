@@ -45,7 +45,7 @@ class Phorva {
   }
 
   async request(path, options = {}) {
-    const url = `\( {this.baseUrl} \){path}`;
+    const url = `${this.baseUrl}${path}`;
     const headers = {
       "Content-Type": "application/json",
       "X-Phorva-Network": this.network,
@@ -77,8 +77,28 @@ class Phorva {
   }
 
   /**
-   * Main authorization / verification call
-   * Works across all supported chains
+   * Canonical Phorva verification.
+   *
+   * SDK, MCP and direct API integrations all enter
+   * the same Phorva verification engine through this
+   * contract.
+   */
+  async verify(payload) {
+    if (!payload || typeof payload !== "object") {
+      throw new TypeError("verify(payload) requires an object");
+    }
+
+    return this.request("/v1/verify", {
+      method: "POST",
+      body: JSON.stringify({
+        ...payload,
+        network: this.network
+      })
+    });
+  }
+
+  /**
+   * Backwards-compatible authorization call.
    */
   async authorize(payload) {
     return this.request("/authorize", {
@@ -133,14 +153,14 @@ class Phorva {
    * Decode a transaction on any supported chain
    */
   async decodeTransaction(chain, hash) {
-    return this.request(`/decode-transaction/\( {chain}/ \){hash}`);
+    return this.request(`/decode-transaction/${chain}/${hash}`);
   }
 
   /**
    * Get transaction details
    */
   async getTransaction(chain, hash) {
-    return this.request(`/transaction/\( {chain}/ \){hash}`);
+    return this.request(`/transaction/${chain}/${hash}`);
   }
 
   /**

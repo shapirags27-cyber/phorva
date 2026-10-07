@@ -41,6 +41,7 @@ function createApiKeyStore(db) {
     developerId,
     useCases = [],
     actions = [],
+    applicationCapabilities = [],
     policy = {},
     securityProfile = null
   }) {
@@ -66,6 +67,12 @@ function createApiKeyStore(db) {
       throw new Error("actions must be an array");
     }
 
+    if (!Array.isArray(applicationCapabilities)) {
+      throw new Error(
+        "applicationCapabilities must be an array"
+      );
+    }
+
     if (
       !policy ||
       typeof policy !== "object" ||
@@ -85,6 +92,15 @@ function createApiKeyStore(db) {
 
     const normalizedActions =
       actions
+        .filter(
+          value =>
+            typeof value === "string" &&
+            value.trim()
+        )
+        .map(value => value.trim());
+
+    const normalizedApplicationCapabilities =
+      applicationCapabilities
         .filter(
           value =>
             typeof value === "string" &&
@@ -116,6 +132,9 @@ function createApiKeyStore(db) {
 
       actions: normalizedActions,
 
+      application_capabilities:
+        normalizedApplicationCapabilities,
+
       policy,
 
       security_profile:
@@ -124,6 +143,14 @@ function createApiKeyStore(db) {
         !Array.isArray(securityProfile)
           ? securityProfile
           : null,
+
+      integration: {
+        method: null,
+        status: "NOT_CONNECTED",
+        verificationId: null,
+        verifiedAt: null,
+        updatedAt: now
+      },
 
       created_at: now,
       updated_at: now
@@ -143,6 +170,11 @@ function createApiKeyStore(db) {
       developerId: project.developer_id,
       useCases: project.use_cases,
       actions: project.actions,
+
+      applicationCapabilities:
+        Array.isArray(project.application_capabilities)
+          ? project.application_capabilities
+          : [],
       policy: project.policy,
       securityProfile:
         project.security_profile || null,
@@ -374,6 +406,163 @@ function createApiKeyStore(db) {
       project &&
       project.developer_id === developerId
     );
+  }
+
+  function getProjectIntegration(projectId) {
+    const project =
+      getProject(projectId);
+
+    if (!project) {
+      return null;
+    }
+
+    const integration =
+      project.integration &&
+      typeof project.integration === "object" &&
+      !Array.isArray(project.integration)
+        ? project.integration
+        : {};
+
+    return {
+      method:
+        typeof integration.method === "string"
+          ? integration.method
+          : null,
+      status:
+        typeof integration.status === "string"
+          ? integration.status
+          : "NOT_CONNECTED",
+      verificationId:
+        typeof integration.verificationId === "string"
+          ? integration.verificationId
+          : null,
+      verifiedAt:
+        integration.verifiedAt || null,
+      updatedAt:
+        integration.updatedAt ||
+        project.updated_at ||
+        project.created_at
+    };
+  }
+
+  function updateProjectIntegration(
+    projectId,
+    updates = {}
+  ) {
+    if (!projectId) {
+      throw new Error("projectId is required");
+    }
+
+    if (
+      !updates ||
+      typeof updates !== "object" ||
+      Array.isArray(updates)
+    ) {
+      throw new Error(
+        "integration updates must be an object"
+      );
+    }
+
+    const allowedMethods = [
+      "api",
+      "sdk",
+      "mcp"
+    ];
+
+    const allowedStatuses = [
+      "NOT_CONNECTED",
+      "PENDING",
+      "VERIFIED",
+      "FAILED"
+    ];
+
+    if (
+      updates.method !== undefined &&
+      !allowedMethods.includes(
+        String(updates.method).toLowerCase()
+      )
+    ) {
+      throw new Error(
+        "Invalid integration method"
+      );
+    }
+
+    if (
+      updates.status !== undefined &&
+      !allowedStatuses.includes(
+        String(updates.status).toUpperCase()
+      )
+    ) {
+      throw new Error(
+        "Invalid integration status"
+      );
+    }
+
+    let result = null;
+
+    db.withData((data) => {
+      const project =
+        data.projects.find(
+          item => item.id === projectId
+        );
+
+      if (!project) {
+        return;
+      }
+
+      const now =
+        new Date().toISOString();
+
+      const current =
+        project.integration &&
+        typeof project.integration === "object" &&
+        !Array.isArray(project.integration)
+          ? project.integration
+          : {};
+
+      project.integration = {
+        method:
+          updates.method !== undefined
+            ? String(updates.method).toLowerCase()
+            : current.method || null,
+
+        status:
+          updates.status !== undefined
+            ? String(updates.status).toUpperCase()
+            : current.status || "NOT_CONNECTED",
+
+        verificationId:
+          updates.verificationId !== undefined
+            ? updates.verificationId
+            : current.verificationId || null,
+
+        verifiedAt:
+          updates.verifiedAt !== undefined
+            ? updates.verifiedAt
+            : current.verifiedAt || null,
+
+        updatedAt: now
+      };
+
+      project.updated_at = now;
+
+      result = {
+        method: project.integration.method,
+        status: project.integration.status,
+        verificationId:
+          project.integration.verificationId,
+        verifiedAt:
+          project.integration.verifiedAt,
+        updatedAt:
+          project.integration.updatedAt
+      };
+    });
+
+    if (!result) {
+      throw new Error("Project not found");
+    }
+
+    return result;
   }
 
   function createKey({
@@ -612,6 +801,8 @@ function createApiKeyStore(db) {
     listProjects,
     updateProject,
     developerOwnsProject,
+    getProjectIntegration,
+    updateProjectIntegration,
     createKey,
     getKey,
     authenticate,

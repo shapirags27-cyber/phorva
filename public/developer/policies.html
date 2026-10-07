@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Phorva — Policies</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#05070b;
+  color:#eef2f8;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:230px;
+  border-right:1px solid rgba(255,255,255,.07);
+  padding:24px 14px;
+  background:#070a10
+}
+.brand{
+  padding:0 12px 28px;
+  font-weight:800;
+  letter-spacing:.12em
+}
+.brand span{
+  display:block;
+  color:#69758a;
+  font-size:9px;
+  margin-top:5px;
+  letter-spacing:.16em
+}
+.nav-label{
+  color:#4f5b70;
+  font-size:9px;
+  letter-spacing:.16em;
+  padding:15px 12px 7px
+}
+.nav a{
+  display:block;
+  padding:10px 12px;
+  border-radius:7px;
+  color:#78859a;
+  text-decoration:none;
+  font-size:12px;
+  margin-bottom:2px
+}
+.nav a:hover,.nav a.active{
+  color:#fff;
+  background:rgba(104,126,255,.10)
+}
+.main{flex:1;padding:34px;max-width:1250px}
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:20px;
+  margin-bottom:28px
+}
+.eyebrow{
+  color:#69758a;
+  font-size:9px;
+  letter-spacing:.18em;
+  margin-bottom:9px
+}
+h1{margin:0;font-size:29px;letter-spacing:-.03em}
+.subtitle{
+  color:#7d899d;
+  margin-top:8px;
+  font-size:12px;
+  max-width:680px;
+  line-height:1.6
+}
+.selector{
+  min-width:190px;
+  background:#0b0f17;
+  border:1px solid rgba(255,255,255,.08);
+  color:#dfe5ee;
+  padding:10px 12px;
+  border-radius:8px
+}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:18px
+}
+.stat,.panel,.agent-card{
+  background:#0a0e15;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:10px
+}
+.stat{padding:17px}
+.stat-label{
+  color:#68758a;
+  font-size:9px;
+  letter-spacing:.12em;
+  text-transform:uppercase
+}
+.stat-value{font-size:22px;font-weight:700;margin-top:8px}
+.panel{padding:20px;margin-bottom:16px}
+.panel-head{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:center;
+  margin-bottom:18px
+}
+.panel-title{font-size:14px;font-weight:700}
+.panel-note{font-size:10px;color:#69758a;margin-top:4px}
+.agents{display:grid;gap:12px}
+.agent-card{padding:18px}
+.agent-head{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:flex-start;
+  margin-bottom:18px
+}
+.agent-name{font-size:14px;font-weight:700}
+.agent-id{
+  color:#5e6b80;
+  font-size:9px;
+  margin-top:5px;
+  word-break:break-all
+}
+.status{
+  font-size:9px;
+  color:#7f8ca1;
+  padding:5px 8px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:999px
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px
+}
+.field{
+  border:1px solid rgba(255,255,255,.07);
+  background:#080c12;
+  border-radius:8px;
+  padding:12px
+}
+.field label{
+  display:block;
+  color:#68758a;
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  margin-bottom:7px
+}
+.field input,.field textarea{
+  width:100%;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:#eef2f8;
+  font-size:12px
+}
+.field textarea{min-height:55px;resize:vertical}
+.toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between
+}
+.toggle input{width:17px;height:17px}
+.actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:15px
+}
+.save{
+  border:1px solid rgba(119,137,255,.35);
+  background:rgba(95,112,255,.13);
+  color:#dfe4ff;
+  border-radius:7px;
+  padding:9px 14px;
+  font-size:11px
+}
+.save:hover{background:rgba(95,112,255,.2)}
+.notice{
+  color:#69758a;
+  font-size:10px;
+  line-height:1.6;
+  border-top:1px solid rgba(255,255,255,.06);
+  padding-top:15px;
+  margin-top:15px
+}
+.empty{
+  padding:35px;
+  text-align:center;
+  color:#68758a;
+  font-size:11px
+}
+.message{
+  position:fixed;
+  right:22px;
+  bottom:22px;
+  padding:11px 14px;
+  border-radius:8px;
+  background:#101722;
+  border:1px solid rgba(255,255,255,.1);
+  color:#dce3ee;
+  font-size:11px;
+  display:none
+}
+@media(max-width:850px){
+  .sidebar{width:190px}
+  .main{padding:22px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:650px){
+  .app{display:block}
+  .sidebar{width:auto;border-right:0;border-bottom:1px solid rgba(255,255,255,.07)}
+  .nav{display:flex;overflow:auto;gap:4px}
+  .nav-label{display:none}
+  .nav a{white-space:nowrap}
+  .main{padding:18px}
+  .top{display:block}
+  .selector{margin-top:15px;width:100%}
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<aside class="sidebar">
+  <div class="brand">
+    PHORVA
+    <span>DEVELOPER PLATFORM</span>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-label">PLATFORM</div>
+    <a href="/developer/index.html">Overview</a>
+    <a href="/developer/projects.html">Applications</a>
+    <a href="/developer/api-keys.html">API Keys</a>
+    <a href="/developer/agents.html">Agents</a>
+    <a href="/developer/verification.html">Verification</a>
+    <a href="/developer/policies.html" class="active">Policies</a>
+    <a href="/developer/integrations.html">Integrations</a>
+    <a href="/developer/settings.html">Settings</a>
+  </nav>
+</aside>
+
+<main class="main">
+
+  <section class="top">
+    <div>
+      <div class="eyebrow">DEVELOPER / SECURITY POLICIES</div>
+      <h1>Policies</h1>
+      <div class="subtitle">
+        Configure enforceable controls for detected agents.
+        Phorva applies these policies inside the same verification core
+        used by API, SDK and MCP integrations.
+      </div>
+    </div>
+
+    <select id="projectSelector" class="selector">
+      <option>Loading applications...</option>
+    </select>
+  </section>
+
+  <section class="stats">
+    <div class="stat">
+      <div class="stat-label">Detected agents</div>
+      <div id="agentCount" class="stat-value">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Policies configured</div>
+      <div id="configuredCount" class="stat-value">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Daily limits</div>
+      <div id="dailyCount" class="stat-value">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Velocity controls</div>
+      <div id="velocityCount" class="stat-value">—</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Agent security policies</div>
+        <div class="panel-note">
+          Policies are enforced during authorization. Agents cannot modify their own policy.
+        </div>
+      </div>
+    </div>
+
+    <div id="agents" class="agents">
+      <div class="empty">Loading policies...</div>
+    </div>
+
+    <div class="notice">
+      <strong>Security boundary.</strong>
+      These controls configure spending, velocity, target, selector and approval restrictions.
+      Mandatory identity, intent, transaction-security, authorization and execution-verification
+      checks remain part of the Phorva security core and cannot be disabled here.
+      The agent capability boundary also remains enforced independently.
+    </div>
+  </section>
+
+</main>
+</div>
+
+<div id="message" class="message"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let projects = [];
+let selectedProject = null;
+let policyRows = [];
+
+function escapeHtml(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function showMessage(text){
+  const el = $("message");
+  el.textContent = text;
+  el.style.display = "block";
+  clearTimeout(showMessage.timer);
+  showMessage.timer = setTimeout(
+    () => el.style.display = "none",
+    2800
+  );
+}
+
+async function api(url, options = {}){
+  const response = await fetch(url, {
+    credentials:"same-origin",
+    ...options,
+    headers:{
+      "Content-Type":"application/json",
+      ...(options.headers || {})
+    }
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok){
+    throw new Error(
+      data?.error?.message ||
+      "Request failed"
+    );
+  }
+
+  return data;
+}
+
+async function loadProjects(){
+  const data = await api("/v1/developer/projects");
+  projects = Array.isArray(data.projects)
+    ? data.projects
+    : [];
+
+  $("projectSelector").innerHTML =
+    projects.length
+      ? projects.map(project =>
+          `<option value="${escapeHtml(project.id)}">${
+            escapeHtml(project.name || project.id)
+          }</option>`
+        ).join("")
+      : `<option value="">No applications</option>`;
+
+  selectedProject =
+    projects.find(
+      project =>
+        project.id === $("projectSelector").value
+    ) || projects[0] || null;
+
+  $("projectSelector").value =
+    selectedProject?.id || "";
+
+  await loadPolicies();
+}
+
+async function loadPolicies(){
+  if (!selectedProject){
+    $("agents").innerHTML =
+      `<div class="empty">Create an application first.</div>`;
+    return;
+  }
+
+  const data = await api(
+    `/v1/developer/projects/${encodeURIComponent(selectedProject.id)}/policies`
+  );
+
+  policyRows =
+    Array.isArray(data.policies)
+      ? data.policies
+      : [];
+
+  render();
+}
+
+function render(){
+  $("agentCount").textContent = policyRows.length;
+
+  const configured =
+    policyRows.filter(row =>
+      row.policy &&
+      Object.keys(row.policy).length > 0
+    ).length;
+
+  const daily =
+    policyRows.filter(row =>
+      row.policy &&
+      row.policy.dailyLimit !== undefined
+    ).length;
+
+  const velocity =
+    policyRows.filter(row =>
+      row.policy &&
+      (
+        row.policy.maxTransactionsPerWindow !== undefined ||
+        row.policy.maxValuePerWindow !== undefined
+      )
+    ).length;
+
+  $("configuredCount").textContent = configured;
+  $("dailyCount").textContent = daily;
+  $("velocityCount").textContent = velocity;
+
+  if (!policyRows.length){
+    $("agents").innerHTML =
+      `<div class="empty">
+        No detected agents yet. Policies will appear automatically
+        when agents interact with your connected application.
+      </div>`;
+    return;
+  }
+
+  $("agents").innerHTML =
+    policyRows.map((row,index) => {
+      const agent = row.agent || {};
+      const policy = row.policy || {};
+
+      return `
+      <article class="agent-card">
+        <div class="agent-head">
+          <div>
+            <div class="agent-name">${escapeHtml(agent.name)}</div>
+            <div class="agent-id">
+              ${escapeHtml(agent.id)}
+              ${agent.external_id
+                ? ` · external ${escapeHtml(agent.external_id)}`
+                : ""}
+            </div>
+          </div>
+          <div class="status">
+            ${agent.revoked_at ? "Revoked" : "Active"}
+          </div>
+        </div>
+
+        <div class="grid">
+
+          <div class="field">
+            <label>Maximum transaction amount</label>
+            <input
+              data-index="${index}"
+              data-field="maxTransactionAmount"
+              type="number"
+              min="0"
+              value="${escapeHtml(policy.maxTransactionAmount ?? "")}"
+              placeholder="No limit"
+            >
+          </div>
+
+          <div class="field">
+            <label>Daily limit</label>
+            <input
+              data-index="${index}"
+              data-field="dailyLimit"
+              type="number"
+              min="0"
+              value="${escapeHtml(policy.dailyLimit ?? "")}"
+              placeholder="No limit"
+            >
+          </div>
+
+          <div class="field">
+            <label>Transactions per window</label>
+            <input
+              data-index="${index}"
+              data-field="maxTransactionsPerWindow"
+              type="number"
+              min="0"
+              value="${escapeHtml(policy.maxTransactionsPerWindow ?? "")}"
+              placeholder="No limit"
+            >
+          </div>
+
+          <div class="field">
+            <label>Value per window</label>
+            <input
+              data-index="${index}"
+              data-field="maxValuePerWindow"
+              type="number"
+              min="0"
+              value="${escapeHtml(policy.maxValuePerWindow ?? "")}"
+              placeholder="No limit"
+            >
+          </div>
+
+          <div class="field">
+            <label>Velocity window (ms)</label>
+            <input
+              data-index="${index}"
+              data-field="velocityWindowMs"
+              type="number"
+              min="1"
+              value="${escapeHtml(policy.velocityWindowMs ?? 60000)}"
+            >
+          </div>
+
+          <div class="field toggle">
+            <label>Quarantine on velocity violation</label>
+            <input
+              data-index="${index}"
+              data-field="quarantineOnVelocityViolation"
+              type="checkbox"
+              ${policy.quarantineOnVelocityViolation === true ? "checked" : ""}
+            >
+          </div>
+
+          <div class="field toggle">
+            <label>Quarantine on critical risk</label>
+            <input
+              data-index="${index}"
+              data-field="quarantineOnCriticalRisk"
+              type="checkbox"
+              ${policy.quarantineOnCriticalRisk === true ? "checked" : ""}
+            >
+          </div>
+
+          <div class="field toggle">
+            <label>Allow unlimited approvals</label>
+            <input
+              data-index="${index}"
+              data-field="allowUnlimitedApprovals"
+              type="checkbox"
+              ${policy.allowUnlimitedApprovals !== false ? "checked" : ""}
+            >
+          </div>
+
+          <div class="field">
+            <label>Maximum approval amount</label>
+            <input
+              data-index="${index}"
+              data-field="maxApprovalAmount"
+              type="number"
+              min="0"
+              value="${escapeHtml(policy.maxApprovalAmount ?? "")}"
+              placeholder="No limit"
+            >
+          </div>
+
+          <div class="field">
+            <label>Allowed contract targets</label>
+            <textarea
+              data-index="${index}"
+              data-field="allowedTargets"
+              placeholder="One address per line"
+            >${escapeHtml(
+              Array.isArray(policy.allowedTargets)
+                ? policy.allowedTargets.join("\n")
+                : ""
+            )}</textarea>
+          </div>
+
+          <div class="field">
+            <label>Allowed function selectors</label>
+            <textarea
+              data-index="${index}"
+              data-field="allowedSelectors"
+              placeholder="e.g. 0x38ed1739"
+            >${escapeHtml(
+              Array.isArray(policy.allowedSelectors)
+                ? policy.allowedSelectors.join("\n")
+                : ""
+            )}</textarea>
+          </div>
+
+          <div class="field">
+            <label>Allowed approval spenders</label>
+            <textarea
+              data-index="${index}"
+              data-field="allowedSpenders"
+              placeholder="One address per line"
+            >${escapeHtml(
+              Array.isArray(policy.allowedSpenders)
+                ? policy.allowedSpenders.join("\n")
+                : ""
+            )}</textarea>
+          </div>
+
+        </div>
+
+        <div class="actions">
+          <button
+            class="save"
+            data-save="${index}"
+          >
+            Save policy
+          </button>
+        </div>
+      </article>
+      `;
+    }).join("");
+
+  document.querySelectorAll("[data-save]").forEach(button => {
+    button.addEventListener("click", () =>
+      savePolicy(Number(button.dataset.save))
+    );
+  });
+}
+
+function readValue(index, field){
+  const element =
+    document.querySelector(
+      `[data-index="${index}"][data-field="${field}"]`
+    );
+
+  if (!element) return undefined;
+
+  if (element.type === "checkbox"){
+    return element.checked;
+  }
+
+  if (
+    [
+      "allowedTargets",
+      "allowedSelectors",
+      "allowedSpenders"
+    ].includes(field)
+  ){
+    return element.value
+      .split("\n")
+      .map(value => value.trim())
+      .filter(Boolean);
+  }
+
+  if (element.value === ""){
+    return undefined;
+  }
+
+  return Number(element.value);
+}
+
+async function savePolicy(index){
+  const row = policyRows[index];
+
+  if (!row || !selectedProject){
+    return;
+  }
+
+  const fields = [
+    "maxTransactionAmount",
+    "dailyLimit",
+    "maxTransactionsPerWindow",
+    "maxValuePerWindow",
+    "velocityWindowMs",
+    "quarantineOnVelocityViolation",
+    "quarantineOnCriticalRisk",
+    "allowUnlimitedApprovals",
+    "maxApprovalAmount",
+    "allowedTargets",
+    "allowedSelectors",
+    "allowedSpenders"
+  ];
+
+  const policy = {};
+
+  for (const field of fields){
+    const value = readValue(index, field);
+
+    if (value !== undefined){
+      policy[field] = value;
+    }
+  }
+
+  try{
+    await api(
+      `/v1/developer/projects/${encodeURIComponent(selectedProject.id)}/agents/${encodeURIComponent(row.agent.id)}/policy`,
+      {
+        method:"PATCH",
+        body:JSON.stringify({policy})
+      }
+    );
+
+    showMessage("Policy saved.");
+    await loadPolicies();
+  }catch(error){
+    showMessage(error.message);
+  }
+}
+
+$("projectSelector").addEventListener("change", async event => {
+  selectedProject =
+    projects.find(
+      project => project.id === event.target.value
+    ) || null;
+
+  try{
+    await loadPolicies();
+  }catch(error){
+    showMessage(error.message);
+  }
+});
+
+loadProjects().catch(error => {
+  $("agents").innerHTML =
+    `<div class="empty">${escapeHtml(error.message)}</div>`;
+});
+</script>
+</body>
+</html>

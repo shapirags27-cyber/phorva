@@ -928,6 +928,396 @@ button{
   min-height:48px
  }
 }
+
+/* =========================================================
+   PHORVA HOME DASHBOARD
+   Presentation only — existing backend/security logic preserved.
+   ========================================================= */
+
+.home-shell{
+  width:100%;
+  max-width:1180px;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.home-hero{
+  position:relative;
+  overflow:hidden;
+  padding:42px;
+  border:1px solid var(--border);
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 80% 0%, rgba(80,90,220,.16), transparent 38%),
+    linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.012));
+}
+
+.home-hero:after{
+  content:"";
+  position:absolute;
+  width:260px;
+  height:260px;
+  right:-120px;
+  bottom:-150px;
+  border-radius:50%;
+  background:rgba(76,82,220,.08);
+  filter:blur(35px);
+  pointer-events:none;
+}
+
+.home-hero h1{
+  max-width:760px;
+  margin:7px 0 14px;
+  font-size:clamp(38px,6vw,72px);
+  line-height:.98;
+  letter-spacing:-.055em;
+}
+
+.home-hero p{
+  max-width:720px;
+  margin:0;
+  color:var(--muted);
+  font-size:16px;
+  line-height:1.7;
+}
+
+.home-actions{
+  display:flex;
+  gap:10px;
+  margin-top:26px;
+}
+
+.home-flow{
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:34px;
+}
+
+.flow-node{
+  padding:8px 12px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:rgba(255,255,255,.025);
+  color:var(--muted);
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.flow-node.core{
+  color:var(--text);
+  border-color:rgba(120,125,255,.38);
+  background:rgba(85,90,220,.09);
+}
+
+.home-flow i{
+  color:var(--muted);
+  font-style:normal;
+}
+
+.home-status-grid,
+.home-metrics{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+
+.home-status-card{
+  min-height:128px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.home-status-card .value{
+  margin:7px 0 3px;
+  font-size:25px;
+  font-weight:700;
+  letter-spacing:-.025em;
+}
+
+.analyzer-value{
+  font-size:18px!important;
+}
+
+.home-metric{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  min-height:118px;
+}
+
+.metric-icon{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  flex:none;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:rgba(255,255,255,.025);
+  font-size:18px;
+}
+
+.metric-value{
+  margin-top:4px;
+  font-size:30px;
+  line-height:1;
+  font-weight:750;
+  letter-spacing:-.04em;
+}
+
+.home-main-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(320px,.85fr);
+  gap:18px;
+}
+
+.home-control-card,
+.home-verification-card,
+.home-activity-card{
+  min-width:0;
+}
+
+.control-pipeline{
+  margin-top:20px;
+}
+
+.control-step{
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+}
+
+.control-step>span{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  flex:none;
+  border:1px solid var(--border);
+  border-radius:9px;
+  color:var(--muted);
+  font-size:10px;
+  font-weight:700;
+}
+
+.control-step strong{
+  display:block;
+  margin-bottom:4px;
+}
+
+.control-step small{
+  display:block;
+  color:var(--muted);
+  line-height:1.5;
+}
+
+.pipeline-line{
+  height:22px;
+  width:1px;
+  margin-left:14px;
+  background:var(--border);
+}
+
+.verification-state{
+  margin-top:18px;
+}
+
+.state-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  padding:15px 0;
+  border-bottom:1px solid var(--border);
+}
+
+.state-row:last-child{
+  border-bottom:0;
+}
+
+.state-row small{
+  display:block;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+
+.state-row span{
+  font-size:14px;
+  font-weight:600;
+}
+
+.state-row>b{
+  font-size:10px;
+  opacity:.75;
+}
+
+.home-note{
+  margin-top:10px;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.55;
+}
+
+.home-activity-card .head{
+  align-items:center;
+}
+
+.small-action{
+  padding:8px 11px!important;
+  font-size:12px!important;
+}
+
+.home-empty{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-height:190px;
+  text-align:center;
+  color:var(--muted);
+}
+
+.home-empty-icon{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  margin-bottom:5px;
+  border:1px solid var(--border);
+  border-radius:12px;
+}
+
+.home-empty strong{
+  color:var(--text);
+}
+
+.home-empty span{
+  max-width:390px;
+  line-height:1.5;
+}
+
+.home-empty button{
+  margin-top:9px;
+}
+
+.home-footer-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:25px;
+  padding:28px 30px;
+  border:1px solid var(--border);
+  border-radius:20px;
+  background:
+    linear-gradient(135deg,rgba(80,90,220,.09),rgba(255,255,255,.015));
+}
+
+.home-footer-card h2{
+  max-width:650px;
+  margin:5px 0 8px;
+  font-size:23px;
+  letter-spacing:-.025em;
+}
+
+.home-footer-card p{
+  max-width:680px;
+  margin:0;
+  color:var(--muted);
+  line-height:1.55;
+  font-size:13px;
+}
+
+@media(max-width:850px){
+  .home-hero{
+    padding:28px 22px;
+    border-radius:18px;
+  }
+
+  .home-hero h1{
+    font-size:42px;
+  }
+
+  .home-status-grid,
+  .home-metrics,
+  .home-main-grid{
+    grid-template-columns:1fr;
+  }
+
+  .home-footer-card{
+    align-items:flex-start;
+    flex-direction:column;
+    padding:24px;
+  }
+}
+
+@media(max-width:600px){
+  .home-shell{
+    gap:13px;
+  }
+
+  .home-hero{
+    padding:23px 17px;
+  }
+
+  .home-hero h1{
+    font-size:36px;
+  }
+
+  .home-hero p{
+    font-size:14px;
+  }
+
+  .home-actions{
+    width:100%;
+  }
+
+  .home-actions button{
+    flex:1;
+  }
+
+  .home-flow{
+    gap:5px;
+    margin-top:25px;
+  }
+
+  .flow-node{
+    padding:6px 8px;
+    font-size:10px;
+  }
+
+  .home-flow i{
+    font-size:10px;
+  }
+
+  .home-status-card,
+  .home-metric{
+    min-height:100px;
+  }
+
+  .home-footer-card{
+    padding:20px;
+  }
+
+  .home-footer-card h2{
+    font-size:20px;
+  }
+
+  .home-activity-card .head{
+    align-items:flex-start;
+  }
+}
+
 </style>
 
 <style id="phorva-docs-css">
@@ -978,59 +1368,358 @@ button{
 }
 </style>
 
-<style id="phorva-persistent-actions">
-.persistent-actions{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:105px;
-  z-index:9999;
-  pointer-events:none;
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-  padding:0 20px;
+
+
+
+<style id="phorva-stabilizer-shell">
+/* PHORVA — Stabilizer-style dashboard shell */
+:root {
+  --stab-content-max: 1240px;
 }
 
-.persistent-actions button{
-  pointer-events:auto;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(12,14,20,.92);
-  color:#fff;
-  border-radius:12px;
-  padding:10px 14px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  cursor:pointer;
-  backdrop-filter:blur(14px);
+main,
+.main,
+.app-main,
+.content,
+.page-content {
+  width: 100%;
 }
 
-.persistent-actions button span{
-  opacity:.8;
+.view {
+  width: 100%;
+  max-width: var(--stab-content-max);
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.persistent-actions button b{
-  font-size:13px;
-  font-weight:600;
+/* Keep the dashboard canvas spacious like the reference */
+.view > .title,
+.view > .sub,
+.view > .kicker {
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.persistent-actions button:hover{
-  border-color:rgba(255,255,255,.24);
+/* Persistent Stabilizer-style controls */
+.persistent-actions {
+  position: fixed !important;
+  left: 24px !important;
+  right: 24px !important;
+  bottom: 105px !important;
+  z-index: 99999 !important;
+  pointer-events: none !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-end !important;
 }
 
-@media(max-width:700px){
-  .persistent-actions{
-    bottom:125px;
-    padding:0 12px;
+.persistent-actions button {
+  pointer-events: auto !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 16px !important;
+  border-radius: 11px !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  background: rgba(18,18,22,.94) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,.28) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+}
+
+.persistent-actions button span {
+  width: 20px !important;
+  height: 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  font-size: 12px !important;
+}
+
+.persistent-ask {
+  margin-left: 0 !important;
+}
+
+.persistent-feedback {
+  margin-right: 0 !important;
+}
+
+@media (max-width: 700px) {
+  .view {
+    width: 100%;
+    max-width: none;
   }
 
-  .persistent-actions button{
-    padding:9px 11px;
+  .persistent-actions {
+    left: 14px !important;
+    right: 14px !important;
+    bottom: 125px !important;
   }
 
-  .persistent-actions button b{
-    font-size:12px;
+  .persistent-actions button {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 13px !important;
+    font-size: 12px !important;
+  }
+}
+</style>
+
+
+
+
+
+<style id="phorva-responsive-ui">
+/* PHORVA — responsive dashboard sizing */
+
+/* Large desktop */
+.view {
+  width: min(94vw, 1480px) !important;
+  max-width: 1480px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+
+.view .title,
+.view h1 {
+  font-size: clamp(36px, 3.2vw, 50px) !important;
+  line-height: 1.08 !important;
+}
+
+.view h2 {
+  font-size: clamp(24px, 2vw, 32px) !important;
+}
+
+.view h3 {
+  font-size: 20px !important;
+}
+
+.view .sub,
+.view p {
+  font-size: clamp(15px, 1.05vw, 17px) !important;
+  line-height: 1.6 !important;
+}
+
+.view .card {
+  padding: clamp(20px, 1.8vw, 30px) !important;
+  border-radius: 16px !important;
+}
+
+.view .muted,
+.view label {
+  font-size: 14px !important;
+}
+
+.view input,
+.view select,
+.view textarea {
+  min-height: 48px !important;
+  font-size: 15px !important;
+}
+
+.view button {
+  min-height: 44px !important;
+  font-size: 14px !important;
+}
+
+/* Desktop dashboard grids should use the available space */
+.view .grid,
+.view .stats,
+.view .cards,
+.view .docs {
+  width: 100% !important;
+}
+
+/* Medium screens / tablets */
+@media (max-width: 1000px) {
+  .view {
+    width: 96vw !important;
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .view .title,
+  .view h1 {
+    font-size: 36px !important;
+  }
+
+  .view .sub,
+  .view p {
+    font-size: 15px !important;
+  }
+
+  .view .card {
+    padding: 20px !important;
+  }
+}
+
+/* Phones */
+@media (max-width: 700px) {
+  .view {
+    width: 100% !important;
+    max-width: none !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .view .title,
+  .view h1 {
+    font-size: 29px !important;
+    line-height: 1.12 !important;
+  }
+
+  .view h2 {
+    font-size: 22px !important;
+  }
+
+  .view h3 {
+    font-size: 18px !important;
+  }
+
+  .view .sub,
+  .view p {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+  }
+
+  .view .card {
+    padding: 16px !important;
+    border-radius: 13px !important;
+  }
+
+  .view .muted,
+  .view label {
+    font-size: 13px !important;
+  }
+
+  .view input,
+  .view select,
+  .view textarea {
+    min-height: 44px !important;
+    font-size: 14px !important;
+    padding: 10px 12px !important;
+  }
+
+  .view button {
+    min-height: 42px !important;
+    font-size: 13px !important;
+  }
+
+  .view table {
+    font-size: 12px !important;
+  }
+
+  .view th,
+  .view td {
+    padding: 10px 8px !important;
+  }
+
+  /* Keep the persistent controls above mobile navigation */
+  .persistent-actions {
+    bottom: 125px !important;
+  }
+
+  .persistent-actions button {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 12px !important;
+    font-size: 12px !important;
+  }
+}
+</style>
+
+
+<style id="phorva-mobile-header-fix">
+/* PHORVA mobile header + persistent controls */
+
+/* Keep the network/checking indicator visible on phones */
+@media (max-width: 700px) {
+  .header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    min-height: 58px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .header-actions .network {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 72px !important;
+    width: auto !important;
+    height: 34px !important;
+    padding: 0 8px !important;
+    font-size: 11px !important;
+    white-space: nowrap !important;
+  }
+
+  .header-actions .theme,
+  #theme {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    min-width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+  }
+
+  /* Wallet stays out of the mobile header */
+  .header-actions .wallet {
+    display: none !important;
+  }
+
+  /* Make sure the persistent controls are actually visible on mobile */
+  .persistent-actions {
+    position: fixed !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 125px !important;
+    z-index: 999999 !important;
+    pointer-events: none !important;
+  }
+
+  .persistent-actions button {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .persistent-ask {
+    margin-left: 0 !important;
+  }
+
+  .persistent-feedback {
+    margin-right: 0 !important;
+  }
+
+  /* Give the page enough room above the bottom navigation */
+  .view {
+    padding-bottom: 145px !important;
   }
 }
 </style>
@@ -1060,148 +1749,218 @@ button{
 
 
 <!-- HOME -->
-
 <section class="view active" id="home">
+  <div class="home-shell">
 
-<div class="card hero">
+    <div class="home-hero">
+      <div class="kicker">Execution-security infrastructure</div>
+      <h1>Verify before autonomous execution.</h1>
+      <p>
+        PHORVA sits between autonomous agents and blockchain execution.
+        It evaluates identity, declared intent, policy, transaction semantics,
+        risk and authorization before an action proceeds.
+      </p>
 
-<div class="kicker">Verifiable execution for autonomous agents</div>
+      <div class="home-actions">
+        <button class="primary" data-view="agent">Open Agent</button>
+        <button class="secondary" data-view="verification">View Verification</button>
+      </div>
 
-<h1>Verify before autonomous execution.</h1>
+      <div class="home-flow">
+        <span class="flow-node">Agent</span>
+        <i>→</i>
+        <span class="flow-node">Intent</span>
+        <i>→</i>
+        <span class="flow-node core">Policy</span>
+        <i>→</i>
+        <span class="flow-node">Risk</span>
+        <i>→</i>
+        <span class="flow-node">Transaction</span>
+        <i>→</i>
+        <span class="flow-node core">Authorization</span>
+        <i>→</i>
+        <span class="flow-node">Execution</span>
+      </div>
+    </div>
 
-<p>
-Phorva sits between autonomous agents and blockchain execution.
-It evaluates declared intent, policy, transaction semantics, risk and authorization before execution proceeds.
-</p>
+    <div class="home-status-grid">
+      <div class="card home-status-card">
+        <div class="label">Backend</div>
+        <div class="value" id="healthStatus">—</div>
+        <div class="meta">PHORVA security engine</div>
+      </div>
 
-<div class="flow">
-<span class="node">Agent</span>
-<i>→</i>
-<span class="node">Intent</span>
-<i>→</i>
-<span class="node core">Policy</span>
-<i>→</i>
-<span class="node">Risk</span>
-<i>→</i>
-<span class="node">Transaction</span>
-<i>→</i>
-<span class="node">Authorization</span>
-<i>→</i>
-<span class="node">Execution</span>
-</div>
+      <div class="card home-status-card">
+        <div class="label">Networks</div>
+        <div class="value" id="networkCount">—</div>
+        <div class="meta">Configured chains</div>
+      </div>
 
-</div>
+      <div class="card home-status-card">
+        <div class="label">Analyzer</div>
+        <div class="value analyzer-value" id="analyzerStatus">—</div>
+        <div class="meta">Transaction analysis</div>
+      </div>
+    </div>
 
+    <div class="home-metrics">
+      <div class="card home-metric">
+        <div class="metric-icon">◇</div>
+        <div>
+          <div class="label">Agents Protected</div>
+          <div class="metric-value" id="homeAgentsProtected">0</div>
+          <div class="meta">Agents evaluated by PHORVA</div>
+        </div>
+      </div>
 
-<div class="grid stats">
+      <div class="card home-metric">
+        <div class="metric-icon">✓</div>
+        <div>
+          <div class="label">Executions Verified</div>
+          <div class="metric-value" id="homeExecutionsVerified">0</div>
+          <div class="meta">Authorized execution requests</div>
+        </div>
+      </div>
 
-<div class="card stat">
-<div class="label">Backend</div>
-<div class="value" id="healthStatus">—</div>
-<div class="meta">PHORVA security engine</div>
-</div>
+      <div class="card home-metric">
+        <div class="metric-icon">!</div>
+        <div>
+          <div class="label">Threats Blocked</div>
+          <div class="metric-value" id="homeThreatsBlocked">0</div>
+          <div class="meta">Requests rejected by verification</div>
+        </div>
+      </div>
+    </div>
 
-<div class="card stat">
-<div class="label">Networks</div>
-<div class="value" id="networkCount">—</div>
-<div class="meta">Configured chains</div>
-</div>
+    <div class="home-main-grid">
 
-<div class="card stat">
-<div class="label">Analyzer</div>
-<div class="value" id="analyzerStatus">—</div>
-<div class="meta">Execution analysis</div>
-</div>
+      <div class="card home-control-card">
+        <div class="head">
+          <div>
+            <strong>Execution Control</strong>
+            <div class="muted">
+              PHORVA verification pipeline
+            </div>
+          </div>
+          <span class="badge green" id="engineBadge">ONLINE</span>
+        </div>
 
-</div>
+        <div class="control-pipeline">
+          <div class="control-step">
+            <span>01</span>
+            <div>
+              <strong>Intent verification</strong>
+              <small>Compare declared intent with requested execution.</small>
+            </div>
+          </div>
 
+          <div class="pipeline-line"></div>
 
-<div class="grid two" style="margin-top:18px">
+          <div class="control-step">
+            <span>02</span>
+            <div>
+              <strong>Policy enforcement</strong>
+              <small>Evaluate limits and permitted execution conditions.</small>
+            </div>
+          </div>
 
-<div class="card">
+          <div class="pipeline-line"></div>
 
-<div class="head">
-<div>
-<strong>Execution Control</strong>
-<div class="muted">Live PHORVA authorization engine</div>
-</div>
-<span class="badge green" id="engineBadge">ONLINE</span>
-</div>
+          <div class="control-step">
+            <span>03</span>
+            <div>
+              <strong>Transaction analysis</strong>
+              <small>Inspect EVM transaction data and parameters.</small>
+            </div>
+          </div>
 
-<div class="activity">
+          <div class="pipeline-line"></div>
 
-<div class="row">
-<div class="row-icon">✓</div>
-<div>
-<strong>Intent verification</strong>
-<span>Declared action compared with execution</span>
-</div>
-<div class="time">CORE</div>
-</div>
+          <div class="control-step">
+            <span>04</span>
+            <div>
+              <strong>Authorization</strong>
+              <small>Return an allow or block decision before execution.</small>
+            </div>
+          </div>
+        </div>
+      </div>
 
-<div class="row">
-<div class="row-icon">◇</div>
-<div>
-<strong>Policy enforcement</strong>
-<span>Limits and permitted conditions</span>
-</div>
-<div class="time">CORE</div>
-</div>
+      <div class="card home-verification-card">
+        <div class="head">
+          <div>
+            <strong>Verification State</strong>
+            <div class="muted">Current PHORVA infrastructure state</div>
+          </div>
+        </div>
 
-<div class="row">
-<div class="row-icon">◆</div>
-<div>
-<strong>Transaction analysis</strong>
-<span>EVM calldata and security checks</span>
-</div>
-<div class="time">CORE</div>
-</div>
+        <div class="verification-state">
+          <div class="state-row">
+            <div>
+              <small>Engine</small>
+              <span id="verificationEngine">Checking...</span>
+            </div>
+            <b>●</b>
+          </div>
 
-<div class="row">
-<div class="row-icon">✓</div>
-<div>
-<strong>Authorization</strong>
-<span>Allow or block execution</span>
-</div>
-<div class="time">CORE</div>
-</div>
+          <div class="state-row">
+            <div>
+              <small>Chain connectivity</small>
+              <span id="verificationChains">Checking...</span>
+            </div>
+            <b>●</b>
+          </div>
 
-</div>
-</div>
+          <div class="state-row">
+            <div>
+              <small>Mode</small>
+              <span id="verificationMode">Checking...</span>
+            </div>
+            <b>●</b>
+          </div>
+        </div>
 
+        <div class="home-note">
+          PHORVA evaluates execution authorization. The agent's wallet
+          and signing infrastructure remain external to PHORVA.
+        </div>
+      </div>
 
-<div class="card">
+    </div>
 
-<div class="head">
-<strong>Verification State</strong>
-</div>
+    <div class="card home-activity-card">
+      <div class="head">
+        <div>
+          <strong>Recent Verification Activity</strong>
+          <div class="muted">Latest authorization decisions from this session</div>
+        </div>
+        <button class="secondary small-action" data-view="activity">View Activity</button>
+      </div>
 
-<div class="pad">
+      <div class="activity home-activity" id="homeActivity">
+        <div class="home-empty">
+          <div class="home-empty-icon">◇</div>
+          <strong>No verification events yet</strong>
+          <span>Run an action from Agent to see authorization results here.</span>
+          <button class="secondary" data-view="agent">Evaluate an Action</button>
+        </div>
+      </div>
+    </div>
 
-<div class="field">
-<small>Engine</small>
-<b id="verificationEngine">Checking...</b>
-</div>
+    <div class="home-footer-card">
+      <div>
+        <div class="kicker">PHORVA CORE</div>
+        <h2>Control what autonomous agents are allowed to execute.</h2>
+        <p>
+          Integrate PHORVA through its API, SDK or MCP interface and keep
+          authorization decisions in the execution path.
+        </p>
+      </div>
+      <button class="primary" data-view="agent">Start Verification</button>
+    </div>
 
-<div class="field" style="margin-top:10px">
-<small>Chain connectivity</small>
-<b id="verificationChains">Checking...</b>
-</div>
-
-<div class="field" style="margin-top:10px">
-<small>Mode</small>
-<b id="verificationMode">Checking...</b>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
+  </div>
 </section>
-
-
 
 <!-- AGENT -->
 
@@ -1543,211 +2302,2250 @@ Inspect the verification state exposed by PHORVA's execution-security backend.
 
 
 <!-- DOCS -->
-
 <section class="view" id="docs">
 
-<div class="kicker">Technical documentation</div>
+  <div class="kicker">Technical documentation</div>
 
-<h1 class="title">Docs</h1>
+  <h1 class="title">PHORVA</h1>
 
-<p class="sub">
-Understand PHORVA's execution-security model, integration flow, verification semantics and developer interfaces.
-</p>
+  <p class="sub">
+    Onchain Verification Infrastructure for Autonomous Execution
+  </p>
 
+  <div class="docs">
+    <div class="docs-nav">
 
-<div class="docs">
+  <button class="active" data-doc="overview">Overview</button>
+  <button data-doc="problem">Problem</button>
+  <button data-doc="verification-gap">Verification Gap</button>
+  <button data-doc="what-phorva-is">What PHORVA Is</button>
+  <button data-doc="what-phorva-is-not">What PHORVA Is Not</button>
+  <button data-doc="security-model">Security Model</button>
+  <button data-doc="identity">Identity</button>
+  <button data-doc="capabilities">Capabilities</button>
+  <button data-doc="intent">Intent</button>
+  <button data-doc="execution-type">Execution Type</button>
 
-<div class="card docs-nav">
+  <button data-doc="transaction">Transaction Verification</button>
+  <button data-doc="parameters">Parameter Verification</button>
+  <button data-doc="protocol-controls">Protocol & Contract Controls</button>
+  <button data-doc="approval">Approval Security</button>
+  <button data-doc="native-value">Native Value Verification</button>
+  <button data-doc="policy-engine">Policy Engine</button>
+  <button data-doc="velocity">Velocity & Quarantine</button>
+  <button data-doc="risk">Risk Verification</button>
+  <button data-doc="canonical-authorization">Canonical Authorization</button>
+  <button data-doc="unified-architecture">Unified Integration Architecture</button>
 
-<button class="active" data-doc="overview">Overview</button>
-<button data-doc="architecture">Architecture</button>
-<button data-doc="authorization">Authorization</button>
-<button data-doc="verification-doc">Verification</button>
-<button data-doc="api">API</button>
-<button data-doc="sdk">SDK integration</button>
-<button data-doc="security">Security model</button>
-<button data-doc="usecases">Use cases</button>
-<button data-doc="ask">Ask Agent Guard</button>
+  <button data-doc="api-integration">API Integration</button>
+  <button data-doc="sdk-integration">SDK Integration</button>
+  <button data-doc="mcp-integration">MCP Integration</button>
+  <button data-doc="mcp-security">Why MCP Does Not Replace PHORVA Security</button>
+  <button data-doc="developer-platform">Developer Platform</button>
+  <button data-doc="project-credentials">Project Credentials</button>
+  <button data-doc="execution-verification">Execution Verification</button>
+  <button data-doc="execution-graph">Execution Graph</button>
+  <button data-doc="final-state">Final-State Verification</button>
+  <button data-doc="verification-evidence">Verification Evidence</button>
+
+  <button data-doc="proof-statements">Proof Statements</button>
+  <button data-doc="provider-abstraction">Provider Abstraction</button>
+  <button data-doc="threat-model">Security Threat Model</button>
+  <button data-doc="security-boundary">Security Boundary</button>
+  <button data-doc="autonomous-trading">Example: Autonomous Trading</button>
+  <button data-doc="manipulated-transaction">Manipulated Transaction</button>
+  <button data-doc="wrong-contract">Wrong Contract</button>
+  <button data-doc="approval-attack">Approval Attack</button>
+  <button data-doc="multi-step-attack">Multi-Step Attack</button>
+  <button data-doc="prediction-markets">Prediction Markets</button>
+
+  <button data-doc="treasury-automation">Treasury Automation</button>
+  <button data-doc="stablecoins-payments">Stablecoins & Payments</button>
+  <button data-doc="beyond-agents">Beyond Agents</button>
+  <button data-doc="cross-chain">Cross-Chain Verification</button>
+  <button data-doc="protocol-adapters">Protocol Adapters</button>
+  <button data-doc="capability-discovery">Application Capability Discovery</button>
+  <button data-doc="adaptive-security">Adaptive Security</button>
+  <button data-doc="control-plane">Verification as Control Plane</button>
+  <button data-doc="verification-receipt">Verification Receipt</button>
+  <button data-doc="observability">Observability</button>
+
+  <button data-doc="security-testing">Security Testing</button>
+  <button data-doc="trust-boundaries">Trust Boundaries</button>
+  <button data-doc="signatures">Why Signatures Are Not Enough</button>
+  <button data-doc="core-invariant">PHORVA Core Invariant</button>
+  <button data-doc="api-sdk-mcp-invariant">API / SDK / MCP Security Invariant</button>
+  <button data-doc="developer-integration">Developer Integration Example</button>
+  <button data-doc="end-to-end-flow">End-to-End Flow</button>
+  <button data-doc="failure-example">Failure Example</button>
+  <button data-doc="post-execution-failure">Post-Execution Failure Example</button>
+  <button data-doc="broader-verification">Broader Verification Infrastructure</button>
+  <button data-doc="long-term-architecture">Long-Term Architecture</button>
+  <button data-doc="design-principles">Design Principles</button>
+  <button data-doc="phorva-thesis">PHORVA Thesis</button>
+  <button data-doc="final-architecture">Final Architecture</button>
+  <button data-doc="closing">Closing</button>
 
 </div>
 
+    <div class="docs-main">
 
-<div class="card docs-content" id="docsContent">
-<h2>PHORVA Documentation</h2>
-<p>
-PHORVA is verification infrastructure for autonomous economic activity.
-It sits between autonomous agents and execution systems to determine whether
-an action is authorized, consistent with intent, and correctly executed.
-</p>
+      <!-- 01 -->
+      <article class="doc active" data-doc-page="overview">
 
-<h3>Core execution flow</h3>
+        <div class="kicker">01</div>
 
-<div class="code">AUTONOMOUS AGENT
+        <h2>Abstract</h2>
+
+        <p>
+          Autonomous software increasingly interacts directly with blockchain systems.
+        </p>
+
+        <p>
+          An AI agent can swap, provide liquidity, move funds, interact with protocol,
+          execute prediction-market position, rebalance treasury, etc.
+        </p>
+
+        <p>
+          Valid signature does not necessarily mean action is valid.
+        </p>
+
+        <p>
+          Agent can have legitimate authority but execute wrong transaction,
+          exceed amount, wrong contract/function/token/protocol, violate policy,
+          manipulated instructions, final state mismatch.
+        </p>
+
+        <p>
+          Traditional auth asks who allowed to act; PHORVA adds what authorized,
+          transaction representation, policy, outcome.
+        </p>
+
+        <p>
+          PHORVA is onchain verification and authorization layer between applications
+          and execution systems.
+        </p>
+
+        <pre>Identity → Intent → Policy → Risk → Authorization → Execution Verification → Evidence / Receipt</pre>
+
+        <p>
+          PHORVA doesn’t replace wallets, protocols, execution systems, autonomous agents.
+        </p>
+
+        <blockquote>
+          Phorva decides whether it’s allowed to happen.
+        </blockquote>
+
+      </article>
+
+
+      <!-- 02 -->
+      <article class="doc" data-doc-page="problem">
+
+        <div class="kicker">02</div>
+
+        <h2>Problem</h2>
+
+        <p>
+          Autonomous execution creates new security boundary.
+        </p>
+
+        <p>
+          Traditional human loop:
+        </p>
+
+        <pre>Select action → Review transaction → Sign → Submit</pre>
+
+        <p>
+          Autonomous:
+        </p>
+
+        <pre>Observe → Reason → Plan → Select tool → Construct tx → Sign → Broadcast</pre>
+
+        <p>
+          Gap between intended and actual calldata.
+        </p>
+
+        <p>
+          Research note about authorization/policy/key compromise/adversarial/multi-agent security.
+        </p>
+
+      </article>
+
+
+      <!-- 03 -->
+      <article class="doc" data-doc-page="verification-gap">
+
+        <div class="kicker">03</div>
+
+        <h2>Verification Gap</h2>
+
+        <p>
+          Example intent swap 300 USDC for ETH, policy max 500,
+          actual tx 3,000 USDC.
+        </p>
+
+        <p>
+          Signature/wallet/contract/protocol can be legitimate but execution mismatches intent.
+        </p>
+
+        <pre>Intent:
+Swap 300 USDC for ETH
+
+Policy:
+Maximum transaction = 500 USDC
+
+Actual transaction:
+3,000 USDC</pre>
+
+        <p>
+          PHORVA evaluates declared intent, policy, risk, transaction semantics,
+          parameters, authorization and allow/block.
+        </p>
+
+      </article>
+
+
+      <!-- 04 -->
+      <article class="doc" data-doc-page="what-phorva-is">
+
+        <div class="kicker">04</div>
+
+        <h2>What PHORVA Is</h2>
+
+        <p>
+          Execution-security and verification infrastructure.
+        </p>
+
+        <p>
+          Verifies agent identity, application/project identity, declared intent,
+          execution type, transaction parameters, protocol, target contract,
+          function selector, policy, risk, capability authorization,
+          transaction security, execution path, final state.
+        </p>
+
+        <p>
+          Can produce structured verification evidence.
+        </p>
+
+        <pre>Developer App
+      ↓
+PHORVA
+      ↓
+Identity
+Intent
+Policy
+Risk
+Authorization
+Execution Verification
+      ↓
+ALLOW / BLOCK
+      ↓
+Existing Execution System</pre>
+
+      </article>
+
+
+      <!-- 05 -->
+      <article class="doc" data-doc-page="what-phorva-is-not">
+
+        <div class="kicker">05</div>
+
+        <h2>What PHORVA Is Not</h2>
+
+        <ul>
+          <li>
+            <strong>Not an agent wallet.</strong>
+            Existing wallet/signer/custody remains.
+          </li>
+
+          <li>
+            <strong>Not an AI agent.</strong>
+            Agent decides objective, PHORVA verifies.
+          </li>
+
+          <li>
+            <strong>Not destination app.</strong>
+            Activity stays in original app
+            (prediction market, Uniswap etc.).
+          </li>
+
+          <li>
+            <strong>Not a prover network.</strong>
+            PHORVA defines semantics, external providers can provide
+            proving/verification infrastructure.
+          </li>
+        </ul>
+
+      </article>
+
+
+      <!-- 06 -->
+      <article class="doc" data-doc-page="security-model">
+
+        <div class="kicker">06</div>
+
+        <h2>Core Security Model</h2>
+
+        <pre>WHO → Identity
+
+WHAT → Intent
+
+UNDER WHAT CONDITIONS → Policy
+
+HOW RISKY → Risk
+
+IS IT PERMITTED → Authorization
+
+DID IT ACTUALLY HAPPEN CORRECTLY → Execution Verification
+
+CAN WE PROVE/AUDIT IT → Evidence</pre>
+
+        <p>
+          Four dimensions:
+          authority, conditions, execution, outcome.
+        </p>
+
+      </article>
+
+
+      <!-- 07 -->
+      <article class="doc" data-doc-page="identity">
+
+        <div class="kicker">07</div>
+
+        <h2>Identity Verification</h2>
+
+        <p>
+          Associates verification requests with authenticated project/application
+          and agent.
+        </p>
+
+        <p>
+          Project has API credentials, agents, policies, verification history, usage.
+        </p>
+
+        <pre>{
+  "id": "trading-agent-01",
+  "capabilities": ["swap"]
+}</pre>
+
+        <p>
+          Caller-supplied identity does not automatically become authority;
+          registered server-side project/agent state determines authorization.
+        </p>
+
+      </article>
+
+
+      <!-- 08 -->
+      <article class="doc" data-doc-page="capabilities">
+
+        <div class="kicker">08</div>
+
+        <h2>Agent Capabilities</h2>
+
+        <p>
+          Capabilities define action class allowed.
+        </p>
+
+        <p>
+          Example agent with swap capability.
+        </p>
+
+        <pre>{
+  "id": "trading-agent-01",
+  "capabilities": ["swap"]
+}</pre>
+
+        <p>
+          Transfer can fail capability boundary.
+        </p>
+
+        <p>
+          Caller cannot self-grant capabilities.
+        </p>
+
+      </article>
+
+
+      <!-- 09 -->
+      <article class="doc" data-doc-page="intent">
+
+        <div class="kicker">09</div>
+
+        <h2>Intent Verification</h2>
+
+        <p>
+          Intent describes agent’s desired action.
+        </p>
+
+        <p>
+          Example swap USDC 300 → ETH.
+        </p>
+
+        <pre>{
+  "action": "swap",
+  "amount": "300",
+  "token": "USDC",
+  "outputToken": "ETH"
+}</pre>
+
+        <p>
+          Actual 3000 USDC gives:
+        </p>
+
+        <pre>parameterMatched = false</pre>
+
+        <p>
+          and the authorization decision fails.
+        </p>
+
+      </article>
+
+
+      <!-- 10 -->
+      <article class="doc" data-doc-page="execution-type">
+
+        <div class="kicker">10</div>
+
+        <h2>Execution-Type Verification</h2>
+
+        <p>
+          Distinguishes categories such as swap, approval, send, transfer.
+        </p>
+
+        <p>
+          Declared swap vs actual ERC20 approval:
+        </p>
+
+        <pre>intentMatched = false
+executionTypeMatched = false</pre>
+
+        <p>
+          The execution therefore fails authorization.
+        </p>
+
+      </article>
+
+    </div>
+  </div>
+
+</section>
+
+
+
+<!-- DOCS PART 2: 11–20 -->
+
+<!-- 11 -->
+<article class="doc" data-doc-page="transaction">
+
+  <div class="kicker">11</div>
+
+  <h2>Transaction Verification</h2>
+
+  <p>
+    Doesn’t treat tx as opaque hash.
+  </p>
+
+  <p>
+    Evaluates network, chainId, target/to, function/selector,
+    calldata/parameters, value, token, amount, recipient,
+    payer, spender, protocol.
+  </p>
+
+  <pre>Network
+chainId
+target / to
+function / selector
+calldata / parameters
+value
+token
+amount
+recipient
+payer
+spender
+protocol</pre>
+
+  <p>
+    Goal: what will tx actually do?
+  </p>
+
+</article>
+
+
+<!-- 12 -->
+<article class="doc" data-doc-page="parameters">
+
+  <div class="kicker">12</div>
+
+  <h2>Parameter Verification</h2>
+
+  <p>
+    Correct protocol can still be malicious.
+  </p>
+
+  <p>
+    Expected vs actual amount, recipient, spender, token examples.
+  </p>
+
+  <p>
+    Verifies params against intent and policy.
+  </p>
+
+</article>
+
+
+<!-- 13 -->
+<article class="doc" data-doc-page="protocol-controls">
+
+  <div class="kicker">13</div>
+
+  <h2>Protocol and Contract Controls</h2>
+
+  <p>
+    Restrict allowed targets, protocols, selectors.
+  </p>
+
+  <p>
+    Layers:
+  </p>
+
+  <pre>agent allowed
+      ↓
+protocol
+      ↓
+contract
+      ↓
+function
+      ↓
+parameters</pre>
+
+</article>
+
+
+<!-- 14 -->
+<article class="doc" data-doc-page="approval">
+
+  <div class="kicker">14</div>
+
+  <h2>Approval Security</h2>
+
+  <p>
+    Evaluates approval amount, spender, token, target,
+    unlimited approval, max policy.
+  </p>
+
+  <p>
+    Example max 10,000 USDC vs
+    <code>approve(attacker,uint256.max)</code>
+    → BLOCK.
+  </p>
+
+  <pre>Policy:
+maxApprovalAmount = 10000 USDC
+
+Actual:
+approve(attacker, uint256.max)
+
+Result:
+BLOCK</pre>
+
+</article>
+
+
+<!-- 15 -->
+<article class="doc" data-doc-page="native-value">
+
+  <div class="kicker">15</div>
+
+  <h2>Native Value Verification</h2>
+
+  <p>
+    Unexpected native value can mismatch intent.
+  </p>
+
+  <p>
+    Evaluates <code>nativeValueMatched</code>.
+  </p>
+
+</article>
+
+
+<!-- 16 -->
+<article class="doc" data-doc-page="policy-engine">
+
+  <div class="kicker">16</div>
+
+  <h2>Policy Engine</h2>
+
+  <p>
+    Example policy:
+  </p>
+
+  <pre>{
+  "maxTransaction": "500",
+  "dailyLimit": "2000",
+  "txsPerWindow": 10,
+  "valuePerWindow": "5000",
+  "velocityWindow": 3600,
+  "maxApprovalAmount": "10000"
+}</pre>
+
+  <p>
+    Evaluates max transaction, daily/rolling limits,
+    frequency, value/window, velocity, quarantine,
+    approval limits, target/selector/spender restrictions.
+  </p>
+
+</article>
+
+
+<!-- 17 -->
+<article class="doc" data-doc-page="velocity">
+
+  <div class="kicker">17</div>
+
+  <h2>Velocity and Quarantine</h2>
+
+  <p>
+    Single tx may be below max but collective behavior
+    can violate velocity/exposure.
+  </p>
+
+  <p>
+    Example series:
+  </p>
+
+  <pre>400
+450
+490
+480
+470</pre>
+
+  <p>
+    Each transaction may remain under the maximum,
+    while the collective behavior can violate velocity.
+  </p>
+
+  <p>
+    Can trigger velocity violation → quarantine →
+    future execution blocked/reviewed.
+  </p>
+
+  <p>
+    Critical risk can trigger quarantine.
+  </p>
+
+</article>
+
+
+<!-- 18 -->
+<article class="doc" data-doc-page="risk">
+
+  <div class="kicker">18</div>
+
+  <h2>Risk Verification</h2>
+
+  <p>
+    Risk between raw tx analysis and authorization.
+  </p>
+
+  <pre>Transaction
+      ↓
+Decode
+      ↓
+Understand semantics
+      ↓
+Risk
+      ↓
+Policy
+      ↓
+Authorization</pre>
+
+  <p>
+    Risk factors: unusual value, dangerous approval,
+    unexpected recipient, suspicious contract, abnormal path,
+    unexpected protocol, abnormal behavior, policy violations,
+    tx semantics.
+  </p>
+
+  <p>
+    Beyond valid signature to safe under app authorization.
+  </p>
+
+</article>
+
+
+<!-- 19 -->
+<article class="doc" data-doc-page="canonical-authorization">
+
+  <div class="kicker">19</div>
+
+  <h2>Canonical Authorization</h2>
+
+  <p>
+    One decision:
+  </p>
+
+  <pre>const authorized =
+  policyPassed &&
+  velocityAllowed &&
+  quarantineAllowed &&
+  capabilityAllowed &&
+  targetAllowed &&
+  selectorAllowed &&
+  approvalAllowed &&
+  intentMatched &&
+  parameterMatched &&
+  executionTypeMatched &&
+  nativeValueMatched &&
+  protocolMatched &&
+  transactionSecuritySafe;</pre>
+
+  <p>
+    Critical: one security core; SDK/API/MCP do not have separate engines;
+    all feed same PHORVA Security Core.
+  </p>
+
+</article>
+
+
+<!-- 20 -->
+<article class="doc" data-doc-page="unified-architecture">
+
+  <div class="kicker">20</div>
+
+  <h2>Unified Integration Architecture</h2>
+
+  <p>
+    Developer app chooses interface:
+    SDK / MCP / API → Project Authentication →
+    PHORVA Security Core → Identity → Intent → Policy →
+    Risk → Authorization → Allow/Block →
+    Execution Verification → Receipt/Evidence.
+  </p>
+
+  <pre>Developer Application
+        │
+        ├── SDK
+        ├── MCP
+        └── API
+             │
+             ↓
+   Project Authentication
+             │
+             ↓
+     PHORVA Security Core
+             │
+       ┌─────┼─────┐
+       ↓     ↓     ↓
+   Identity Intent Policy
+       │     │     │
+       └─────┼─────┘
+             ↓
+           Risk
+             ↓
+       Authorization
+             ↓
+        Allow / Block
+             ↓
+   Execution Verification
+             ↓
+      Receipt / Evidence</pre>
+
+  <p>
+    API, SDK, MCP are interfaces, not separate security systems.
+  </p>
+
+</article>
+
+
+
+<!-- DOCS PART 3: 21–30 -->
+
+<!-- 21 -->
+<article class="doc" data-doc-page="api-integration">
+
+  <div class="kicker">21</div>
+
+  <h2>API Integration</h2>
+
+  <p>
+    Example:
+  </p>
+
+  <pre>POST /verify
+
+Authorization: Bearer pk_live_...
+
+{
+  "agent": "trading-agent-01",
+  "intent": {
+    "action": "swap",
+    "amount": "300",
+    "token": "USDC"
+  },
+  "transaction": {
+    "chainId": 8453,
+    "target": "0x...",
+    "data": "0x..."
+  }
+}</pre>
+
+  <p>
+    PHORVA evaluates through the same core.
+  </p>
+
+</article>
+
+
+<!-- 22 -->
+<article class="doc" data-doc-page="sdk-integration">
+
+  <div class="kicker">22</div>
+
+  <h2>SDK Integration</h2>
+
+  <p>
+    Example:
+  </p>
+
+  <pre>phorva.verify({
+  agent: "trading-agent-01",
+
+  intent: {
+    action: "swap",
+    amount: "300",
+    token: "USDC"
+  },
+
+  transaction
+})</pre>
+
+  <p>
+    SDK transports into the same core, no alternative auth engine.
+  </p>
+
+</article>
+
+
+<!-- 23 -->
+<article class="doc" data-doc-page="mcp-integration">
+
+  <div class="kicker">23</div>
+
+  <h2>MCP Integration</h2>
+
+  <pre>AI Agent
+   ↓
+MCP
+   ↓
+PHORVA Verification
+   ↓
+Identity
+Intent
+Policy
+Risk
+Transaction
+Execution
+   ↓
+ALLOW / BLOCK
+   ↓
+Existing wallet / protocol / signer
+   ↓
+Blockchain</pre>
+
+  <p>
+    MCP integration/interface layer, not security mechanism.
+  </p>
+
+  <p>
+    MCP can establish tool access but not transaction authorization;
+    PHORVA determines blockchain authorization.
+  </p>
+
+</article>
+
+
+<!-- 24 -->
+<article class="doc" data-doc-page="mcp-security">
+
+  <div class="kicker">24</div>
+
+  <h2>Why MCP Does Not Replace PHORVA Security</h2>
+
+  <p>
+    Example:
+  </p>
+
+  <pre>phorva_verify_transaction(...)</pre>
+
+  <p>
+    MCP auth says caller authorized to use MCP server,
+    not tx authorized.
+  </p>
+
+  <p>
+    PHORVA still asks who/what/policy/protocol/contract/params/risk/execution/outcome.
+  </p>
+
+  <p>
+    Note MCP is developing richer auth/scopes/attestations/tool-security proposals.
+  </p>
+
+</article>
+
+
+<!-- 25 -->
+<article class="doc" data-doc-page="developer-platform">
+
+  <div class="kicker">25</div>
+
+  <h2>Developer Platform</h2>
+
+  <pre>Developer Account
         ↓
-      INTENT
+Project
         ↓
-   PHORVA CORE
+API Credentials
         ↓
-POLICY → RISK → AUTHORIZATION
+Agents
         ↓
-    VALIDATION
+Policies
         ↓
-    EXECUTION
+Verification
         ↓
-   VERIFICATION
-        ↓
-      PROOF</div>
+Logs / Evidence</pre>
 
-<h3>Core concepts</h3>
+  <p>
+    Developers manage projects, test/prod credentials, agents,
+    policies, verification logs, usage, SDK/MCP/API integrations, settings.
+  </p>
 
-<div class="docs-grid">
-<div class="docs-card">
-<b>Intent</b>
-<p>What the agent declares it intends to execute.</p>
-</div>
+  <p>
+    End users do not need PHORVA accounts.
+  </p>
 
-<div class="docs-card">
-<b>Policy</b>
-<p>The rules and limits that determine whether an action may proceed.</p>
-</div>
+</article>
 
-<div class="docs-card">
-<b>Risk</b>
-<p>Transaction and execution-security analysis performed before authorization.</p>
-</div>
 
-<div class="docs-card">
-<b>Authorization</b>
-<p>PHORVA's decision on whether the proposed execution satisfies the required conditions.</p>
-</div>
+<!-- 26 -->
+<article class="doc" data-doc-page="project-credentials">
 
-<div class="docs-card">
-<b>Verification</b>
-<p>Independent validation that execution matched the authorized action.</p>
-</div>
+  <div class="kicker">26</div>
 
-<div class="docs-card">
-<b>Proof-Carrying Actions</b>
-<p>Execution evidence containing authorization, evaluation and verification information.</p>
-</div>
-</div>
+  <h2>Project Credentials</h2>
 
-<h3>Execution Graph</h3>
-<p>
-PHORVA can represent multi-operation executions as an execution graph,
-allowing the system to verify the complete sequence and expected final state.
-</p>
+  <pre>pk_test_...
+pk_live_...</pre>
 
-<div class="code">Intent
-  ↓
-Approve
-  ↓
+  <p>
+    Credential ≠ Authorization.
+  </p>
+
+  <p>
+    Key proves request belongs to project, not transaction authorization.
+  </p>
+
+</article>
+
+
+<!-- 27 -->
+<article class="doc" data-doc-page="execution-verification">
+
+  <div class="kicker">27</div>
+
+  <h2>Execution Verification</h2>
+
+  <p>
+    Authorization: can action proceed?
+  </p>
+
+  <p>
+    Execution verification: did actual action correspond to authorized action?
+  </p>
+
+  <pre>Pre-execution
+      ↓
+Authorization
+      ↓
+Allow
+      ↓
+Execution
+      ↓
+Post-execution
+      ↓
+Verification</pre>
+
+</article>
+
+
+<!-- 28 -->
+<article class="doc" data-doc-page="execution-graph">
+
+  <div class="kicker">28</div>
+
+  <h2>Execution Graph</h2>
+
+  <p>
+    Complex action example:
+    intent move 10,000 USDC into yield strategy.
+  </p>
+
+  <pre>Approve
+   ↓
 Swap
-  ↓
+   ↓
 Deposit
-  ↓
-Final State</div>
+   ↓
+Final Position</pre>
 
-<h3>Verification evidence</h3>
+  <p>
+    PHORVA can model execution graph and detect malicious alternative
+    ending in transfer to attacker.
+  </p>
 
-<div class="code">Execution Graph
+</article>
+
+
+<!-- 29 -->
+<article class="doc" data-doc-page="final-state">
+
+  <div class="kicker">29</div>
+
+  <h2>Final-State Verification</h2>
+
+  <p>
+    Intended final state vs attacker-controlled final state.
+  </p>
+
+  <p>
+    Evaluate intent + execution path + final state.
+  </p>
+
+</article>
+
+
+<!-- 30 -->
+<article class="doc" data-doc-page="verification-evidence">
+
+  <div class="kicker">30</div>
+
+  <h2>Verification Evidence</h2>
+
+  <p>
+    Result should be richer than:
+  </p>
+
+  <pre>{ "authorized": true }</pre>
+
+  <p>
+    Evidence can include intent, policy, execution data,
+    trace, commitment, receipt.
+  </p>
+
+  <p>
+    Evidence model reflected in PHORVA docs architecture.
+  </p>
+
+</article>
+
+
+
+<!-- DOCS PART 4: 31–40 -->
+
+<!-- 31 -->
+<article class="doc" data-doc-page="proof-statements">
+
+  <div class="kicker">31</div>
+
+  <h2>Proof Statements</h2>
+
+  <pre>{
+  "version": "phorva-proof-v1",
+  "decision": "AUTHORIZED",
+  "intent": "...",
+  "policy": "...",
+  "execution": "...",
+  "commitment": "..."
+}</pre>
+
+  <p>
+    Statement describes what Phorva verified.
+  </p>
+
+  <p>
+    Proving infrastructure used to establish/verify can remain external.
+  </p>
+
+  <p>
+    Preserves provider-agnostic architecture.
+  </p>
+
+  <p>
+    <code>phorva-app.js</code>
+  </p>
+
+</article>
+
+
+<!-- 32 -->
+<article class="doc" data-doc-page="provider-abstraction">
+
+  <div class="kicker">32</div>
+
+  <h2>Provider Abstraction</h2>
+
+  <pre>PHORVA
+   ↓
+Verification Semantics
+   ↓
+┌───────────────┬───────────────┐
+│               │               │
+Provider A   Provider B       ...
+│               │
+└───────────────┴───────────────┘
+        ↓
+Proving / Verification</pre>
+
+  <p>
+    Benefits: provider independence, routing flexibility,
+    redundancy, adding providers, separation semantics/machinery.
+  </p>
+
+  <p>
+    Phorva defines what must be verified; provider supplies
+    how proof/verification machinery is performed.
+  </p>
+
+</article>
+
+
+<!-- 33 -->
+<article class="doc" data-doc-page="threat-model">
+
+  <div class="kicker">33</div>
+
+  <h2>Security Threat Model</h2>
+
+  <ul>
+    <li>Identity abuse</li>
+    <li>Intent manipulation</li>
+    <li>Parameter manipulation</li>
+    <li>Protocol substitution</li>
+    <li>Function substitution</li>
+    <li>Approval abuse</li>
+    <li>Chain confusion</li>
+    <li>Execution-path manipulation</li>
+    <li>Final-state manipulation</li>
+    <li>Velocity abuse</li>
+    <li>Dependency risk</li>
+    <li>Agent-tool manipulation</li>
+  </ul>
+
+  <p>
+    Modern agent security research note; TechRadar +1
+  </p>
+
+</article>
+
+
+<!-- 34 -->
+<article class="doc" data-doc-page="security-boundary">
+
+  <div class="kicker">34</div>
+
+  <h2>Security Boundary</h2>
+
+  <pre>UNTRUSTED / EXTERNAL
+        │
+        ↓
+   Caller / Agent
+        │
+        ↓
+────────────────────
+     PHORVA
+────────────────────
+        │
+        ↓
+Verification Core
+        │
+        ↓
+Execution System
+        │
+        ↓
+   Blockchain</pre>
+
+  <p>
+    Caller can provide claims; PHORVA independently evaluates;
+    caller-provided policy/capabilities should not become trusted
+    authorization state.
+  </p>
+
+</article>
+
+
+<!-- 35 -->
+<article class="doc" data-doc-page="autonomous-trading">
+
+  <div class="kicker">35</div>
+
+  <h2>Example: Autonomous Trading</h2>
+
+  <p>
+    Developer policy:
+  </p>
+
+  <pre>Max transaction $500
+Daily limit $2,000
+Allowed protocol Uniswap
+Allowed action swap</pre>
+
+  <p>
+    Agent intent:
+  </p>
+
+  <pre>{
+  "action": "swap",
+  "amount": "300",
+  "token": "USDC"
+}</pre>
+
+  <p>
+    Actual transaction: Uniswap, 300 USDC, recipient expected,
+    function expected.
+  </p>
+
+  <p>
+    Checks all ✓; Result AUTHORIZED.
+  </p>
+
+</article>
+
+
+<!-- 36 -->
+<article class="doc" data-doc-page="manipulated-transaction">
+
+  <div class="kicker">36</div>
+
+  <h2>Manipulated Transaction</h2>
+
+  <p>
+    Same intent Swap 300 USDC; actual 3,000 USDC.
+  </p>
+
+  <pre>Identity ✓
+Capability ✓
+Policy ✗
+Intent ✗
+Parameter ✗
+Authorization ✗</pre>
+
+  <p>
+    Result BLOCK.
+  </p>
+
+  <p>
+    Agent/wallet/protocol can still be legitimate;
+    execution unauthorized.
+  </p>
+
+</article>
+
+
+<!-- 37 -->
+<article class="doc" data-doc-page="wrong-contract">
+
+  <div class="kicker">37</div>
+
+  <h2>Wrong Contract</h2>
+
+  <p>
+    Intent swap USDC→ETH on approved DEX.
+  </p>
+
+  <pre>Actual:
+to = unknown contract
+
+targetAllowed = false
+
+Result:
+BLOCK</pre>
+
+</article>
+
+
+<!-- 38 -->
+<article class="doc" data-doc-page="approval-attack">
+
+  <div class="kicker">38</div>
+
+  <h2>Approval Attack</h2>
+
+  <p>
+    Intent swap 300 USDC.
+  </p>
+
+  <pre>Actual:
+approve(attacker, uint256.max)</pre>
+
+  <p>
+    Detects:
+  </p>
+
+  <pre>executionTypeMismatch
+approvalRisk
+spenderViolation
+approvalAmountViolation</pre>
+
+  <p>
+    BLOCK.
+  </p>
+
+</article>
+
+
+<!-- 39 -->
+<article class="doc" data-doc-page="multi-step-attack">
+
+  <div class="kicker">39</div>
+
+  <h2>Multi-Step Attack</h2>
+
+  <p>
+    Intent deposit 10,000 USDC into yield strategy.
+  </p>
+
+  <p>
+    Expected:
+  </p>
+
+  <pre>Approve
+   ↓
+Swap
+   ↓
+Deposit
+   ↓
+Yield position</pre>
+
+  <p>
+    Attacker:
+  </p>
+
+  <pre>Approve
+   ↓
+Swap
+   ↓
+Transfer
+   ↓
+Attacker</pre>
+
+  <p>
+    Final state mismatch; reject/flag depending enforcement model.
+  </p>
+
+</article>
+
+
+<!-- 40 -->
+<article class="doc" data-doc-page="prediction-markets">
+
+  <div class="kicker">40</div>
+
+  <h2>Prediction Markets</h2>
+
+  <p>
+    Intent buy $500 YES shares on Market X.
+  </p>
+
+  <p>
+    Policy max position $500, approved market Market X.
+  </p>
+
+  <p>
+    Actual Market Y, $5,000.
+  </p>
+
+  <pre>Market mismatch
++
+Amount mismatch
+=
+BLOCK</pre>
+
+</article>
+
+
+
+<!-- DOCS PART 5: 41–50 -->
+
+<!-- 41 -->
+<article class="doc" data-doc-page="treasury-automation">
+
+  <div class="kicker">41</div>
+
+  <h2>Treasury Automation</h2>
+
+  <p>
+    Treasury Agent; max tx $50k; allowed Aave/Uniswap;
+    allowed USDC/ETH; require execution verification true.
+  </p>
+
+  <pre>Agent decides
       ↓
-Verification Trace
+PHORVA evaluates
       ↓
-Proof Statement
+Policy satisfied?
+   ┌──┴──┐
+  YES    NO
+   ↓      ↓
+EXECUTE  BLOCK</pre>
+
+  <p>
+    Treasury docs conceptually include spending policies,
+    multisig workflows, protocol/contract allowlists,
+    asset restrictions, proposal execution, audit evidence.
+  </p>
+
+  <p>
+    <code>phorva-app.js</code>
+  </p>
+
+</article>
+
+
+<!-- 42 -->
+<article class="doc" data-doc-page="stablecoins-payments">
+
+  <div class="kicker">42</div>
+
+  <h2>Stablecoins and Payments</h2>
+
+  <p>
+    Payment Agent; max payment $1k; allowed recipient merchant-set;
+    daily $10k.
+  </p>
+
+  <p>
+    Agent Send $750 USDC →
+    verify Agent/Recipient/Token/Amount/Policy/Transaction →
+    ALLOW.
+  </p>
+
+  <pre>Payment Agent
       ↓
-Canonical Commitment</div>
+Send $750 USDC
+      ↓
+Verify:
+Agent
+Recipient
+Token
+Amount
+Policy
+Transaction
+      ↓
+ALLOW</pre>
 
-<h3>What PHORVA is not</h3>
-<ul>
-<li>Not an agent wallet.</li>
-<li>Not a blockchain.</li>
-<li>Not a prover network.</li>
-<li>Not a prover marketplace.</li>
-<li>Not an agent platform.</li>
-<li>Not an execution environment.</li>
-<li>Not the agent's decision-maker.</li>
-</ul>
+  <p>
+    Compromised agent Send $9k USDC to attacker →
+    blocked pre-execution.
+  </p>
 
-<div class="docs-status">
-<b>Current MVP</b>
-<p>
-Base Sepolia, Ethereum Sepolia and Arbitrum Sepolia testnets,
-execution verification, policy enforcement, intent matching,
-risk evaluation, authorization, execution graphs, final-state verification,
-verification traces, proof statements, proof commitments and provider abstraction.
-</p>
-</div>
-
-</div>
-
-<h3>What PHORVA is not</h3>
-
-<ul>
-<li>Not an agent wallet.</li>
-<li>Not a custody layer.</li>
-<li>Not a prover marketplace.</li>
-<li>Not a place where autonomous agents live.</li>
-<li>Not a replacement for the agent's signer.</li>
-</ul>
-
-</div>
-
-</div>
-
-</section>
+</article>
 
 
+<!-- 43 -->
+<article class="doc" data-doc-page="beyond-agents">
 
-<!-- ASK AGENT GUARD -->
+  <div class="kicker">43</div>
 
-<section class="view" id="ask">
+  <h2>Beyond Agents</h2>
 
-<div class="kicker">PHORVA intelligence</div>
+  <p>
+    Underlying primitive broader: verify financial/blockchain action
+    satisfies declared conditions.
+  </p>
 
-<h1 class="title">Ask Agent Guard</h1>
+  <p>
+    Applies to AI agents, wallets, DeFi, prediction markets,
+    treasury, automated strategies, payment systems, DAOs, gaming,
+    cross-chain, autonomous infrastructure.
+  </p>
 
-<p class="sub">
-Ask questions about PHORVA's architecture, execution verification, policies, authorization, integrations and security model.
-</p>
+  <p>
+    Long-term category: Onchain Verification Infrastructure,
+    not merely AI Agent Security.
+  </p>
 
-
-<div class="card pad" style="margin-top:24px">
-
-<div class="ask">
-<input id="askInput" placeholder="Ask: How does PHORVA verify an agent transaction?">
-<button id="askButton">Ask Agent Guard</button>
-</div>
-
-<div class="ask-answer" id="askAnswer"></div>
-
-</div>
+</article>
 
 
-<div class="grid three" style="margin-top:16px">
+<!-- 44 -->
+<article class="doc" data-doc-page="cross-chain">
 
-<div class="card pad">
-<div class="kicker">Architecture</div>
-<h3>How does PHORVA work?</h3>
-<p class="sub">Ask about the execution-control pipeline.</p>
-</div>
+  <div class="kicker">44</div>
 
-<div class="card pad">
-<div class="kicker">Security</div>
-<h3>What does PHORVA verify?</h3>
-<p class="sub">Ask about policy, intent, parameters and transaction security.</p>
-</div>
+  <h2>Cross-Chain Verification</h2>
 
-<div class="card pad">
-<div class="kicker">Integration</div>
-<h3>How do agents integrate?</h3>
-<p class="sub">Ask about API and SDK integration.</p>
-</div>
+  <p>
+    Provider- and chain-agnostic.
+  </p>
 
-</div>
+  <p>
+    Same semantics:
+  </p>
 
-</section>
+  <pre>Identity
+Intent
+Policy
+Risk
+Authorization
+Execution
+Outcome</pre>
 
+  <p>
+    Chain adapters provide decoding, protocol semantics,
+    execution data, state info.
+  </p>
+
+  <p>
+    Ethereum/Base/Arbitrum feed same model.
+  </p>
+
+</article>
+
+
+<!-- 45 -->
+<article class="doc" data-doc-page="protocol-adapters">
+
+  <div class="kicker">45</div>
+
+  <h2>Protocol Adapters</h2>
+
+  <pre>Uniswap Adapter ──┐
+Aave Adapter ─────┤
+Curve Adapter ────┤
+Custom Adapter ───┤
+                   ↓
+          PHORVA NORMALIZATION
+                   ↓
+          COMMON VERIFICATION MODEL</pre>
+
+  <p>
+    Separate protocol-specific decoding from core semantics.
+  </p>
+
+</article>
+
+
+<!-- 46 -->
+<article class="doc" data-doc-page="capability-discovery">
+
+  <div class="kicker">46</div>
+
+  <h2>Application Capability Discovery</h2>
+
+  <p>
+    Registered capabilities vs newly observed behavior.
+  </p>
+
+  <p>
+    Known swap; app later introduces rebalance.
+  </p>
+
+  <pre>NEW_APPLICATION_CAPABILITY</pre>
+
+  <p>
+    Detect <code>NEW_APPLICATION_CAPABILITY</code> without assuming malicious.
+  </p>
+
+  <p>
+    New app behavior observable/policy-controlled;
+    unregistered agent capability remains authorization boundary.
+  </p>
+
+</article>
+
+
+<!-- 47 -->
+<article class="doc" data-doc-page="adaptive-security">
+
+  <div class="kicker">47</div>
+
+  <h2>Adaptive Security</h2>
+
+  <p>
+    Static policies insufficient for all.
+  </p>
+
+  <p>
+    Normal txs:
+  </p>
+
+  <pre>100
+120
+140
+110
+130
+
+then
+
+4,500</pre>
+
+  <p>
+    Behavioral layer:
+  </p>
+
+  <pre>Normal baseline
+      ↓
+Behavioral deviation
+      ↓
+Review / elevated risk</pre>
+
+  <p>
+    Path toward behavioral verification without replacing explicit policies.
+  </p>
+
+</article>
+
+
+<!-- 48 -->
+<article class="doc" data-doc-page="control-plane">
+
+  <div class="kicker">48</div>
+
+  <h2>Verification as Control Plane</h2>
+
+  <pre>APPLICATION
+    ↓
+AI AGENT
+    ↓
+PHORVA
+ ┌──┴──┐
+POLICY RISK
+ └──┬──┘
+AUTHORIZATION
+ ┌──┴──┐
+ALLOW BLOCK
+    │
+EXECUTION SYSTEM
+    │
+BLOCKCHAIN
+    │
+EXECUTION EVIDENCE
+    │
+PHORVA</pre>
+
+  <p>
+    PHORVA doesn’t need to own wallet/blockchain execution.
+  </p>
+
+</article>
+
+
+<!-- 49 -->
+<article class="doc" data-doc-page="verification-receipt">
+
+  <div class="kicker">49</div>
+
+  <h2>Verification Receipt</h2>
+
+  <pre>{
+  "verificationId": "ver_123",
+  "decision": "AUTHORIZED",
+  "agent": "trading-agent-01",
+  "intent": {
+    "action": "swap",
+    "amount": "300",
+    "token": "USDC"
+  },
+  "policy": {
+    "maxTransaction": "500",
+    "dailyLimit": "2000"
+  },
+  "execution": {
+    "chainId": 8453,
+    "protocol": "Uniswap",
+    "target": "0x..."
+  },
+  "checks": {
+    "capabilityAllowed": true,
+    "targetAllowed": true,
+    "intentMatched": true,
+    "parameterMatched": true,
+    "protocolMatched": true,
+    "transactionSecuritySafe": true
+  },
+  "evidence": {
+    "trace": "...",
+    "commitment": "..."
+  }
+}</pre>
+
+  <p>
+    Exact production schema can evolve; purpose is
+    machine-verifiable/auditable authorization reasoning.
+  </p>
+
+</article>
+
+
+<!-- 50 -->
+<article class="doc" data-doc-page="observability">
+
+  <div class="kicker">50</div>
+
+  <h2>Observability</h2>
+
+  <p>
+    Developer sees Verification → Decision → Checks →
+    Failure reason → Transaction → Execution → Evidence.
+  </p>
+
+  <p>
+    Block example:
+  </p>
+
+  <pre>BLOCKED
+
+Reason parameterMatched=false
+
+Expected 300 USDC
+
+Actual 3,000 USDC</pre>
+
+  <p>
+    Better than “Transaction failed.”
+  </p>
+
+</article>
+
+
+
+<!-- DOCS PART 6: 51–65 -->
+
+<!-- 51 -->
+<article class="doc" data-doc-page="security-testing">
+
+  <div class="kicker">51</div>
+
+  <h2>Security Testing</h2>
+
+  <p>
+    Adversarial cases:
+  </p>
+
+  <ul>
+    <li>Intent mismatch</li>
+    <li>Policy violations</li>
+    <li>Wrong protocol/chain</li>
+    <li>Unknown functions</li>
+    <li>Unexpected native value</li>
+    <li>Token/amount manipulation</li>
+    <li>Unlimited approvals</li>
+    <li>Approval spender violations</li>
+    <li>Execution graph integrity</li>
+    <li>Final-state verification</li>
+    <li>Proof verification</li>
+    <li>Provider routing</li>
+  </ul>
+
+  <p>
+    Current engineering docs record 87-test security suite checkpoint.
+  </p>
+
+  <p>
+    Treat as engineering milestone, not universal security or production audit claim.
+  </p>
+
+</article>
+
+
+<!-- 52 -->
+<article class="doc" data-doc-page="trust-boundaries">
+
+  <div class="kicker">52</div>
+
+  <h2>Trust Boundaries</h2>
+
+  <pre>Caller
+   ↓
+PHORVA
+   ↓
+Provider
+   ↓
+Execution System
+   ↓
+Blockchain</pre>
+
+  <p>
+    Each layer different responsibility; reduces single trust model
+    in wallet/agent/prover/protocol.
+  </p>
+
+</article>
+
+
+<!-- 53 -->
+<article class="doc" data-doc-page="signatures">
+
+  <div class="kicker">53</div>
+
+  <h2>Why Signatures Are Not Enough</h2>
+
+  <p>
+    Signature proves key authorized message/tx.
+  </p>
+
+  <p>
+    Does not necessarily prove intended action, app policy,
+    safe path, final state.
+  </p>
+
+  <p>
+    PHORVA adds semantic checks.
+  </p>
+
+</article>
+
+
+<!-- 54 -->
+<article class="doc" data-doc-page="core-invariant">
+
+  <div class="kicker">54</div>
+
+  <h2>Phorva Core Invariant</h2>
+
+  <p>
+    Execution authorized only when execution semantics satisfy identity,
+    intent, policy, risk, transaction conditions for authority.
+  </p>
+
+  <pre>AUTHORIZED =
+Identity ∧
+Intent ∧
+Policy ∧
+Risk ∧
+Capability ∧
+Transaction ∧
+Execution Conditions</pre>
+
+  <p>
+    After execution:
+  </p>
+
+  <pre>VERIFIED =
+AUTHORIZED ∧
+Execution Path Valid ∧
+Final State Valid</pre>
+
+</article>
+
+
+<!-- 55 -->
+<article class="doc" data-doc-page="api-sdk-mcp-invariant">
+
+  <div class="kicker">55</div>
+
+  <h2>API / SDK / MCP Security Invariant</h2>
+
+  <p>
+    Equivalent inputs yield equivalent result.
+  </p>
+
+  <p>
+    API/SDK/MCP all same PHORVA SECURITY CORE.
+  </p>
+
+  <p>
+    No separate API security / SDK security / MCP security.
+  </p>
+
+</article>
+
+
+<!-- 56 -->
+<article class="doc" data-doc-page="developer-integration">
+
+  <div class="kicker">56</div>
+
+  <h2>Developer Integration Example</h2>
+
+  <ol>
+    <li>Create Phorva project</li>
+    <li>Generate test API key</li>
+    <li>Register agent</li>
+    <li>Define policies</li>
+    <li>Install @phorva/sdk</li>
+    <li>Send intended tx for verification</li>
+    <li>Receive ALLOW/BLOCK</li>
+    <li>Execute only when authorized</li>
+    <li>Submit/observe execution</li>
+    <li>Store verification receipt</li>
+  </ol>
+
+  <p>
+    App owns agent, wallet, execution, UX, protocol interaction.
+  </p>
+
+  <p>
+    Phorva owns verification semantics, authorization,
+    execution validation, evidence.
+  </p>
+
+</article>
+
+
+<!-- 57 -->
+<article class="doc" data-doc-page="end-to-end-flow">
+
+  <div class="kicker">57</div>
+
+  <h2>End-to-End Flow</h2>
+
+  <pre>USER / APPLICATION
+       │
+       ↓
+AI AGENT
+       │
+       │ "Swap 300 USDC"
+       ↓
+PHORVA
+       │
+       ├── Authenticate project
+       ├── Resolve agent
+       ├── Check capability
+       ├── Parse intent
+       ├── Parse transaction
+       ├── Identify protocol
+       ├── Identify target
+       ├── Decode calldata
+       ├── Compare parameters
+       ├── Evaluate policy
+       ├── Evaluate risk
+       └── Produce authorization
+       │
+       ↓
+    ALLOW
+       │
+       ↓
+WALLET / SIGNER / EXECUTION SYSTEM
+       │
+       ↓
+BLOCKCHAIN
+       │
+       ↓
+EXECUTION DATA
+       │
+       ↓
+PHORVA
+       │
+       ├── Verify execution graph
+       ├── Verify state transition
+       ├── Verify final state
+       └── Generate evidence
+       │
+       ↓
+    RECEIPT</pre>
+
+</article>
+
+
+<!-- 58 -->
+<article class="doc" data-doc-page="failure-example">
+
+  <div class="kicker">58</div>
+
+  <h2>Failure Example</h2>
+
+  <p>
+    Agent “Swap 300 USDC”
+  </p>
+
+  <p>
+    PHORVA sees tx amount 3,000 USDC.
+  </p>
+
+  <pre>parameterMatched = false
+Authorization = false
+BLOCK</pre>
+
+  <p>
+    Execution never needs the blockchain;
+    pre-execution layer.
+  </p>
+
+</article>
+
+
+<!-- 59 -->
+<article class="doc" data-doc-page="post-execution-failure">
+
+  <div class="kicker">59</div>
+
+  <h2>Post-Execution Failure Example</h2>
+
+  <p>
+    Agent “Move 10,000 USDC into strategy”
+  </p>
+
+  <p>
+    Authorization ALLOW
+  </p>
+
+  <pre>Execution:
+Approve
+   ↓
+Swap
+   ↓
+Unexpected transfer
+   ↓
+Attacker
+
+Final state mismatch
+   ↓
+VERIFICATION FAILURE</pre>
+
+  <p>
+    PHORVA not merely auth API, but execution verification system.
+  </p>
+
+</article>
+
+
+<!-- 60 -->
+<article class="doc" data-doc-page="broader-verification">
+
+  <div class="kicker">60</div>
+
+  <h2>Broader Verification Infrastructure</h2>
+
+  <ul>
+    <li>Cross-chain execution</li>
+    <li>Oracle-dependent execution</li>
+    <li>Prediction markets</li>
+    <li>Treasury systems</li>
+    <li>Stablecoin infrastructure</li>
+    <li>Protocol automation</li>
+    <li>Governance</li>
+    <li>Autonomous recovery</li>
+  </ul>
+
+  <p>
+    Common primitive:
+  </p>
+
+  <pre>Declared condition
+        ↓
+Observed execution
+        ↓
+Verification
+        ↓
+Decision
+        ↓
+Evidence</pre>
+
+</article>
+
+
+<!-- 61 -->
+<article class="doc" data-doc-page="long-term-architecture">
+
+  <div class="kicker">61</div>
+
+  <h2>Long-Term Architecture</h2>
+
+  <pre>                      PHORVA
+                         │
+          ONCHAIN VERIFICATION LAYER
+                         │
+       ┌─────────────────┼─────────────────┐
+       │                 │                 │
+   PRE-EXECUTION      EXECUTION        POST-EXECUTION
+       │                 │                 │
+    Identity           Runtime           Outcome
+    Intent             Controls          State
+    Policy             Risk              Recovery
+    Authority          MEV               Evidence
+       │                 │                 │
+       └─────────────────┼─────────────────┘
+                         │
+                  SYSTEMIC SECURITY
+                         │
+            ┌────────────┼────────────┐
+            │            │            │
+       Dependencies   Contagion   Economic Risk
+            │            │            │
+            └────────────┼────────────┘
+                         │
+                  AUTONOMOUS RESPONSE
+                         │
+             BLOCK / LIMIT / PAUSE /
+              REAUTHORIZE / RECOVER</pre>
+
+  <p>
+    Direction for existing primitive without wallet/protocol/prover network.
+  </p>
+
+</article>
+
+
+<!-- 62 -->
+<article class="doc" data-doc-page="design-principles">
+
+  <div class="kicker">62</div>
+
+  <h2>Design Principles</h2>
+
+  <ol>
+    <li>Verify semantics, not just signatures</li>
+    <li>Authorization contextual: who + what + where + how much + under what conditions</li>
+    <li>Caller claims are not authority</li>
+    <li>One security core</li>
+    <li>Execution matters</li>
+    <li>Final state matters</li>
+    <li>Evidence matters</li>
+    <li>Provider independence</li>
+    <li>Protocol independence</li>
+    <li>Phorva should not become execution environment</li>
+  </ol>
+
+</article>
+
+
+<!-- 63 -->
+<article class="doc" data-doc-page="phorva-thesis">
+
+  <div class="kicker">63</div>
+
+  <h2>Phorva Thesis</h2>
+
+  <p>
+    Future blockchain systems increasingly autonomous:
+    control assets, call protocols, strategies, payments,
+    liquidity, markets, treasuries, coordination.
+  </p>
+
+  <p>
+    The question changes from:
+  </p>
+
+  <blockquote>
+    “Did someone sign the transaction?”
+  </blockquote>
+
+  <p>
+    to:
+  </p>
+
+  <blockquote>
+    “Was this exact action authorized, did it satisfy conditions,
+    and did execution produce intended result?”
+  </blockquote>
+
+  <p>
+    Phorva infrastructure answers this.
+  </p>
+
+</article>
+
+
+<!-- 64 -->
+<article class="doc" data-doc-page="final-architecture">
+
+  <div class="kicker">64</div>
+
+  <h2>Final Architecture</h2>
+
+  <pre>                           PHORVA
+               ONCHAIN VERIFICATION INFRASTRUCTURE
+                                │
+                                │
+                      DEVELOPER APPLICATION
+                                │
+                   ┌────────────┼────────────┐
+                   │            │            │
+                  API          SDK           MCP
+                   │            │            │
+                   └────────────┼────────────┘
+                                ↓
+                       PROJECT AUTHENTICATION
+                                ↓
+                       PHORVA SECURITY CORE
+                                │
+               ┌────────────────┼────────────────┐
+               ↓                ↓                ↓
+            IDENTITY          INTENT           POLICY
+               │                │                │
+               └────────────────┼────────────────┘
+                                ↓
+                              RISK
+                                ↓
+                       TRANSACTION
+                         ANALYSIS
+                                ↓
+                       AUTHORIZATION
+                                │
+                       ┌────────┴────────┐
+                       ↓                 ↓
+                     ALLOW              BLOCK
+                       │
+                       ↓
+                EXISTING EXECUTION
+                  WALLET / SIGNER
+                       │
+                       ↓
+                   BLOCKCHAIN
+                       │
+                       ↓
+               EXECUTION VERIFICATION
+                       │
+               ┌───────┼────────┐
+               ↓       ↓        ↓
+             TRACE    GRAPH   FINAL STATE
+               │       │        │
+               └───────┼────────┘
+                       ↓
+                  EVIDENCE
+                       │
+               ┌───────┼────────┐
+               ↓       ↓        ↓
+           STATEMENT COMMITMENT RECEIPT</pre>
+
+</article>
+
+
+<!-- 65 -->
+<article class="doc" data-doc-page="closing">
+
+  <div class="kicker">65</div>
+
+  <h2>Closing</h2>
+
+  <p>
+    Phorva does not become wallet, AI agent, blockchain,
+    proving marketplace.
+  </p>
+
+  <p>
+    Sits at verification boundary.
+  </p>
+
+  <p>
+    Application decides goal; agent proposes action;
+    execution infrastructure prepares tx; Phorva evaluates
+    authorization and resulting execution.
+  </p>
+
+  <p>
+    Primitive: Verifiable execution.
+  </p>
+
+  <blockquote>
+    Phorva decides whether it’s allowed to happen.
+  </blockquote>
+
+</article>
 
 
 <!-- FAUCET -->
@@ -1893,6 +4691,71 @@ This section remains available as the testnet access surface without pretending 
 
 
 
+
+<section class="view" id="developer">
+  <div class="kicker">Developer platform</div>
+  <h1 class="title">Developer</h1>
+  <p class="sub">
+    Build and manage applications that use PHORVA's execution-security infrastructure.
+  </p>
+
+  <div class="grid two" style="margin-top:24px">
+
+    <div class="card pad">
+      <div class="kicker">Developer Console</div>
+      <h3>Manage your integration</h3>
+      <p class="sub">
+        Create projects, generate project credentials, register agents,
+        configure policies and inspect verification activity.
+      </p>
+      <button class="primary developer-open-console" type="button">
+        Open Developer Dashboard
+      </button>
+    </div>
+
+    <div class="card pad">
+      <div class="kicker">Integration</div>
+      <h3>Connect an application</h3>
+      <p class="sub">
+        Integrate PHORVA through the API or SDK. End users and agents
+        do not need PHORVA accounts.
+      </p>
+      <button class="secondary developer-open-docs" type="button">
+        View Developer Docs
+      </button>
+    </div>
+
+  </div>
+
+  <div class="grid three" style="margin-top:24px">
+
+    <div class="card pad">
+      <div class="kicker">Projects</div>
+      <h3>Project-scoped access</h3>
+      <p class="sub">
+        Separate test and live environments and credentials.
+      </p>
+    </div>
+
+    <div class="card pad">
+      <div class="kicker">Agents</div>
+      <h3>Execution identities</h3>
+      <p class="sub">
+        Associate autonomous agents with their execution context.
+      </p>
+    </div>
+
+    <div class="card pad">
+      <div class="kicker">Verification</div>
+      <h3>Security activity</h3>
+      <p class="sub">
+        Inspect authorization and verification activity generated by your integration.
+      </p>
+    </div>
+
+  </div>
+</section>
+
 </main>
 
 
@@ -1946,7 +4809,7 @@ This section remains available as the testnet access surface without pretending 
 <button data-view="guard"><span class="mi">◈</span><b>Guard</b></button>
 <button data-view="docs"><span class="mi">▤</span><b>Docs</b></button>
 
-<button data-view="faucet"><span class="mi">♨</span><b>Faucet</b></button>
+<button data-view="developer"><span class="mi">⌘</span><b>Developer</b></button>
 <button data-view="settings"><span class="mi">⚙</span><b>Settings</b></button>
 
 </div>
@@ -4275,7 +7138,6 @@ External Wallet / Signer</div>
       title: "Ask Agent Guard",
       body: `
         <p>Ask Agent Guard is PHORVA's documentation and product assistant for questions about architecture, authorization, verification, security and integrations.</p>
-        <button class="primary" data-view="ask">Open Ask Agent Guard</button>
       `
     }
   };
@@ -4298,8 +7160,11 @@ External Wallet / Signer</div>
 
 
 <!-- PERSISTENT ACTIONS -->
-<div class="persistent-actions">
-  <button class="persistent-ask" data-view="ask">
+
+
+
+<div class="persistent-actions" aria-label="PHORVA persistent controls">
+  <button class="persistent-ask" data-view="ask" type="button">
     <span>?</span>
     <b>Ask Agent Guard</b>
   </button>
@@ -4309,6 +7174,816 @@ External Wallet / Signer</div>
     <b>Feedback</b>
   </button>
 </div>
+
+
+<script id="phorva-functional-core">
+(() => {
+  "use strict";
+
+  /*
+   * PHORVA frontend API foundation.
+   *
+   * This layer talks to the existing PHORVA backend.
+   * It does NOT replace or modify the security engine.
+   */
+
+  const PhorvaAPI = {
+    async request(path, options = {}) {
+      const response = await fetch(path, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers || {})
+        }
+      });
+
+      let data = null;
+
+      try {
+        data = await response.json();
+      } catch (_) {
+        data = null;
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error ||
+          data?.message ||
+          `PHORVA request failed (${response.status})`
+        );
+      }
+
+      return data;
+    },
+
+    health() {
+      return this.request("/health");
+    },
+
+    chains() {
+      return this.request("/api/chains");
+    },
+
+    chainStatus() {
+      return this.request("/chain-status");
+    },
+
+    providerStatus() {
+      return this.request("/provider-status");
+    },
+
+    authorize(payload) {
+      return this.request("/authorize", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    },
+
+    transaction(chain, hash) {
+      return this.request(
+        `/transaction/${encodeURIComponent(chain)}/${encodeURIComponent(hash)}`
+      );
+    },
+
+    decodeTransaction(chain, hash) {
+      return this.request(
+        `/decode-transaction/${encodeURIComponent(chain)}/${encodeURIComponent(hash)}`
+      );
+    }
+  };
+
+  window.PhorvaAPI = PhorvaAPI;
+
+  /*
+   * Developer dashboard
+   *
+   * The Developer area is an entry point into the existing
+   * public/developer application. We keep the developer console
+   * separate from the end-user PHORVA execution UI.
+   */
+  function openDeveloperDashboard() {
+    window.location.href = "/developer/";
+  }
+
+  document.addEventListener("click", (event) => {
+    const consoleButton = event.target.closest(".developer-open-console");
+    if (consoleButton) {
+      event.preventDefault();
+      openDeveloperDashboard();
+      return;
+    }
+
+    const docsButton = event.target.closest(".developer-open-docs");
+    if (docsButton) {
+      event.preventDefault();
+
+      const docsButtonTarget =
+        document.querySelector('[data-view="docs"]');
+
+      if (docsButtonTarget) {
+        docsButtonTarget.click();
+      }
+    }
+  });
+
+  /*
+   * Home live-status helper.
+   * This only updates elements when the corresponding IDs exist,
+   * so it is safe with the current UI.
+   */
+  async function refreshPhorvaStatus() {
+    const engine = document.getElementById("phorvaEngineStatus");
+    const chains = document.getElementById("phorvaChainStatus");
+    const mode = document.getElementById("phorvaModeStatus");
+
+    if (!engine && !chains && !mode) return;
+
+    try {
+      const [health, chainStatus] = await Promise.all([
+        PhorvaAPI.health(),
+        PhorvaAPI.chainStatus()
+      ]);
+
+      if (engine) {
+        engine.textContent =
+          health?.status === "running" ? "Online" : "Unavailable";
+      }
+
+      if (mode) {
+        mode.textContent =
+          health?.mode || "Connected";
+      }
+
+      if (chains) {
+        const values = Object.values(chainStatus?.chains || {});
+        const connected = values.filter(c => c.connected).length;
+
+        chains.textContent =
+          `${connected}/${values.length || 0} connected`;
+      }
+    } catch (error) {
+      if (engine) engine.textContent = "Unavailable";
+      if (chains) chains.textContent = "Unavailable";
+      if (mode) mode.textContent = "Backend unavailable";
+
+      console.warn("PHORVA status check failed:", error);
+    }
+  }
+
+  window.refreshPhorvaStatus = refreshPhorvaStatus;
+
+  /*
+   * Refresh once on load and whenever the Home view becomes active.
+   */
+  refreshPhorvaStatus();
+
+  document.addEventListener("click", (event) => {
+    const homeButton = event.target.closest('[data-view="home"]');
+
+    if (homeButton) {
+      setTimeout(refreshPhorvaStatus, 50);
+    }
+  });
+})();
+</script>
+
+
+
+<script id="phorva-navigation-fix-v2">
+(() => {
+  "use strict";
+
+  function phorvaNavigate(id) {
+    const target = document.getElementById(id);
+    if (!target || !target.classList.contains("view")) return false;
+
+    document.querySelectorAll(".view").forEach(view => {
+      view.classList.toggle("active", view.id === id);
+    });
+
+    document.querySelectorAll(".nav[data-view]").forEach(nav => {
+      nav.classList.toggle("active", nav.dataset.view === id);
+    });
+
+    const sheet = document.getElementById("sheet");
+    if (sheet) sheet.classList.remove("open");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+    if (id === "home" && typeof window.refreshPhorvaStatus === "function") {
+      setTimeout(window.refreshPhorvaStatus, 50);
+    }
+
+    return true;
+  }
+
+  document.addEventListener("click", event => {
+    const more = event.target.closest("#more");
+
+    if (more) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      const sheet = document.getElementById("sheet");
+      if (sheet) sheet.classList.add("open");
+
+      return;
+    }
+
+    const button = event.target.closest("[data-view]");
+
+    if (!button) return;
+
+    const id = button.dataset.view;
+
+    if (!id || id === "ask") return;
+
+    if (document.getElementById(id)?.classList.contains("view")) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      phorvaNavigate(id);
+    }
+  }, true);
+
+  window.PhorvaNavigate = phorvaNavigate;
+})();
+</script>
+
+<script id="phorva-live-wiring-v2">
+(() => {
+  "use strict";
+
+  const state = {
+    verified: Number(localStorage.getItem("phorva_verified_count") || 0),
+    blocked: Number(localStorage.getItem("phorva_blocked_count") || 0),
+    events: JSON.parse(localStorage.getItem("phorva_events") || "[]")
+  };
+
+  const chainIds = {
+    baseSepolia: 84532,
+    ethereumSepolia: 11155111,
+    arbitrumSepolia: 421614
+  };
+
+  const routers = {
+    baseSepolia:
+      "0x492e6456d9528771018deb9e87ef7750ef184104",
+    ethereumSepolia:
+      "0x3a9d48ab9751398bbfa63ad67599bb04e4bdf98b",
+    arbitrumSepolia:
+      "0xefd1d4bd4cf1e86da286bb4cb1b8bced9c10ba47"
+  };
+
+  const token =
+    "0x5555555555555555555555555555555555555555";
+
+  function el(id) {
+    return document.getElementById(id);
+  }
+
+  function set(id, value) {
+    const node = el(id);
+    if (node) node.textContent = value;
+  }
+
+  function word(value) {
+    const n = BigInt(
+      Math.max(0, Math.floor(Number(value) || 0))
+    );
+
+    return n.toString(16).padStart(64, "0");
+  }
+
+  function address(value) {
+    return String(value || "")
+      .replace(/^0x/i, "")
+      .padStart(64, "0")
+      .slice(-64);
+  }
+
+  function save() {
+    localStorage.setItem(
+      "phorva_verified_count",
+      String(state.verified)
+    );
+
+    localStorage.setItem(
+      "phorva_blocked_count",
+      String(state.blocked)
+    );
+
+    localStorage.setItem(
+      "phorva_events",
+      JSON.stringify(state.events.slice(0, 20))
+    );
+  }
+
+  function record(data, payload) {
+    const event = {
+      timestamp: Date.now(),
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      }),
+      agent: payload.agent,
+      action: payload.action?.type || "execution",
+      chain: payload.action?.chain || "",
+      authorized: Boolean(data.authorized),
+      risk: data.risk || "",
+      reason: data.reason || ""
+    };
+
+    if (event.authorized) {
+      state.verified++;
+    } else {
+      state.blocked++;
+    }
+
+    state.events.unshift(event);
+    state.events = state.events.slice(0, 20);
+
+    save();
+    renderHome();
+  }
+
+  function renderHome() {
+    /*
+     * Existing home statistics.
+     * Only update them when their IDs exist.
+     */
+    set(
+      "homeAgentsProtected",
+      String(
+        new Set(
+          state.events
+            .map(x => x.agent)
+            .filter(Boolean)
+        ).size
+      )
+    );
+
+    set(
+      "homeExecutionsVerified",
+      String(state.verified)
+    );
+
+    set(
+      "homeThreatsBlocked",
+      String(state.blocked)
+    );
+
+    /*
+     * Existing Recent Activity area.
+     */
+    const activity = el("homeActivity");
+
+    if (activity && state.events.length) {
+      const rows = state.events.slice(0, 5).map(event => {
+        const title = event.authorized
+          ? "Execution authorized"
+          : "Execution blocked";
+
+        const detail =
+          `${event.agent || "Agent"} · ` +
+          `${event.action} · ` +
+          `${event.chain}`;
+
+        return `
+          <div class="row">
+            <div class="row-icon">
+              ${event.authorized ? "✓" : "!"}
+            </div>
+            <div>
+              <strong>${escapeHTML(title)}</strong>
+              <span>${escapeHTML(detail)}</span>
+            </div>
+            <div class="time">
+              ${escapeHTML(event.time)}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      activity.innerHTML = rows;
+    }
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  /*
+   * Keep the existing chain/protocol/asset selectors supplied
+   * by the backend.
+   */
+  async function loadAgentMetadata() {
+    try {
+      const [chains, protocols, assets] =
+        await Promise.all([
+          window.PhorvaAPI.chains(),
+          window.PhorvaAPI.request("/api/protocols"),
+          window.PhorvaAPI.request("/api/assets")
+        ]);
+
+      const chainSelect = el("agentChain");
+
+      if (chainSelect && Array.isArray(chains)) {
+        const current = chainSelect.value;
+
+        chainSelect.innerHTML = chains
+          .map(chain => `
+            <option value="${escapeHTML(chain.key)}">
+              ${escapeHTML(chain.name)}
+            </option>
+          `)
+          .join("");
+
+        if (
+          current &&
+          chains.some(c => c.key === current)
+        ) {
+          chainSelect.value = current;
+        }
+      }
+
+      updateProtocolAndAssetSelectors(
+        protocols,
+        assets
+      );
+
+    } catch (error) {
+      console.warn(
+        "PHORVA metadata refresh failed:",
+        error
+      );
+    }
+  }
+
+  function updateProtocolAndAssetSelectors(
+    protocols,
+    assets
+  ) {
+    const chain =
+      el("agentChain")?.value ||
+      "baseSepolia";
+
+    const protocolSelect =
+      el("agentProtocol");
+
+    if (protocolSelect) {
+      const values =
+        protocols?.[chain] || [];
+
+      protocolSelect.innerHTML =
+        values.length
+          ? values.map(protocol => `
+              <option value="${escapeHTML(protocol)}">
+                ${escapeHTML(protocol)}
+              </option>
+            `).join("")
+          : `<option value="">No registered protocols</option>`;
+    }
+
+    const assetSelect =
+      el("agentAsset");
+
+    if (assetSelect) {
+      const values =
+        assets?.[chain] || [];
+
+      assetSelect.innerHTML =
+        values.map(asset => `
+          <option
+            value="${escapeHTML(asset.address || "")}">
+            ${escapeHTML(
+              asset.symbol ||
+              asset.name ||
+              asset.address ||
+              "Asset"
+            )}
+          </option>
+        `).join("");
+
+      if (!values.length) {
+        assetSelect.innerHTML =
+          `<option value="">No registered assets</option>`;
+      }
+    }
+  }
+
+  function buildPayload() {
+    const chain =
+      el("agentChain")?.value ||
+      "baseSepolia";
+
+    const action =
+      el("agentAction")?.value ||
+      "swap";
+
+    const agent =
+      el("agentName")?.value.trim() ||
+      "TradingAgent-01";
+
+    const walletInput =
+      el("agentWallet")?.value.trim();
+
+    const wallet =
+      /^0x[a-fA-F0-9]{40}$/.test(walletInput || "")
+        ? walletInput
+        : "0x1111111111111111111111111111111111111111";
+
+    const protocol =
+      el("agentProtocol")?.value ||
+      "Uniswap";
+
+    const assetValue =
+      el("agentAsset")?.value || token;
+
+    const amount =
+      Number(el("intentAmount")?.value || 0);
+
+    const maximum =
+      Number(el("policyMaximum")?.value || 0);
+
+    const functionName =
+      el("functionName")?.value ||
+      "swapExactTokensForTokens";
+
+    const selector =
+      el("selector")?.value ||
+      "0x38ed1739";
+
+    let to;
+    let calldata;
+
+    if (
+      action === "transfer" ||
+      action === "send"
+    ) {
+      to = token;
+
+      calldata =
+        "0xa9059cbb" +
+        address(
+          "0x3333333333333333333333333333333333333333"
+        ) +
+        word(amount);
+
+    } else if (
+      action === "approve"
+    ) {
+      to = routers[chain];
+
+      calldata =
+        "0x095ea7b3" +
+        address(routers[chain]) +
+        word(amount);
+
+    } else {
+      /*
+       * Preserve the existing PHORVA selector/function
+       * model for the current demo verification path.
+       */
+      to = routers[chain];
+
+      calldata =
+        selector +
+        word(amount) +
+        word(Math.max(1, amount - 10)) +
+        word(160) +
+        address(
+          "0x3333333333333333333333333333333333333333"
+        ) +
+        word(
+          Math.floor(Date.now() / 1000) + 3600
+        ) +
+        word(2) +
+        address(token) +
+        address(
+          "0x2222222222222222222222222222222222222222"
+        );
+    }
+
+    return {
+      agent,
+
+      action: {
+        type: action,
+        chain,
+        protocol,
+        asset: assetValue,
+        amount
+      },
+
+      policy: {
+        maxTransactionAmount: maximum,
+        dailyLimit: 2000
+      },
+
+      intent: {
+        type: action,
+        chain,
+        protocol,
+        asset: assetValue,
+        amount
+      },
+
+      transaction: {
+        from: wallet,
+        to,
+        chainId: chainIds[chain],
+        expectedChainId: chainIds[chain],
+        value: "0",
+        calldata,
+        amount
+      }
+    };
+  }
+
+  async function evaluate() {
+    const button = el("evaluate");
+
+    if (!button) return;
+
+    button.disabled = true;
+    button.textContent = "Checking…";
+
+    set(
+      "resultTitle",
+      "PHORVA verification in progress"
+    );
+
+    set(
+      "resultReason",
+      "Checking policy, intent, parameters, protocol and transaction security…"
+    );
+
+    try {
+      const payload = buildPayload();
+
+      const data =
+        await window.PhorvaAPI.authorize(payload);
+
+      /*
+       * Existing Agent result UI.
+       */
+      set(
+        "resultTitle",
+        data.authorized
+          ? "Authorization approved"
+          : "Authorization blocked"
+      );
+
+      set(
+        "resultReason",
+        data.reason || ""
+      );
+
+      set(
+        "vPolicy",
+        data.policyPassed
+          ? "PASSED"
+          : "FAILED"
+      );
+
+      set(
+        "vIntent",
+        data.intentMatched
+          ? "MATCHED"
+          : "MISMATCH"
+      );
+
+      set(
+        "vParameters",
+        data.parameterMatched
+          ? "MATCHED"
+          : "MISMATCH"
+      );
+
+      set(
+        "vProtocol",
+        data.protocolMatched
+          ? "MATCHED"
+          : "MISMATCH"
+      );
+
+      set(
+        "vContract",
+        data.verdict?.contract ||
+        "UNKNOWN"
+      );
+
+      set(
+        "vSecurity",
+        data.transactionSecuritySafe
+          ? "SAFE"
+          : "THREAT DETECTED"
+      );
+
+      const proof =
+        el("proofOutput");
+
+      if (proof) {
+        proof.textContent =
+          JSON.stringify(
+            data.proof || {},
+            null,
+            2
+          );
+      }
+
+      /*
+       * This is the bridge from Agent -> Home.
+       */
+      record(data, payload);
+
+      /*
+       * Refresh live backend state after verification.
+       */
+      if (
+        typeof window.refreshPhorvaStatus ===
+        "function"
+      ) {
+        window.refreshPhorvaStatus();
+      }
+
+    } catch (error) {
+      console.error(
+        "PHORVA authorization error:",
+        error
+      );
+
+      set(
+        "resultTitle",
+        "Authorization request failed"
+      );
+
+      set(
+        "resultReason",
+        error.message ||
+        "PHORVA backend unavailable."
+      );
+
+    } finally {
+      button.disabled = false;
+      button.textContent = "Evaluate Action";
+    }
+  }
+
+  /*
+   * Capture the click before any legacy UI-only handler.
+   * This prevents duplicate /authorize calls if an older
+   * handler is still present elsewhere in the file.
+   */
+  document.addEventListener(
+    "click",
+    event => {
+      const button =
+        event.target.closest("#evaluate");
+
+      if (!button) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      evaluate();
+    },
+    true
+  );
+
+  /*
+   * Keep Agent metadata live when its chain changes.
+   */
+  document.addEventListener("change", event => {
+    if (
+      event.target?.id === "agentChain"
+    ) {
+      window.PhorvaLiveAgent?.loadMetadata();
+    }
+  });
+
+  /*
+   * Initial state.
+   */
+  renderHome();
+  loadAgentMetadata();
+
+  window.PhorvaLiveAgent = {
+    loadMetadata: loadAgentMetadata,
+    evaluate,
+    buildPayload
+  };
+
+})();
+</script>
 
 </body>
 </html>

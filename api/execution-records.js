@@ -19,6 +19,7 @@ function createExecutionRecordStore(db) {
     protocol,
     securityProfileId,
     baselineDecision,
+    dailyLimit,
     policyPassed,
     intentMatched,
     parameterMatched,
@@ -26,6 +27,7 @@ function createExecutionRecordStore(db) {
     nativeValueMatched,
     protocolMatched,
     transactionSecuritySafe,
+    capabilityAllowed,
     transaction
   }) {
     const now = new Date().toISOString();
@@ -83,6 +85,13 @@ function createExecutionRecordStore(db) {
       baseline_decision:
         baselineDecision || null,
 
+      daily_limit:
+        dailyLimit !== undefined &&
+        dailyLimit !== null &&
+        Number.isFinite(Number(dailyLimit))
+          ? Number(dailyLimit)
+          : null,
+
       checks: {
         policyPassed: policyPassed === true,
         intentMatched: intentMatched === true,
@@ -93,6 +102,8 @@ function createExecutionRecordStore(db) {
           nativeValueMatched === true,
         protocolMatched:
           protocolMatched === true,
+        capabilityAllowed:
+          capabilityAllowed === true,
         transactionSecuritySafe:
           transactionSecuritySafe === true
       },
@@ -266,6 +277,74 @@ function createExecutionRecordStore(db) {
       );
   }
 
+  function getDailyAgentUsage(
+    projectId,
+    agentId,
+    now = Date.now()
+  ) {
+    const data = db.load();
+
+    const records =
+      Array.isArray(data.executionRecords)
+        ? data.executionRecords
+        : [];
+
+    const current = new Date(now);
+
+    const startOfDay =
+      new Date(
+        current.getFullYear(),
+        current.getMonth(),
+        current.getDate()
+      ).getTime();
+
+    const endOfDay =
+      startOfDay + 24 * 60 * 60 * 1000;
+
+    return records
+      .filter(record => {
+        if (
+          record.project_id !== projectId ||
+          record.agent_id !== agentId
+        ) {
+          return false;
+        }
+
+        /*
+         * Only successful/approved executions consume
+         * the cumulative daily allowance.
+         *
+         * REVIEW_REQUIRED and BLOCKED do not consume it.
+         */
+        if (
+          record.status !== "VERIFIED" &&
+          record.status !== "APPROVED"
+        ) {
+          return false;
+        }
+
+        const createdAt =
+          new Date(record.created_at).getTime();
+
+        return (
+          Number.isFinite(createdAt) &&
+          createdAt >= startOfDay &&
+          createdAt < endOfDay
+        );
+      })
+      .reduce((total, record) => {
+        const amount =
+          Number(
+            record.actual_transaction_amount
+          );
+
+        return Number.isFinite(amount) &&
+          amount >= 0
+          ? total + amount
+          : total;
+      }, 0);
+  }
+
   function listByAgent(agentId, limit = 100) {
     const data = db.load();
 
@@ -294,7 +373,8 @@ function createExecutionRecordStore(db) {
     listByProject,
     listByAgent,
     listReviews,
-    updateReview
+    updateReview,
+    getDailyAgentUsage
   };
 }
 

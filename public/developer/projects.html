@@ -439,16 +439,59 @@
       font-weight: 550;
     }
 
-    .action:hover {
-      color: #fff;
-      border-color: rgba(255,255,255,.14);
+    .action.detected {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: default;
+      color: #d4d9e4;
+      background: rgba(111,124,255,.055);
+      border-color: rgba(111,124,255,.16);
     }
 
-    .action.selected {
-      color: #fff;
-      background: rgba(111,124,255,.13);
-      border-color: var(--accent-border);
-      box-shadow: inset 0 0 0 1px rgba(111,124,255,.08);
+    .action.detected:hover {
+      color: #d4d9e4;
+      border-color: rgba(111,124,255,.16);
+    }
+
+    .action-check {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(111,124,255,.14);
+      color: #aeb7ff;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .detected-capabilities-note {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 22px;
+      padding: 12px 14px;
+      border: 1px solid rgba(111,124,255,.12);
+      border-radius: 9px;
+      background: rgba(111,124,255,.035);
+      color: #8992aa;
+      font-size: 11px;
+    }
+
+    .detected-capabilities-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(111,124,255,.14);
+      color: #aeb7ff;
+      font-size: 10px;
+      font-weight: 800;
+      flex: 0 0 auto;
     }
 
     .empty-actions {
@@ -613,30 +656,6 @@
       line-height: 1.65;
     }
 
-    .key-box {
-      max-width: 650px;
-      margin: 0 auto;
-      padding: 18px;
-      text-align: left;
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      background: #090b11;
-    }
-
-    .key-label {
-      margin-bottom: 9px;
-      color: #6d7588;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      font-weight: 700;
-    }
-
-    .key-row {
-      display: flex;
-      gap: 8px;
-    }
-
     .key-value {
       min-width: 0;
       flex: 1;
@@ -655,22 +674,6 @@
       text-overflow: ellipsis;
     }
 
-    .copy-button {
-      height: 44px;
-      padding: 0 15px;
-      border-radius: 8px;
-      border: 1px solid var(--border-strong);
-      background: #10131c;
-      color: #d5dae4;
-      font-size: 11px;
-      font-weight: 650;
-    }
-
-    .copy-button:hover {
-      border-color: rgba(255,255,255,.2);
-      color: #fff;
-    }
-
     .key-warning {
       margin-top: 10px;
       color: #777f90;
@@ -681,8 +684,8 @@
     /* FOOTER ACTIONS */
 
     .creation-footer {
-      min-height: 70px;
-      padding: 14px 22px;
+      min-height: 62px;
+      padding: 10px 22px;
       border-top: 1px solid var(--border);
       display: flex;
       align-items: center;
@@ -808,14 +811,6 @@
       .review-row {
         grid-template-columns: 125px 1fr;
       }
-
-      .key-row {
-        flex-direction: column;
-      }
-
-      .copy-button {
-        width: 100%;
-      }
     }
   </style>
 </head>
@@ -839,7 +834,7 @@
 
         <a href="/developer/projects.html" class="active">
           <span class="nav-dot"></span>
-          Projects
+          Applications
         </a>
 
         <a href="/developer/api-keys.html">
@@ -882,8 +877,8 @@
 
       <header class="topbar">
         <div class="topbar-title">
-          Projects
-          <span>/ Create project</span>
+          Applications
+          <span>/ Create application</span>
         </div>
 
         <div class="account" id="developerEmail">Loading...</div>
@@ -893,7 +888,7 @@
 
         <div class="page-header">
           <div class="eyebrow">Verifiable execution infrastructure</div>
-          <h1 class="page-title">Create project</h1>
+          <h1 class="page-title">Create application</h1>
           <p class="page-description">
             Define the security boundary for an application integrating
             autonomous execution with Phorva.
@@ -940,17 +935,17 @@
             <!-- STEP 2 -->
 
             <div class="screen" data-step="2">
-              <h2 class="screen-title">Use cases</h2>
+              <h2 class="screen-title">Use case</h2>
 
               <p class="screen-description">
                 Select the execution environments this project will secure.
-                A project can cover up to three use cases.
+                A project uses one Phorva use case.
               </p>
 
               <div class="selection-meta">
-                <span>Select up to three</span>
+                <span>Select one</span>
                 <span class="selection-count">
-                  <strong id="useCaseCount">0</strong> / 3 selected
+                  <strong id="useCaseCount">0</strong> selected
                 </span>
               </div>
 
@@ -959,13 +954,24 @@
 
             <!-- STEP 3 -->
             <div class="screen" data-step="3">
-              <h2 class="screen-title">Actions</h2>
+              <h2 class="screen-title">
+                Application security surface
+              </h2>
 
               <p class="screen-description">
-                Phorva automatically provides the actions associated with
-                your selected use cases. Select the actions this application
-                will be allowed to execute.
+                Phorva automatically detects the capabilities associated
+                with your selected use case. These capabilities are shown
+                for visibility and are not manually configured. Phorva
+                continuously evaluates actual application activity against
+                the project's security policy.
               </p>
+
+              <div class="detected-capabilities-note">
+                <span class="detected-capabilities-icon">✓</span>
+                <span>
+                  Phorva detected capabilities for this application.
+                </span>
+              </div>
 
               <div id="actionGroups" class="action-groups"></div>
             </div>
@@ -984,7 +990,7 @@
 
                 <div class="limit-card">
                   <div class="limit-title">
-                    Maximum transaction
+                    Maximum transaction per agent
                   </div>
 
                   <div class="input-prefix">
@@ -999,13 +1005,13 @@
                   </div>
 
                   <div class="field-help">
-                    Maximum value permitted for a single execution.
+                    Maximum value a single agent can execute in one transaction.
                   </div>
                 </div>
 
                 <div class="limit-card">
                   <div class="limit-title">
-                    Daily spending limit
+                    Daily transaction limit per agent
                   </div>
 
                   <div class="input-prefix">
@@ -1020,7 +1026,7 @@
                   </div>
 
                   <div class="field-help">
-                    Maximum aggregate spending allowed within the project
+                    Maximum cumulative value a single agent can execute within the daily
                     policy window.
                   </div>
                 </div>
@@ -1048,7 +1054,8 @@
               <h2 class="screen-title">Review project</h2>
 
               <p class="screen-description">
-                Confirm the integration boundary before creating the project.
+                Review what you configured and what Phorva detected before
+                creating the project.
               </p>
 
               <div class="review">
@@ -1059,26 +1066,32 @@
                 </div>
 
                 <div class="review-row">
-                  <div class="review-label">Use cases</div>
+                  <div class="review-label">Use case</div>
                   <div class="review-value" id="reviewUseCases">—</div>
                 </div>
 
                 <div class="review-row">
-                  <div class="review-label">Actions</div>
+                  <div class="review-label">
+                    Application security surface
+                  </div>
                   <div class="review-value">
                     <div class="review-actions" id="reviewActions"></div>
                   </div>
                 </div>
 
                 <div class="review-row">
-                  <div class="review-label">Maximum transaction</div>
+                  <div class="review-label">
+                    Maximum transaction per agent
+                  </div>
                   <div class="review-value" id="reviewMaxTransaction">
                     —
                   </div>
                 </div>
 
                 <div class="review-row">
-                  <div class="review-label">Daily spending limit</div>
+                  <div class="review-label">
+                    Daily transaction limit per agent
+                  </div>
                   <div class="review-value" id="reviewDailyLimit">
                     —
                   </div>
@@ -1102,41 +1115,12 @@
 
                 <div class="success-mark">✓</div>
 
-                <h2>Project created</h2>
+                <h2>Application created</h2>
 
                 <p>
-                  Your project is ready. A test API key has been generated
-                  for the integration.
+                Your application is ready. Connect it to Phorva to complete the integration.
                 </p>
-
-                <div class="key-box">
-
-                  <div class="key-label">
-                    Test API key
-                  </div>
-
-                  <div class="key-row">
-                    <div
-                      class="key-value"
-                      id="createdApiKey"
-                    >
-                      —
-                    </div>
-
-                    <button
-                      type="button"
-                      class="copy-button"
-                      id="copyKeyButton"                    >
-                      Copy API key
-                    </button>
-                  </div>
-
-                  <div class="key-warning">
-                    This secret is displayed once. Store it securely.
-                    Phorva does not expose the secret again after creation.
-                  </div>
-
-                </div>
+</div>
 
               </div>
 
@@ -1193,9 +1177,7 @@
           dailyLimit: ""
         },
         developer: null,
-        createdProject: null,
-        createdApiKey: null
-      };
+        createdProject: null,};
 
       const USE_CASES = [
         {
@@ -1204,7 +1186,7 @@
           description: "Secure decentralized finance execution."
         },
         {
-          id: "prediction-market",
+          id: "prediction-markets",
           name: "Prediction Markets",
           description: "Verify market positions, trades and settlements."
         },
@@ -1219,7 +1201,7 @@
           description: "Secure on-chain game and marketplace actions."
         },
         {
-          id: "agent-payment",
+          id: "agent-payments",
           name: "Agent Payments",
           description: "Verify autonomous payment execution."
         },
@@ -1229,22 +1211,22 @@
           description: "Apply verification to card execution flows."
         },
         {
-          id: "dao",
+          id: "dao-treasury",
           name: "DAOs & Treasuries",
           description: "Protect treasury and governance execution."
         },
         {
-          id: "general",
+          id: "onchain-automation",
           name: "On-chain Automation",
           description: "Secure automated blockchain execution."
         },
         {
-          id: "agent-wallet",
+          id: "wallet-infrastructure",
           name: "Agent Wallet Infrastructure",
           description: "Add verification to agent wallet infrastructure."
         },
         {
-          id: "other",
+          id: "custom",
           name: "Other",
           description: "Use Phorva for another execution environment."
         }
@@ -1296,6 +1278,11 @@
       }
 
       function setStep(step) {
+        console.log("[Phorva] setStep:", {
+          from: state.step,
+          to: step
+        });
+
         state.step = step;
 
         if (step === 5) {
@@ -1303,22 +1290,38 @@
           renderReview();
         }
 
-        document.querySelectorAll(".screen[data-step]").forEach(
-          function (screen) {
+        document
+          .querySelectorAll(".screen[data-step]")
+          .forEach(function (screen) {
             screen.classList.toggle(
               "active",
               Number(screen.dataset.step) === step
             );
-          }
-        );
+          });
+
+        const activeScreen =
+          document.querySelector(
+            ".screen[data-step].active"
+          );
+
+        console.log("[Phorva] active screen:", {
+          step: step,
+          dataStep:
+            activeScreen?.dataset?.step || null,
+          title:
+            activeScreen?.querySelector(
+              ".screen-title"
+            )?.textContent?.trim() || null
+        });
 
         const stageNames = {
-          1: "Project",
-          2: "Use cases",
-          3: "Actions",
+          1: "Application",
+          2: "Use case",
+          3: "Security surface",
           4: "Limits",
           5: "Review"
         };
+
         $("stageTitle").textContent =
           stageNames[step] || "Project";
 
@@ -1336,19 +1339,11 @@
         }
 
         if (next) {
-          next.style.display =
-            step < 5
-              ? "inline-flex"
-              : "inline-flex";
-
+          next.style.display = "inline-flex";
           next.textContent =
             step === 5
-              ? "Create project"
+              ? "Create application"
               : "Continue";
-        }
-
-        if (step === 5) {
-          renderReview();
         }
 
         showStatus("", "");
@@ -1360,7 +1355,8 @@
         if (!grid) return;
 
         grid.innerHTML = USE_CASES.map(function (item) {
-          const selected = state.useCases.includes(item.id);
+          const selected =
+            state.useCases[0] === item.id;
 
           return `
             <button
@@ -1384,26 +1380,11 @@
             button.addEventListener("click", function () {
               const id = button.dataset.useCase;
 
-              if (state.useCases.includes(id)) {
-                state.useCases =
-                  state.useCases.filter(function (item) {
-                    return item !== id;
-                  });
+        if (state.useCases[0] === id) {
+          return;
+        }
 
-                renderUseCases();
-                renderActions();
-                return;
-              }
-
-              if (state.useCases.length >= 3) {
-                showStatus(
-                  "You can select up to 3 use cases.",
-                  "error"
-                );
-                return;
-              }
-
-              state.useCases.push(id);
+        state.useCases = [id];
 
               renderUseCases();
               renderActions();
@@ -1647,16 +1628,16 @@
 
 const USE_CASE_DOMAINS = {
   defi: ["defi"],
-  "prediction-market": ["prediction-market"],
+  "prediction-markets": ["prediction-market"],
   gaming: ["gaming"],
-  dao: ["dao"],
-  "agent-payment": ["agent-payment"],
-  "virtual-card": ["virtual-card"],
+  "dao-treasury": ["dao"],
+  "agent-payments": ["agent-payment"],
 
   "autonomous-trading": ["defi", "general"],
-  "agent-wallet": ["general"],
-  "on-chain-automation": ["general", "defi"],
-  other: ["general"]
+  "wallet-infrastructure": ["general"],
+  "onchain-automation": ["general", "defi"],
+  "agent-platform": ["general"],
+  custom: ["general"]
 };
 
 function getRelevantActions() {
@@ -1750,6 +1731,17 @@ function renderActions() {
           groups[group].push(action);
         });
 
+        /*
+         * Application capabilities are derived by Phorva
+         * from the selected use case. They are displayed
+         * here for visibility only and cannot be edited
+         * by the developer.
+         */
+        state.actions =
+          actions.map(function (action) {
+            return normalizeActionId(action.id);
+          });
+
         container.innerHTML =
           Object.keys(groups)
             .sort()
@@ -1763,27 +1755,16 @@ function renderActions() {
                   <div class="action-grid">
                     ${groups[group]
                       .map(function (action) {
-                        const selected =
-                          state.actions.includes(
-                            action.id
-                          );
-
                         return `
-                          <button
-                            type="button"
-                            class="action ${
-                              selected
-                                ? "selected"
-                                : ""
-                            }"
-                            data-action="${escapeHtml(
-                              action.id
-                            )}"
+                          <div
+                            class="action detected"
+                            aria-disabled="true"
                           >
+                            <span class="action-check">✓</span>
                             ${escapeHtml(
                               action.label
                             )}
-                          </button>
+                          </div>
                         `;
                       })
                       .join("")}
@@ -1792,35 +1773,6 @@ function renderActions() {
               `;
             })
             .join("");
-
-        container
-          .querySelectorAll("[data-action]")
-          .forEach(function (button) {
-            button.addEventListener(
-              "click",
-              function () {
-                const id =
-                  normalizeActionId(
-                    button.dataset.action
-                  );
-
-                if (
-                  state.actions.includes(id)
-                ) {
-                  state.actions =
-                    state.actions.filter(
-                      function (item) {
-                        return item !== id;
-                      }
-                    );
-                } else {
-                  state.actions.push(id);
-                }
-
-                renderActions();
-              }
-            );
-          });
       }
 
       function readPolicy() {
@@ -1903,7 +1855,7 @@ function formatMoney(value) {
             .join("")
         : `
           <span class="review-tag">
-            No actions selected
+            No capabilities detected
           </span>
         `;
   }
@@ -1930,7 +1882,7 @@ function formatMoney(value) {
 function getAllActionLabels() {
         const labels = {};
 
-        catalogEntries().forEach(
+        getRelevantActions().forEach(
           function (action) {
             labels[action.id] = action.label;
           }
@@ -1965,17 +1917,9 @@ function getAllActionLabels() {
         }
 
         if (state.step === 2) {
-          if (!state.useCases.length) {
+          if (state.useCases.length !== 1) {
             showStatus(
-              "Select at least one use case.",
-              "error"
-            );
-            return false;
-          }
-
-          if (state.useCases.length > 3) {
-            showStatus(
-              "You can select up to 3 use cases.",
+              "Select one Phorva use case.",
               "error"
             );
             return false;
@@ -1987,7 +1931,7 @@ function getAllActionLabels() {
         if (state.step === 3) {
           if (!state.actions.length) {
             showStatus(
-              "Select at least one action.",
+              "Phorva could not determine an application security surface for the selected use case.",
               "error"
             );
             return false;
@@ -2062,11 +2006,21 @@ function getAllActionLabels() {
         }
 
         if (!response.ok) {
-          throw new Error(
-            data?.error ||
-            data?.message ||
-            "Request failed."
-          );
+          const apiError =
+            data?.error;
+
+          const message =
+            typeof apiError === "string"
+              ? apiError
+              : apiError &&
+                typeof apiError === "object" &&
+                typeof apiError.message === "string"
+                ? apiError.message
+                : typeof data?.message === "string"
+                  ? data.message
+                  : "Request failed.";
+
+          throw new Error(message);
         }
 
         return data;
@@ -2096,8 +2050,14 @@ function getAllActionLabels() {
       async function createProject() {
         const payload = {
           name: state.name,
-          use_cases: state.useCases,
-          actions: state.actions,
+          useCase:
+            state.useCases.length
+              ? state.useCases[0]
+              : "",
+          maxTransactionAmount:
+            state.policy.maxTransaction,
+          dailyLimit:
+            state.policy.dailyLimit,
           policy: {
             maxTransaction:
               state.policy.maxTransaction,
@@ -2127,6 +2087,15 @@ function getAllActionLabels() {
         const projectId =
           project?.id;
 
+        console.log(
+          "[Phorva] Created application:",
+          project
+        );
+        console.log(
+          "[Phorva] Created application ID:",
+          projectId
+        );
+
         if (!projectId) {
           throw new Error(
             "Project was created but no project ID was returned."
@@ -2136,46 +2105,9 @@ function getAllActionLabels() {
         state.createdProject =
           project;
 
-        const keyResponse =
-          await api(
-            "/v1/developer/projects/" +
-              encodeURIComponent(projectId) +
-              "/api-keys",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
-              body:
-                JSON.stringify({
-                  environment: "test"
-                })
-            }
-          );
-
-        const keyData =
-          keyResponse?.key ||
-          keyResponse;
-
-        state.createdApiKey =
-          keyData?.apiKey ||
-          keyResponse?.apiKey ||
-          keyResponse?.secret ||
-          null;
-
-        if (!state.createdApiKey) {
-          throw new Error(
-            "Project was created, but the test API key was not returned."
-          );
-        }
-
-        $("createdApiKey").textContent =
-          state.createdApiKey;
-
         $("creationFooter").innerHTML = `
           <div class="status success">
-            Integration ready
+            Application created. Connect it to Phorva.
           </div>
 
           <div class="footer-buttons">
@@ -2192,7 +2124,7 @@ function getAllActionLabels() {
               class="button primary"
               id="integrationButton"
             >
-              View integration
+              Connect application
             </button>
           </div>
         `;
@@ -2211,7 +2143,8 @@ function getAllActionLabels() {
             "click",
             function () {
               window.location.href =
-                "/developer/integrations.html";
+                "/developer/integrations.html?project=" +
+                encodeURIComponent(projectId);
             }
           );
 
@@ -2230,7 +2163,7 @@ function getAllActionLabels() {
           .classList.add("active");
 
         $("stageTitle").textContent =
-          "Project created";
+          "Application created";
 
         $("stageCount").textContent =
           "READY";
@@ -2243,6 +2176,12 @@ function getAllActionLabels() {
         }
 
         showStatus("", "");
+
+        if (state.step === 4) {
+          readPolicy();
+          setStep(5);
+          return;
+        }
 
         if (state.step < 5) {
           setStep(state.step + 1);
@@ -2270,7 +2209,7 @@ function getAllActionLabels() {
           if (next) {
             next.disabled = false;
             next.textContent =
-              "Create project";
+              "Create application";
           }
         }
       }
@@ -2293,38 +2232,6 @@ function getAllActionLabels() {
         .addEventListener(
           "click",
           handleBack
-        );
-
-      $("copyKeyButton")
-        .addEventListener(
-          "click",
-          async function () {
-            if (!state.createdApiKey) {
-              return;
-            }
-
-            try {
-              await navigator.clipboard.writeText(
-                state.createdApiKey
-              );
-
-              $("copyKeyButton").textContent =
-                "Copied";
-
-              setTimeout(
-                function () {
-                  $("copyKeyButton").textContent =
-                    "Copy API key";
-                },
-                1600
-              );
-            } catch (error) {
-              showStatus(
-                "Unable to copy the API key.",
-                "error"
-              );
-            }
-          }
         );
 
       $("projectName")
