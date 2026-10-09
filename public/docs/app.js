@@ -971,36 +971,35 @@ function renderNav() {
   `).join("");
 }
 
+
 function renderPage(path) {
-  const cleanPath = String(path || "/docs").replace(/\/+$/, "") || "/docs";
-  const parts = cleanPath.split("/").filter(Boolean);
-  const candidates = [
-    PHORVA_ROUTES[cleanPath],
-    parts.length ? parts[parts.length - 1] : "introduction",
-    parts.length > 1 ? parts.slice(-2).join("-") : null
-  ];
-
-  const pageId = candidates.find(
-    id => id && Object.prototype.hasOwnProperty.call(PHORVA_PAGES, id)
-  ) || "introduction";
-
-  const content = PHORVA_PAGES[pageId] || PHORVA_PAGES.introduction;
   const root = document.getElementById("docs-content");
   if (!root) return;
 
-  root.innerHTML = content;
+  const orderedIds = [];
+  const addPage = id => {
+    if (id && Object.prototype.hasOwnProperty.call(PHORVA_PAGES, id)
+        && !orderedIds.includes(id)) {
+      orderedIds.push(id);
+    }
+  };
 
-  document.querySelectorAll("[data-doc-link]").forEach(link => {
-    link.classList.toggle(
-      "active",
-      link.getAttribute("href") === cleanPath
-    );
+  // Preserve the intended order of topics in the existing documentation.
+  PHORVA_NAV.forEach(([, items]) => {
+    items.forEach(([, href]) => addPage(PHORVA_ROUTES[href]));
   });
 
-  const titleNode = root.querySelector("h1");
-  if (titleNode) {
-    document.title = `${titleNode.textContent} — Phorva Docs`;
-  }
+  // Include every additional documentation page as well.
+  Object.keys(PHORVA_PAGES).forEach(addPage);
+
+  root.innerHTML = orderedIds.map(id => {
+    const safeId = id.replace(/[^a-zA-Z0-9_-]/g, "-");
+    return `<section class="docs-section" id="doc-${safeId}">
+      ${PHORVA_PAGES[id]}
+    </section>`;
+  }).join("");
+
+  document.title = "Phorva Documentation";
 }
 
 function openSidebar() {
