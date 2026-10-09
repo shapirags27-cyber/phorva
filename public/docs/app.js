@@ -956,21 +956,8 @@ function currentPath() {
 }
 
 function renderNav() {
-  const navRoot = document.getElementById("docs-nav");
-  if (!navRoot) return;
-
-  navRoot.innerHTML = PHORVA_NAV.map(([group, items]) => `
-    <div class="nav-group">
-      <div class="nav-group-title">${group}</div>
-      ${items.map(([label, href]) => `
-        <a href="${href}" class="nav-link" data-doc-link="${href}">
-          <span>${label}</span>
-        </a>
-      `).join("")}
-    </div>
-  `).join("");
+  // The documentation now uses one continuous page without a sidebar.
 }
-
 
 function renderPage(path) {
   const root = document.getElementById("docs-content");
@@ -978,28 +965,40 @@ function renderPage(path) {
 
   const orderedIds = [];
   const addPage = id => {
-    if (id && Object.prototype.hasOwnProperty.call(PHORVA_PAGES, id)
-        && !orderedIds.includes(id)) {
+    if (
+      id &&
+      Object.prototype.hasOwnProperty.call(PHORVA_PAGES, id) &&
+      !orderedIds.includes(id)
+    ) {
       orderedIds.push(id);
     }
   };
 
-  // Preserve the intended order of topics in the existing documentation.
-  PHORVA_NAV.forEach(([, items]) => {
-    items.forEach(([, href]) => addPage(PHORVA_ROUTES[href]));
-  });
+  // Start with the introduction, then follow the existing documentation order.
+  addPage("introduction");
 
-  // Include every additional documentation page as well.
+  if (Array.isArray(PHORVA_NAV)) {
+    PHORVA_NAV.forEach(([, items]) => {
+      if (!Array.isArray(items)) return;
+      items.forEach(([, href]) => {
+        if (typeof href === "string") addPage(PHORVA_ROUTES[href]);
+      });
+    });
+  }
+
+  // Include every remaining page, including pages not listed in the navigation.
   Object.keys(PHORVA_PAGES).forEach(addPage);
 
-  root.innerHTML = orderedIds.map(id => {
+  root.innerHTML = orderedIds.map((id, index) => {
     const safeId = id.replace(/[^a-zA-Z0-9_-]/g, "-");
-    return `<section class="docs-section" id="doc-${safeId}">
-      ${PHORVA_PAGES[id]}
-    </section>`;
-  }).join("");
+    return `
+      <section class="docs-section" id="doc-${safeId}" data-doc-section="${index + 1}">
+        ${PHORVA_PAGES[id]}
+      </section>
+    `;
+  }).join("\n");
 
-  document.title = "Phorva Documentation";
+  document.title = "PHORVA — Technical Documentation";
 }
 
 function openSidebar() {
