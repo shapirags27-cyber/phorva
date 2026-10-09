@@ -972,7 +972,18 @@ function renderNav() {
 }
 
 function renderPage(path) {
-  const pageId = PHORVA_ROUTES[path] || "introduction";
+  const cleanPath = String(path || "/docs").replace(/\/+$/, "") || "/docs";
+  const parts = cleanPath.split("/").filter(Boolean);
+  const candidates = [
+    PHORVA_ROUTES[cleanPath],
+    parts.length ? parts[parts.length - 1] : "introduction",
+    parts.length > 1 ? parts.slice(-2).join("-") : null
+  ];
+
+  const pageId = candidates.find(
+    id => id && Object.prototype.hasOwnProperty.call(PHORVA_PAGES, id)
+  ) || "introduction";
+
   const content = PHORVA_PAGES[pageId] || PHORVA_PAGES.introduction;
   const root = document.getElementById("docs-content");
   if (!root) return;
@@ -982,17 +993,8 @@ function renderPage(path) {
   document.querySelectorAll("[data-doc-link]").forEach(link => {
     link.classList.toggle(
       "active",
-      link.getAttribute("href") === path
+      link.getAttribute("href") === cleanPath
     );
-
-    link.addEventListener("click", event => {
-      event.preventDefault();
-      const href = link.getAttribute("href");
-      window.history.pushState({}, "", href);
-      renderPage(currentPath());
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      closeSidebar();
-    });
   });
 
   const titleNode = root.querySelector("h1");
@@ -1030,15 +1032,47 @@ function setup() {
   renderPage(currentPath());
   setupSearch();
 
+  const navRoot = document.getElementById("docs-nav");
+  navRoot?.addEventListener("click", event => {
+    const link = event.target.closest("a[data-doc-link]");
+    if (!link || !navRoot.contains(link)) return;
+
+    const href = link.getAttribute("href");
+    if (!href || !href.startsWith("/docs")) return;
+
+    event.preventDefault();
+    if (currentPath() !== href) {
+      window.history.pushState({}, "", href);
+    }
+    renderPage(href);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    closeSidebar();
+  });
+
   document.getElementById("docs-menu")?.addEventListener("click", openSidebar);
   document.getElementById("docs-close")?.addEventListener("click", closeSidebar);
 
-  document.getElementById("docs-theme")?.addEventListener("click", () => {
-    const html = document.documentElement;
-    const current = html.getAttribute("data-theme") || "dark";
-    const next = current === "dark" ? "light" : "dark";
-    html.setAttribute("data-theme", next);
+  const themeButton = document.getElementById("docs-theme");
+
+  function applyDocsTheme(theme) {
+    const next = theme === "light" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
     localStorage.setItem("phorva-docs-theme", next);
+    if (themeButton) {
+      themeButton.setAttribute("aria-pressed", String(next === "light"));
+      themeButton.textContent = next === "light" ? "Dark theme" : "Light theme";
+    }
+  }
+
+  applyDocsTheme(
+    localStorage.getItem("phorva-docs-theme") ||
+    document.documentElement.getAttribute("data-theme") ||
+    "dark"
+  );
+
+  themeButton?.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme") || "dark";
+    applyDocsTheme(current === "dark" ? "light" : "dark");
   });
 
   window.addEventListener("popstate", () => {

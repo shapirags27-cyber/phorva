@@ -1,0 +1,6144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101216">
+<title>Phorva — Verifiable Execution</title>
+
+<style>
+:root{
+ --bg:#0b0d11;
+ --panel:#12161c;
+ --panel2:#181e26;
+ --line:#252c35;
+ --text:#f4f6f8;
+ --muted:#89929e;
+ --accent:#6f8cff;
+ --accent2:#9aaeff;
+ --green:#58d49b;
+ --red:#f06f82;
+ --yellow:#e8c56b;
+ --soft:rgba(111,140,255,.12);
+ --shadow:0 24px 70px rgba(0,0,0,.28)
+}
+
+:root.light{
+ --bg:#f5f7f9;
+ --panel:#fff;
+ --panel2:#eef1f5;
+ --line:#dce2e8;
+ --text:#171a20;
+ --muted:#69727e;
+ --accent:#516ee8;
+ --accent2:#3f5dd3;
+ --green:#27956a;
+ --red:#d34f64;
+ --yellow:#9b7b21;
+ --soft:rgba(81,110,232,.1);
+ --shadow:0 18px 50px rgba(20,25,35,.08)
+}
+
+*{box-sizing:border-box}
+
+html{
+ background:var(--bg);
+ scroll-behavior:smooth
+}
+
+body{
+ margin:0;
+ background:var(--bg);
+ color:var(--text);
+ font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ min-height:100vh
+}
+
+button,input,select{
+ font:inherit;
+ color:inherit
+}
+
+button{
+ cursor:pointer
+}
+
+.app{
+ min-height:100vh;
+ padding-bottom:84px
+}
+
+.header{
+ height:78px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ padding:0 28px;
+ border-bottom:1px solid var(--line);
+ background:rgba(11,13,17,.94);
+ backdrop-filter:blur(18px);
+ position:sticky;
+ top:0;
+ z-index:50
+}
+
+:root.light .header{
+ background:rgba(245,247,249,.94)
+}
+
+.brand{
+ display:flex;
+ align-items:center;
+ gap:12px;
+ border:0;
+ background:none
+}
+
+.brand img{
+ width:42px;
+ height:42px;
+ padding:7px;
+ border-radius:12px;
+ background:#07090c;
+ border:1px solid var(--line);
+ object-fit:contain
+}
+
+.brand b{
+ font-size:18px;
+ letter-spacing:.12em
+}
+
+.header-actions{
+ display:flex;
+ align-items:center;
+ gap:9px
+}
+
+.icon-btn,
+.network{
+ height:44px;
+ border:1px solid var(--line);
+ background:var(--panel);
+ border-radius:12px
+}
+
+.icon-btn{
+ width:44px
+}
+
+.network{
+ padding:0 14px;
+ font-size:12px;
+ font-weight:800
+}
+
+.main{
+ width:min(1180px,calc(100% - 40px));
+ margin:auto;
+ padding:30px 0
+}
+
+.view{
+ display:none
+}
+
+.view.active{
+ display:block
+}
+
+.kicker{
+ color:var(--accent2);
+ font-size:10px;
+ letter-spacing:.17em;
+ text-transform:uppercase;
+ font-weight:900
+}
+
+.title{
+ font-size:clamp(34px,5vw,52px);
+ line-height:1;
+ letter-spacing:-.045em;
+ margin:10px 0 12px
+}
+
+.sub{
+ color:var(--muted);
+ line-height:1.65;
+ max-width:760px
+}
+
+.card{
+ border:1px solid var(--line);
+ background:linear-gradient(145deg,var(--panel),var(--bg));
+ border-radius:20px;
+ box-shadow:var(--shadow);
+ overflow:hidden
+}
+
+.pad{
+ padding:22px
+}
+
+.hero{
+ padding:34px;
+ min-height:350px;
+ background:
+ radial-gradient(circle at 88% 0%,rgba(111,140,255,.2),transparent 34%),
+ linear-gradient(145deg,var(--panel2),var(--panel))
+}
+
+.hero h1{
+ max-width:780px;
+ font-size:clamp(38px,6vw,62px);
+ line-height:1;
+ letter-spacing:-.055em;
+ margin:14px 0 20px
+}
+
+.hero p{
+ max-width:760px;
+ color:var(--muted);
+ line-height:1.7
+}
+
+.flow{
+ display:flex;
+ align-items:center;
+ gap:8px;
+ flex-wrap:wrap;
+ margin-top:28px
+}
+
+.flow i{
+ color:var(--muted);
+ font-style:normal
+}
+
+.node{
+ padding:10px 13px;
+ border:1px solid var(--line);
+ border-radius:10px;
+ background:rgba(0,0,0,.12);
+ font-size:10px;
+ font-weight:850
+}
+
+.node.core{
+ border-color:rgba(111,140,255,.5);
+ background:var(--soft);
+ color:var(--accent2)
+}
+
+.grid{
+ display:grid;
+ gap:16px
+}
+
+.stats{
+ grid-template-columns:repeat(3,1fr);
+ margin-top:18px
+}
+
+.two{
+ grid-template-columns:1.3fr .7fr
+}
+
+.three{
+ grid-template-columns:repeat(3,1fr)
+}
+
+.stat{
+ padding:22px;
+ min-height:145px
+}
+
+.label{
+ color:var(--muted);
+ font-size:10px;
+ text-transform:uppercase;
+ letter-spacing:.1em;
+ font-weight:850
+}
+
+.value{
+ font-size:30px;
+ font-weight:900;
+ margin-top:18px
+}
+
+.meta{
+ color:var(--accent2);
+ font-size:10px;
+ margin-top:6px
+}
+
+.head{
+ padding:18px 20px;
+ border-bottom:1px solid var(--line);
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:12px
+}
+
+.head strong{
+ font-size:14px
+}
+
+.muted{
+ color:var(--muted);
+ font-size:10px
+}
+
+.badge{
+ padding:7px 10px;
+ border-radius:999px;
+ background:var(--soft);
+ color:var(--accent2);
+ font-size:9px;
+ font-weight:900
+}
+
+.badge.green{
+ background:rgba(88,212,155,.1);
+ color:var(--green)
+}
+
+.badge.red{
+ background:rgba(240,111,130,.1);
+ color:var(--red)
+}
+
+.badge.yellow{
+ background:rgba(232,197,107,.1);
+ color:var(--yellow)
+}
+
+.activity{
+ padding:10px 20px
+}
+
+.row{
+ display:grid;
+ grid-template-columns:36px 1fr auto;
+ gap:12px;
+ align-items:center;
+ padding:14px 0;
+ border-bottom:1px solid var(--line)
+}
+
+.row:last-child{
+ border-bottom:0
+}
+
+.row-icon{
+ width:36px;
+ height:36px;
+ border-radius:10px;
+ background:var(--panel2);
+ display:grid;
+ place-items:center;
+ color:var(--accent2)
+}
+
+.row strong{
+ display:block;
+ font-size:11px
+}
+
+.row span{
+ display:block;
+ color:var(--muted);
+ font-size:9px;
+ margin-top:4px
+}
+
+.time{
+ color:var(--muted);
+ font-size:9px
+}
+
+.field{
+ border:1px solid var(--line);
+ background:var(--panel2);
+ border-radius:13px;
+ padding:15px
+}
+
+.field small{
+ display:block;
+ color:var(--muted);
+ font-size:9px;
+ text-transform:uppercase;
+ letter-spacing:.1em
+}
+
+.field b{
+ display:block;
+ font-size:12px;
+ margin-top:7px
+}
+
+.field input,
+.field select{
+ width:100%;
+ margin-top:8px;
+ background:transparent;
+ border:0;
+ outline:0;
+ font-weight:750
+}
+
+.fields{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:12px;
+ padding:20px
+}
+
+.full{
+ grid-column:1/-1
+}
+
+.primary{
+ width:calc(100% - 40px);
+ margin:0 20px 10px;
+ padding:15px;
+ border:0;
+ border-radius:13px;
+ background:var(--accent);
+ color:#fff;
+ font-weight:900
+}
+
+.primary:disabled{
+ opacity:.5;
+ cursor:not-allowed
+}
+
+.note{
+ text-align:center;
+ color:var(--muted);
+ font-size:9px;
+ padding:0 20px 18px
+}
+
+.preview{
+ margin:0 20px 20px;
+ padding:14px;
+ border:1px solid var(--line);
+ border-radius:14px;
+ background:var(--bg)
+}
+
+.preview div{
+ display:flex;
+ justify-content:space-between;
+ padding:10px 0;
+ border-bottom:1px solid var(--line);
+ font-size:10px;
+ gap:15px
+}
+
+.preview div:last-child{
+ border:0
+}
+
+.preview span{
+ color:var(--muted)
+}
+
+.result{
+ margin:0 20px 20px;
+ padding:18px;
+ border-radius:15px;
+ border:1px solid var(--line);
+ background:var(--bg);
+ display:none
+}
+
+.result.show{
+ display:block
+}
+
+.result-title{
+ font-weight:900;
+ font-size:18px
+}
+
+.result pre{
+ white-space:pre-wrap;
+ overflow:auto;
+ color:var(--muted);
+ font-size:10px;
+ line-height:1.55;
+ margin:15px 0 0
+}
+
+.verdict-grid{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:10px;
+ margin-top:15px
+}
+
+.verdict{
+ padding:13px;
+ border:1px solid var(--line);
+ border-radius:12px;
+ background:var(--panel2)
+}
+
+.verdict small{
+ display:block;
+ color:var(--muted);
+ font-size:8px;
+ text-transform:uppercase
+}
+
+.verdict b{
+ display:block;
+ margin-top:6px;
+ font-size:11px
+}
+
+.ok{
+ color:var(--green)
+}
+
+.bad{
+ color:var(--red)
+}
+
+.agent{
+ display:grid;
+ grid-template-columns:.7fr 1.3fr;
+ gap:16px;
+ margin-top:24px
+}
+
+.agent-menu{
+ padding:10px
+}
+
+.agent-menu button{
+ display:block;
+ width:100%;
+ text-align:left;
+ border:1px solid transparent;
+ background:none;
+ border-radius:12px;
+ padding:14px
+}
+
+.agent-menu button.active{
+ background:var(--soft);
+ border-color:rgba(111,140,255,.2)
+}
+
+.agent-menu strong{
+ font-size:12px
+}
+
+.agent-menu span{
+ display:block;
+ color:var(--muted);
+ font-size:10px;
+ margin-top:4px
+}
+
+.guard-grid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:12px;
+ padding:20px
+}
+
+.guard-item{
+ padding:17px;
+ border:1px solid var(--line);
+ border-radius:14px;
+ background:var(--panel2)
+}
+
+.guard-item b{
+ font-size:12px
+}
+
+.guard-item p{
+ color:var(--muted);
+ font-size:10px;
+ line-height:1.5;
+ margin:7px 0 0
+}
+
+.status{
+ float:right;
+ width:8px;
+ height:8px;
+ border-radius:50%;
+ background:var(--green);
+ box-shadow:0 0 9px var(--green)
+}
+
+.docs{
+ display:grid;
+ grid-template-columns:240px 1fr;
+ gap:16px;
+ margin-top:24px
+}
+
+.docs-nav{
+ padding:12px
+}
+
+.docs-nav button{
+ width:100%;
+ text-align:left;
+ padding:12px;
+ border:0;
+ background:none;
+ border-radius:10px
+}
+
+.docs-nav button.active{
+ background:var(--soft);
+ color:var(--accent2)
+}
+
+.docs-content{
+ padding:30px
+}
+
+.docs-content h2{
+ font-size:30px;
+ margin:0 0 12px
+}
+
+.docs-content h3{
+ margin-top:28px
+}
+
+.docs-content p,
+.docs-content li{
+ color:var(--muted);
+ line-height:1.7;
+ font-size:13px
+}
+
+.code{
+ padding:16px;
+ border:1px solid var(--line);
+ background:#080a0e;
+ border-radius:12px;
+ overflow:auto;
+ color:#cbd5e1;
+ font-size:11px;
+ line-height:1.6
+}
+
+.ask{
+ display:grid;
+ grid-template-columns:1fr auto;
+ gap:10px;
+ margin-top:20px
+}
+
+.ask input{
+ min-width:0;
+ padding:15px;
+ border:1px solid var(--line);
+ background:var(--panel2);
+ border-radius:12px;
+ outline:0
+}
+
+.ask button{
+ border:0;
+ background:var(--accent);
+ color:#fff;
+ border-radius:12px;
+ padding:0 20px;
+ font-weight:850
+}
+
+.ask-answer{
+ margin-top:14px;
+ padding:18px;
+ border:1px solid var(--line);
+ border-radius:14px;
+ background:var(--panel2);
+ color:var(--muted);
+ line-height:1.65;
+ font-size:12px;
+ display:none
+}
+
+.ask-answer.show{
+ display:block
+}
+
+.placeholder{
+ min-height:230px;
+ display:grid;
+ place-items:center;
+ text-align:center;
+ padding:30px
+}
+
+.placeholder p{
+ color:var(--muted);
+ max-width:520px;
+ line-height:1.6;
+ font-size:11px
+}
+
+.bottom{
+ position:fixed;
+ left:0;
+ right:0;
+ bottom:0;
+ height:78px;
+ background:rgba(11,13,17,.96);
+ border-top:1px solid var(--line);
+ z-index:60;
+ display:grid;
+ grid-template-columns:repeat(5,1fr);
+ padding:6px 10px
+}
+
+:root.light .bottom{
+ background:rgba(245,247,249,.96)
+}
+
+.nav{
+ border:0;
+ background:none;
+ color:var(--muted);
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ gap:4px;
+ border-radius:12px
+}
+
+.nav.active{
+ color:var(--accent2);
+ background:var(--soft)
+}
+
+.nav .ico{
+ font-size:20px
+}
+
+.nav small{
+ font-size:9px;
+ font-weight:800
+}
+
+.sheet{
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.6);
+ backdrop-filter:blur(8px);
+ z-index:100;
+ display:none
+}
+
+.sheet.open{
+ display:block
+}
+
+.panel{
+ position:absolute;
+ right:0;
+ top:0;
+ height:100%;
+ width:min(440px,100%);
+ background:var(--bg);
+ border-left:1px solid var(--line);
+ padding:28px;
+ overflow:auto
+}
+
+.close{
+ float:right;
+ border:0;
+ background:none;
+ font-size:30px;
+ color:var(--muted)
+}
+
+.more-title{
+ font-size:30px;
+ font-weight:900;
+ margin:48px 0 24px
+}
+
+.menu{
+ display:grid;
+ gap:4px
+}
+
+.menu button{
+ border:0;
+ background:none;
+ text-align:left;
+ padding:14px 8px;
+ border-radius:11px;
+ display:flex;
+ align-items:center;
+ gap:14px
+}
+
+.menu button:hover{
+ background:var(--panel)
+}
+
+.mi{
+ width:28px;
+ text-align:center;
+ color:var(--muted);
+ font-size:18px
+}
+
+.menu b{
+ font-size:13px
+}
+
+.divider{
+ height:1px;
+ background:var(--line);
+ margin:17px 0
+}
+
+@media(max-width:800px){
+
+ .header{
+  height:78px;
+  padding:0 14px
+ }
+
+ .brand img{
+  width:42px;
+  height:42px
+ }
+
+ .brand b{
+  font-size:16px
+ }
+
+ .network{
+  display:none
+ }
+
+ .main{
+  width:calc(100% - 24px);
+  padding:24px 0 30px
+ }
+
+ .hero{
+  padding:25px
+ }
+
+ .hero h1{
+  font-size:42px
+ }
+
+ .flow{
+  flex-wrap:nowrap;
+  overflow:auto;
+  padding-bottom:4px
+ }
+
+ .node{
+  flex:0 0 auto
+ }
+
+ .stats,
+ .two,
+ .three,
+ .agent,
+ .docs{
+  grid-template-columns:1fr
+ }
+
+ .fields{
+  grid-template-columns:1fr
+ }
+
+ .full{
+  grid-column:auto
+ }
+
+ .guard-grid{
+  grid-template-columns:1fr
+ }
+
+ .verdict-grid{
+  grid-template-columns:1fr 1fr
+ }
+
+ .bottom{
+  height:88px
+ }
+
+ .nav{
+  min-height:76px
+ }
+
+ .nav .ico{
+  font-size:25px
+ }
+
+ .nav small{
+  font-size:10px
+ }
+
+ .docs-content{
+  padding:22px
+ }
+}
+
+@media(max-width:500px){
+
+ .title{
+  font-size:36px
+ }
+
+ .hero h1{
+  font-size:36px
+ }
+
+ .brand b{
+  display:none
+ }
+
+ .verdict-grid{
+  grid-template-columns:1fr
+ }
+
+ .ask{
+  grid-template-columns:1fr
+ }
+
+ .ask button{
+  min-height:48px
+ }
+}
+
+/* =========================================================
+   PHORVA HOME DASHBOARD
+   Presentation only — existing backend/security logic preserved.
+   ========================================================= */
+
+.home-shell{
+  width:100%;
+  max-width:1180px;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.home-hero{
+  position:relative;
+  overflow:hidden;
+  padding:42px;
+  border:1px solid var(--border);
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 80% 0%, rgba(80,90,220,.16), transparent 38%),
+    linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.012));
+}
+
+.home-hero:after{
+  content:"";
+  position:absolute;
+  width:260px;
+  height:260px;
+  right:-120px;
+  bottom:-150px;
+  border-radius:50%;
+  background:rgba(76,82,220,.08);
+  filter:blur(35px);
+  pointer-events:none;
+}
+
+.home-hero h1{
+  max-width:760px;
+  margin:7px 0 14px;
+  font-size:clamp(38px,6vw,72px);
+  line-height:.98;
+  letter-spacing:-.055em;
+}
+
+.home-hero p{
+  max-width:720px;
+  margin:0;
+  color:var(--muted);
+  font-size:16px;
+  line-height:1.7;
+}
+
+.home-actions{
+  display:flex;
+  gap:10px;
+  margin-top:26px;
+}
+
+.home-flow{
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:34px;
+}
+
+.flow-node{
+  padding:8px 12px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:rgba(255,255,255,.025);
+  color:var(--muted);
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.flow-node.core{
+  color:var(--text);
+  border-color:rgba(120,125,255,.38);
+  background:rgba(85,90,220,.09);
+}
+
+.home-flow i{
+  color:var(--muted);
+  font-style:normal;
+}
+
+.home-status-grid,
+.home-metrics{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+
+.home-status-card{
+  min-height:128px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.home-status-card .value{
+  margin:7px 0 3px;
+  font-size:25px;
+  font-weight:700;
+  letter-spacing:-.025em;
+}
+
+.analyzer-value{
+  font-size:18px!important;
+}
+
+.home-metric{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  min-height:118px;
+}
+
+.metric-icon{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  flex:none;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:rgba(255,255,255,.025);
+  font-size:18px;
+}
+
+.metric-value{
+  margin-top:4px;
+  font-size:30px;
+  line-height:1;
+  font-weight:750;
+  letter-spacing:-.04em;
+}
+
+.home-main-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(320px,.85fr);
+  gap:18px;
+}
+
+.home-control-card,
+.home-verification-card,
+.home-activity-card{
+  min-width:0;
+}
+
+.control-pipeline{
+  margin-top:20px;
+}
+
+.control-step{
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+}
+
+.control-step>span{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  flex:none;
+  border:1px solid var(--border);
+  border-radius:9px;
+  color:var(--muted);
+  font-size:10px;
+  font-weight:700;
+}
+
+.control-step strong{
+  display:block;
+  margin-bottom:4px;
+}
+
+.control-step small{
+  display:block;
+  color:var(--muted);
+  line-height:1.5;
+}
+
+.pipeline-line{
+  height:22px;
+  width:1px;
+  margin-left:14px;
+  background:var(--border);
+}
+
+.verification-state{
+  margin-top:18px;
+}
+
+.state-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  padding:15px 0;
+  border-bottom:1px solid var(--border);
+}
+
+.state-row:last-child{
+  border-bottom:0;
+}
+
+.state-row small{
+  display:block;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+
+.state-row span{
+  font-size:14px;
+  font-weight:600;
+}
+
+.state-row>b{
+  font-size:10px;
+  opacity:.75;
+}
+
+.home-note{
+  margin-top:10px;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.55;
+}
+
+.home-activity-card .head{
+  align-items:center;
+}
+
+.small-action{
+  padding:8px 11px!important;
+  font-size:12px!important;
+}
+
+.home-empty{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-height:190px;
+  text-align:center;
+  color:var(--muted);
+}
+
+.home-empty-icon{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  margin-bottom:5px;
+  border:1px solid var(--border);
+  border-radius:12px;
+}
+
+.home-empty strong{
+  color:var(--text);
+}
+
+.home-empty span{
+  max-width:390px;
+  line-height:1.5;
+}
+
+.home-empty button{
+  margin-top:9px;
+}
+
+.home-footer-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:25px;
+  padding:28px 30px;
+  border:1px solid var(--border);
+  border-radius:20px;
+  background:
+    linear-gradient(135deg,rgba(80,90,220,.09),rgba(255,255,255,.015));
+}
+
+.home-footer-card h2{
+  max-width:650px;
+  margin:5px 0 8px;
+  font-size:23px;
+  letter-spacing:-.025em;
+}
+
+.home-footer-card p{
+  max-width:680px;
+  margin:0;
+  color:var(--muted);
+  line-height:1.55;
+  font-size:13px;
+}
+
+@media(max-width:850px){
+  .home-hero{
+    padding:28px 22px;
+    border-radius:18px;
+  }
+
+  .home-hero h1{
+    font-size:42px;
+  }
+
+  .home-status-grid,
+  .home-metrics,
+  .home-main-grid{
+    grid-template-columns:1fr;
+  }
+
+  .home-footer-card{
+    align-items:flex-start;
+    flex-direction:column;
+    padding:24px;
+  }
+}
+
+@media(max-width:600px){
+  .home-shell{
+    gap:13px;
+  }
+
+  .home-hero{
+    padding:23px 17px;
+  }
+
+  .home-hero h1{
+    font-size:36px;
+  }
+
+  .home-hero p{
+    font-size:14px;
+  }
+
+  .home-actions{
+    width:100%;
+  }
+
+  .home-actions button{
+    flex:1;
+  }
+
+  .home-flow{
+    gap:5px;
+    margin-top:25px;
+  }
+
+  .flow-node{
+    padding:6px 8px;
+    font-size:10px;
+  }
+
+  .home-flow i{
+    font-size:10px;
+  }
+
+  .home-status-card,
+  .home-metric{
+    min-height:100px;
+  }
+
+  .home-footer-card{
+    padding:20px;
+  }
+
+  .home-footer-card h2{
+    font-size:20px;
+  }
+
+  .home-activity-card .head{
+    align-items:flex-start;
+  }
+}
+
+</style>
+
+<style id="phorva-docs-css">
+.docs-shell{display:grid;grid-template-columns:250px 1fr;min-height:calc(100vh - 70px)}
+.docs-sidebar{border-right:1px solid rgba(255,255,255,.08);padding:24px 14px;overflow:auto}
+.docs-sidebar-title{font-size:13px;font-weight:800;letter-spacing:.16em;padding:0 10px 22px}
+.docs-sidebar-title small{opacity:.4;font-size:8px}
+.docs-group{margin-bottom:20px}
+.docs-group-title{font-size:8px;letter-spacing:.14em;opacity:.4;padding:0 10px 7px}
+.docs-link{display:block;width:100%;border:0;background:transparent;color:inherit;text-align:left;padding:7px 10px;border-radius:7px;font-size:11px;opacity:.65;cursor:pointer}
+.docs-link:hover,.docs-link.active{opacity:1;background:rgba(100,110,255,.1)}
+.docs-link.active{box-shadow:inset 2px 0 rgba(130,140,255,.9)}
+.docs-main{max-width:1100px;width:100%;margin:auto;padding:0 45px 50px}
+.docs-topbar{height:70px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.07)}
+.docs-eyebrow{font-size:8px;letter-spacing:.16em;opacity:.4}
+.docs-search{display:flex;align-items:center;width:240px;height:34px;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:0 10px}
+.docs-search input{width:100%;border:0;outline:0;background:transparent;color:inherit;font-size:11px}
+.docs-content{max-width:800px;padding:60px 0}
+.docs-page[hidden]{display:none}
+.docs-status{display:inline-block;font-size:8px;letter-spacing:.13em;padding:6px 9px;border:1px solid rgba(130,140,255,.2);border-radius:20px;opacity:.7}
+.docs-page h1{font-size:clamp(32px,5vw,56px);line-height:1.05;letter-spacing:-.04em;margin:18px 0}
+.docs-lead{font-size:17px;line-height:1.7;opacity:.65}
+.docs-page h2{margin:45px 0 12px;font-size:22px}
+.docs-page p{font-size:13px;line-height:1.8;opacity:.68}
+.docs-callout{padding:20px;margin:25px 0;border:1px solid rgba(120,130,255,.15);border-radius:10px;background:rgba(100,110,255,.05)}
+.docs-callout strong{display:block;margin:5px 0}
+.docs-flow{display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px;margin:25px 0;border:1px solid rgba(255,255,255,.07);border-radius:11px}
+.docs-flow div{width:250px;text-align:center;padding:10px;border:1px solid rgba(255,255,255,.08);border-radius:7px;font-size:9px;letter-spacing:.1em;font-weight:800}
+.docs-flow .primary{background:rgba(100,110,255,.1);border-color:rgba(130,140,255,.3)}
+.docs-flow span{opacity:.3}
+.docs-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:25px 0}
+.docs-card{padding:18px;border:1px solid rgba(255,255,255,.07);border-radius:10px}
+.docs-card h3{font-size:13px;margin:0 0 7px}
+.docs-card p{margin:0;font-size:11px}
+.docs-code{padding:20px;overflow:auto;background:#05070c;border:1px solid rgba(255,255,255,.08);border-radius:9px;font-size:11px;line-height:1.7}
+.docs-endpoint{display:inline-block;padding:9px 12px;border:1px solid rgba(255,255,255,.08);border-radius:7px;font:11px monospace}
+.docs-bottom{display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,.07);padding-top:20px}
+.docs-bottom button{background:transparent;color:inherit;border:1px solid rgba(255,255,255,.08);padding:9px 13px;border-radius:7px}
+@media(max-width:800px){
+.docs-shell{grid-template-columns:1fr}
+.docs-sidebar{max-height:190px;border-right:0;border-bottom:1px solid rgba(255,255,255,.08)}
+.docs-nav{display:flex;gap:15px;overflow-x:auto}
+.docs-group{min-width:max-content}
+.docs-group-title{display:none}
+.docs-main{padding:0 18px 40px}
+.docs-grid{grid-template-columns:1fr}
+.docs-search{width:150px}
+}
+</style>
+
+
+
+
+<style id="phorva-stabilizer-shell">
+/* PHORVA — Stabilizer-style dashboard shell */
+:root {
+  --stab-content-max: 1240px;
+}
+
+main,
+.main,
+.app-main,
+.content,
+.page-content {
+  width: 100%;
+}
+
+.view {
+  width: 100%;
+  max-width: var(--stab-content-max);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Keep the dashboard canvas spacious like the reference */
+.view > .title,
+.view > .sub,
+.view > .kicker {
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Persistent Stabilizer-style controls */
+.persistent-actions {
+  position: fixed !important;
+  left: 24px !important;
+  right: 24px !important;
+  bottom: 105px !important;
+  z-index: 99999 !important;
+  pointer-events: none !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-end !important;
+}
+
+.persistent-actions button {
+  pointer-events: auto !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 16px !important;
+  border-radius: 11px !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  background: rgba(18,18,22,.94) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,.28) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+}
+
+.persistent-actions button span {
+  width: 20px !important;
+  height: 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  font-size: 12px !important;
+}
+
+.persistent-ask {
+  margin-left: 0 !important;
+}
+
+.persistent-feedback {
+  margin-right: 0 !important;
+}
+
+@media (max-width: 700px) {
+  .view {
+    width: 100%;
+    max-width: none;
+  }
+
+  .persistent-actions {
+    left: 14px !important;
+    right: 14px !important;
+    bottom: 125px !important;
+  }
+
+  .persistent-actions button {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 13px !important;
+    font-size: 12px !important;
+  }
+}
+</style>
+
+
+
+
+
+<style id="phorva-responsive-ui">
+/* PHORVA — responsive dashboard sizing */
+
+/* Large desktop */
+.view {
+  width: min(94vw, 1480px) !important;
+  max-width: 1480px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+
+.view .title,
+.view h1 {
+  font-size: clamp(36px, 3.2vw, 50px) !important;
+  line-height: 1.08 !important;
+}
+
+.view h2 {
+  font-size: clamp(24px, 2vw, 32px) !important;
+}
+
+.view h3 {
+  font-size: 20px !important;
+}
+
+.view .sub,
+.view p {
+  font-size: clamp(15px, 1.05vw, 17px) !important;
+  line-height: 1.6 !important;
+}
+
+.view .card {
+  padding: clamp(20px, 1.8vw, 30px) !important;
+  border-radius: 16px !important;
+}
+
+.view .muted,
+.view label {
+  font-size: 14px !important;
+}
+
+.view input,
+.view select,
+.view textarea {
+  min-height: 48px !important;
+  font-size: 15px !important;
+}
+
+.view button {
+  min-height: 44px !important;
+  font-size: 14px !important;
+}
+
+/* Desktop dashboard grids should use the available space */
+.view .grid,
+.view .stats,
+.view .cards,
+.view .docs {
+  width: 100% !important;
+}
+
+/* Medium screens / tablets */
+@media (max-width: 1000px) {
+  .view {
+    width: 96vw !important;
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .view .title,
+  .view h1 {
+    font-size: 36px !important;
+  }
+
+  .view .sub,
+  .view p {
+    font-size: 15px !important;
+  }
+
+  .view .card {
+    padding: 20px !important;
+  }
+}
+
+/* Phones */
+@media (max-width: 700px) {
+  .view {
+    width: 100% !important;
+    max-width: none !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .view .title,
+  .view h1 {
+    font-size: 29px !important;
+    line-height: 1.12 !important;
+  }
+
+  .view h2 {
+    font-size: 22px !important;
+  }
+
+  .view h3 {
+    font-size: 18px !important;
+  }
+
+  .view .sub,
+  .view p {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+  }
+
+  .view .card {
+    padding: 16px !important;
+    border-radius: 13px !important;
+  }
+
+  .view .muted,
+  .view label {
+    font-size: 13px !important;
+  }
+
+  .view input,
+  .view select,
+  .view textarea {
+    min-height: 44px !important;
+    font-size: 14px !important;
+    padding: 10px 12px !important;
+  }
+
+  .view button {
+    min-height: 42px !important;
+    font-size: 13px !important;
+  }
+
+  .view table {
+    font-size: 12px !important;
+  }
+
+  .view th,
+  .view td {
+    padding: 10px 8px !important;
+  }
+
+  /* Keep the persistent controls above mobile navigation */
+  .persistent-actions {
+    bottom: 125px !important;
+  }
+
+  .persistent-actions button {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 12px !important;
+    font-size: 12px !important;
+  }
+}
+</style>
+
+
+<style id="phorva-mobile-header-fix">
+/* PHORVA mobile header + persistent controls */
+
+/* Keep the network/checking indicator visible on phones */
+@media (max-width: 700px) {
+  .header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    min-height: 58px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .header-actions .network {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 72px !important;
+    width: auto !important;
+    height: 34px !important;
+    padding: 0 8px !important;
+    font-size: 11px !important;
+    white-space: nowrap !important;
+  }
+
+  .header-actions .theme,
+  #theme {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    min-width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+  }
+
+  /* Wallet stays out of the mobile header */
+  .header-actions .wallet {
+    display: none !important;
+  }
+
+  /* Make sure the persistent controls are actually visible on mobile */
+  .persistent-actions {
+    position: fixed !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 125px !important;
+    z-index: 999999 !important;
+    pointer-events: none !important;
+  }
+
+  .persistent-actions button {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .persistent-ask {
+    margin-left: 0 !important;
+  }
+
+  .persistent-feedback {
+    margin-right: 0 !important;
+  }
+
+  /* Give the page enough room above the bottom navigation */
+  .view {
+    padding-bottom: 145px !important;
+  }
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+<header class="header">
+
+<button class="brand" data-view="home">
+<img src="/phorva-logo.png" alt="Phorva">
+<b>PHORVA</b>
+</button>
+
+<div class="header-actions">
+<button class="icon-btn" id="theme">☼</button>
+<button class="network" id="networkStatus">◈ Checking</button>
+</div>
+
+</header>
+
+
+<main class="main">
+
+
+<!-- HOME -->
+<section class="view active" id="home">
+  <div class="home-shell">
+
+    <div class="home-hero">
+      <div class="kicker">Execution-security infrastructure</div>
+      <h1>Verify before autonomous execution.</h1>
+      <p>
+        PHORVA sits between autonomous agents and blockchain execution.
+        It evaluates identity, declared intent, policy, transaction semantics,
+        risk and authorization before an action proceeds.
+      </p>
+
+      <div class="home-actions">
+        <button class="primary" data-view="agent">Open Agent</button>
+        <button class="secondary" data-view="verification">View Verification</button>
+      </div>
+
+      <div class="home-flow">
+        <span class="flow-node">Agent</span>
+        <i>→</i>
+        <span class="flow-node">Intent</span>
+        <i>→</i>
+        <span class="flow-node core">Policy</span>
+        <i>→</i>
+        <span class="flow-node">Risk</span>
+        <i>→</i>
+        <span class="flow-node">Transaction</span>
+        <i>→</i>
+        <span class="flow-node core">Authorization</span>
+        <i>→</i>
+        <span class="flow-node">Execution</span>
+      </div>
+    </div>
+
+    <div class="home-status-grid">
+      <div class="card home-status-card">
+        <div class="label">Backend</div>
+        <div class="value" id="healthStatus">—</div>
+        <div class="meta">PHORVA security engine</div>
+      </div>
+
+      <div class="card home-status-card">
+        <div class="label">Networks</div>
+        <div class="value" id="networkCount">—</div>
+        <div class="meta">Configured chains</div>
+      </div>
+
+      <div class="card home-status-card">
+        <div class="label">Analyzer</div>
+        <div class="value analyzer-value" id="analyzerStatus">—</div>
+        <div class="meta">Transaction analysis</div>
+      </div>
+    </div>
+
+    <div class="home-metrics">
+      <div class="card home-metric">
+        <div class="metric-icon">◇</div>
+        <div>
+          <div class="label">Agents Protected</div>
+          <div class="metric-value" id="homeAgentsProtected">0</div>
+          <div class="meta">Agents evaluated by PHORVA</div>
+        </div>
+      </div>
+
+      <div class="card home-metric">
+        <div class="metric-icon">✓</div>
+        <div>
+          <div class="label">Executions Verified</div>
+          <div class="metric-value" id="homeExecutionsVerified">0</div>
+          <div class="meta">Authorized execution requests</div>
+        </div>
+      </div>
+
+      <div class="card home-metric">
+        <div class="metric-icon">!</div>
+        <div>
+          <div class="label">Threats Blocked</div>
+          <div class="metric-value" id="homeThreatsBlocked">0</div>
+          <div class="meta">Requests rejected by verification</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="home-main-grid">
+
+      <div class="card home-control-card">
+        <div class="head">
+          <div>
+            <strong>Execution Control</strong>
+            <div class="muted">
+              PHORVA verification pipeline
+            </div>
+          </div>
+          <span class="badge green" id="engineBadge">ONLINE</span>
+        </div>
+
+        <div class="control-pipeline">
+          <div class="control-step">
+            <span>01</span>
+            <div>
+              <strong>Intent verification</strong>
+              <small>Compare declared intent with requested execution.</small>
+            </div>
+          </div>
+
+          <div class="pipeline-line"></div>
+
+          <div class="control-step">
+            <span>02</span>
+            <div>
+              <strong>Policy enforcement</strong>
+              <small>Evaluate limits and permitted execution conditions.</small>
+            </div>
+          </div>
+
+          <div class="pipeline-line"></div>
+
+          <div class="control-step">
+            <span>03</span>
+            <div>
+              <strong>Transaction analysis</strong>
+              <small>Inspect EVM transaction data and parameters.</small>
+            </div>
+          </div>
+
+          <div class="pipeline-line"></div>
+
+          <div class="control-step">
+            <span>04</span>
+            <div>
+              <strong>Authorization</strong>
+              <small>Return an allow or block decision before execution.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card home-verification-card">
+        <div class="head">
+          <div>
+            <strong>Verification State</strong>
+            <div class="muted">Current PHORVA infrastructure state</div>
+          </div>
+        </div>
+
+        <div class="verification-state">
+          <div class="state-row">
+            <div>
+              <small>Engine</small>
+              <span id="verificationEngine">Checking...</span>
+            </div>
+            <b>●</b>
+          </div>
+
+          <div class="state-row">
+            <div>
+              <small>Chain connectivity</small>
+              <span id="verificationChains">Checking...</span>
+            </div>
+            <b>●</b>
+          </div>
+
+          <div class="state-row">
+            <div>
+              <small>Mode</small>
+              <span id="verificationMode">Checking...</span>
+            </div>
+            <b>●</b>
+          </div>
+        </div>
+
+        <div class="home-note">
+          PHORVA evaluates execution authorization. The agent's wallet
+          and signing infrastructure remain external to PHORVA.
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card home-activity-card">
+      <div class="head">
+        <div>
+          <strong>Recent Verification Activity</strong>
+          <div class="muted">Latest authorization decisions from this session</div>
+        </div>
+        <button class="secondary small-action" data-view="activity">View Activity</button>
+      </div>
+
+      <div class="activity home-activity" id="homeActivity">
+        <div class="home-empty">
+          <div class="home-empty-icon">◇</div>
+          <strong>No verification events yet</strong>
+          <span>Run an action from Agent to see authorization results here.</span>
+          <button class="secondary" data-view="agent">Evaluate an Action</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="home-footer-card">
+      <div>
+        <div class="kicker">PHORVA CORE</div>
+        <h2>Control what autonomous agents are allowed to execute.</h2>
+        <p>
+          Integrate PHORVA through its API, SDK or MCP interface and keep
+          authorization decisions in the execution path.
+        </p>
+      </div>
+      <button class="primary" data-view="agent">Start Verification</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- AGENT -->
+
+<section class="view" id="agent">
+
+<div class="kicker">Main product</div>
+
+<h1 class="title">Agent</h1>
+
+<p class="sub">
+Prepare an autonomous action and send it through the real PHORVA authorization engine.
+The agent's wallet remains external to PHORVA; PHORVA evaluates whether the requested execution is authorized.
+</p>
+
+
+<div class="agent">
+
+<div class="card">
+
+<div class="head">
+<div>
+<strong>Agent Context</strong>
+<div class="muted">Execution identity</div>
+</div>
+<span class="badge">PHORVA CORE</span>
+</div>
+
+<div class="fields">
+
+<div class="field full">
+<small>Agent</small>
+<input id="agentName" value="TradingAgent-01">
+</div>
+
+<div class="field full">
+<small>Agent wallet address</small>
+<input id="agentWallet" value="0x0000000000000000000000000000000000000000">
+</div>
+
+<div class="field">
+<small>Network</small>
+<select id="agentChain"></select>
+</div>
+
+<div class="field">
+<small>Domain</small>
+<select id="agentDomain">
+<option value="defi">DeFi</option>
+<option value="prediction-market">Prediction Market</option>
+<option value="gaming">Gaming</option>
+<option value="dao">DAO / Treasury</option>
+<option value="agent-payment">Agent Payment</option>
+<option value="virtual-card">Virtual Card / Payments</option>
+<option value="general">General On-Chain</option>
+</select>
+</div>
+
+<div class="field">
+<small>Action</small>
+<select id="agentAction">
+<option value="send">Send</option>
+<option value="swap">Swap</option>
+<option value="bridge">Bridge</option>
+<option value="trade">Trade</option>
+<option value="buy">Buy</option>
+<option value="sell">Sell</option>
+<option value="deposit">Deposit</option>
+<option value="withdraw">Withdraw</option>
+<option value="transfer">Transfer</option>
+<option value="approve">Approve</option>
+<option value="stake">Stake</option>
+<option value="unstake">Unstake</option>
+<option value="lend">Lend</option>
+<option value="borrow">Borrow</option>
+<option value="repay">Repay</option>
+<option value="claim">Claim</option>
+<option value="mint">Mint</option>
+<option value="redeem">Redeem</option>
+<option value="contract-call">Contract Call</option>
+<option value="custom-action">Custom Action</option>
+</select>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="head">
+<div>
+<strong>Prepare Execution</strong>
+<div class="muted">Evaluated by /authorize</div>
+</div>
+
+<span class="badge green">LIVE</span>
+</div>
+
+
+<div class="fields">
+
+<div class="field" id="agentProtocolField">
+<small>Protocol</small>
+<select id="agentProtocol"></select>
+</div>
+
+<div class="field" id="agentAssetField">
+<small>Asset</small>
+<select id="agentAsset"></select>
+</div>
+
+<div class="field">
+<small>Declared amount</small>
+<div class="field full">
+<small>Action Parameters</small>
+<div id="agentActionFields">
+<div class="fields">
+
+<div class="field">
+<small>Declared amount</small>
+<input id="intentAmount" type="number" value="300">
+</div>
+
+<div class="field">
+<small>Policy maximum</small>
+<input id="policyMaximum" type="number" value="500">
+</div>
+
+<div class="field">
+<small>Function</small>
+<input id="functionName" value="swapExactTokensForTokens">
+</div>
+
+<div class="field">
+<small>Selector</small>
+<input id="selector" value="0x38ed1739">
+</div>
+
+</div>
+</div>
+</div>
+
+</div>
+
+
+<button class="primary" id="evaluate">
+Evaluate Action</button>
+
+<div class="note">
+PHORVA derives the authorization decision from the supplied execution context and its existing security engine.
+</div>
+
+
+<div class="result" id="authorizationResult">
+
+<div class="result-title" id="resultTitle">Authorization result</div>
+
+<div class="muted" id="resultReason"></div>
+
+<div class="verdict-grid">
+
+<div class="verdict">
+<small>Policy</small>
+<b id="vPolicy">—</b>
+</div>
+
+<div class="verdict">
+<small>Intent</small>
+<b id="vIntent">—</b>
+</div>
+
+<div class="verdict">
+<small>Parameters</small>
+<b id="vParameters">—</b>
+</div>
+
+<div class="verdict">
+<small>Protocol</small>
+<b id="vProtocol">—</b>
+</div>
+
+<div class="verdict">
+<small>Contract</small>
+<b id="vContract">—</b>
+</div>
+
+<div class="verdict">
+<small>Transaction security</small>
+<b id="vSecurity">—</b>
+</div>
+
+</div>
+
+<pre id="proofOutput"></pre>
+
+</div>
+
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- GUARD -->
+
+<section class="view" id="guard">
+
+<div class="kicker">Security control</div>
+
+<h1 class="title">Guard</h1>
+
+<p class="sub">
+PHORVA's execution-security controls. These correspond to checks already implemented by the backend authorization engine.
+</p>
+
+
+<div class="card" style="margin-top:24px">
+
+<div class="head">
+<div>
+<strong>Protection Controls</strong>
+<div class="muted">Authorization and transaction verification</div>
+</div>
+<span class="badge green">ACTIVE</span>
+</div>
+
+
+<div class="guard-grid">
+
+<div class="guard-item">
+<span class="status"></span>
+<b>Transaction limits</b>
+<p>Maximum value per execution and policy limits.</p>
+</div>
+
+<div class="guard-item">
+<span class="status"></span>
+<b>Intent matching</b>
+<p>Compare declared intent against actual execution.</p>
+</div>
+
+<div class="guard-item">
+<span class="status"></span>
+<b>Parameter verification</b>
+<p>Verify actual calldata parameters against authorized values.</p>
+</div>
+
+<div class="guard-item">
+<span class="status"></span>
+<b>Protocol verification</b>
+<p>Check that execution targets the declared protocol.</p>
+</div>
+
+<div class="guard-item">
+<span class="status"></span>
+<b>Transaction security</b>
+<p>Detect transaction-security threats before authorization.</p>
+</div>
+
+<div class="guard-item">
+<span class="status"></span>
+<b>Proof evidence</b>
+<p>Generate commitments and authorization proof statements.</p>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- VERIFICATION -->
+
+<section class="view" id="verification">
+
+<div class="kicker">Execution evidence</div>
+
+<h1 class="title">Verification</h1>
+
+<p class="sub">
+Inspect the verification state exposed by PHORVA's execution-security backend.
+</p>
+
+<div class="grid two" style="margin-top:24px">
+
+<div class="card">
+
+<div class="head">
+<strong>Chain Status</strong>
+<span class="badge" id="chainBadge">CHECKING</span>
+</div>
+
+<div class="activity" id="chainStatusList"></div>
+
+</div>
+
+<div class="card">
+
+<div class="head">
+<strong>Backend Health</strong>
+</div>
+
+<div class="pad">
+
+<div class="field">
+<small>Service</small>
+<b id="healthService">—</b>
+</div>
+
+<div class="field" style="margin-top:10px">
+<small>Status</small>
+<b id="healthState">—</b>
+</div>
+
+<div class="field" style="margin-top:10px">
+<small>Analyzer</small>
+<b id="healthAnalyzer">—</b>
+</div>
+
+<div class="field" style="margin-top:10px">
+<small>Mode</small>
+<b id="healthMode">—</b>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- DOCS -->
+<section class="view" id="docs">
+
+  <div class="kicker">Technical documentation</div>
+
+  <h1 class="title">PHORVA</h1>
+
+  <p class="sub">
+    Onchain Verification Infrastructure for Autonomous Execution
+  </p>
+
+  <div class="docs">
+    <div class="docs-nav">
+
+      <button class="active" data-doc="overview">
+        Overview
+      </button>
+
+      <button data-doc="problem">
+        Problem
+      </button>
+
+      <button data-doc="verification-gap">
+        Verification Gap
+      </button>
+
+      <button data-doc="what-phorva-is">
+        What PHORVA Is
+      </button>
+
+      <button data-doc="what-phorva-is-not">
+        What PHORVA Is Not
+      </button>
+
+      <button data-doc="security-model">
+        Core Security Model
+      </button>
+
+      <button data-doc="identity">
+        Identity Verification
+      </button>
+
+      <button data-doc="capabilities">
+        Agent Capabilities
+      </button>
+
+      <button data-doc="intent">
+        Intent Verification
+      </button>
+
+      <button data-doc="execution-type">
+        Execution-Type Verification
+      </button>
+
+    </div>
+
+    <div class="docs-main">
+
+      <!-- 01 -->
+      <article class="doc active" data-doc-page="overview">
+
+        <div class="kicker">01</div>
+
+        <h2>Abstract</h2>
+
+        <p>
+          Autonomous software increasingly interacts directly with blockchain systems.
+        </p>
+
+        <p>
+          An AI agent can swap, provide liquidity, move funds, interact with protocol,
+          execute prediction-market position, rebalance treasury, etc.
+        </p>
+
+        <p>
+          Valid signature does not necessarily mean action is valid.
+        </p>
+
+        <p>
+          Agent can have legitimate authority but execute wrong transaction,
+          exceed amount, wrong contract/function/token/protocol, violate policy,
+          manipulated instructions, final state mismatch.
+        </p>
+
+        <p>
+          Traditional auth asks who allowed to act; PHORVA adds what authorized,
+          transaction representation, policy, outcome.
+        </p>
+
+        <p>
+          PHORVA is onchain verification and authorization layer between applications
+          and execution systems.
+        </p>
+
+        <pre>Identity → Intent → Policy → Risk → Authorization → Execution Verification → Evidence / Receipt</pre>
+
+        <p>
+          PHORVA doesn’t replace wallets, protocols, execution systems, autonomous agents.
+        </p>
+
+        <blockquote>
+          Phorva decides whether it’s allowed to happen.
+        </blockquote>
+
+      </article>
+
+
+      <!-- 02 -->
+      <article class="doc" data-doc-page="problem">
+
+        <div class="kicker">02</div>
+
+        <h2>Problem</h2>
+
+        <p>
+          Autonomous execution creates new security boundary.
+        </p>
+
+        <p>
+          Traditional human loop:
+        </p>
+
+        <pre>Select action → Review transaction → Sign → Submit</pre>
+
+        <p>
+          Autonomous:
+        </p>
+
+        <pre>Observe → Reason → Plan → Select tool → Construct tx → Sign → Broadcast</pre>
+
+        <p>
+          Gap between intended and actual calldata.
+        </p>
+
+        <p>
+          Research note about authorization/policy/key compromise/adversarial/multi-agent security.
+        </p>
+
+      </article>
+
+
+      <!-- 03 -->
+      <article class="doc" data-doc-page="verification-gap">
+
+        <div class="kicker">03</div>
+
+        <h2>Verification Gap</h2>
+
+        <p>
+          Example intent swap 300 USDC for ETH, policy max 500,
+          actual tx 3,000 USDC.
+        </p>
+
+        <p>
+          Signature/wallet/contract/protocol can be legitimate but execution mismatches intent.
+        </p>
+
+        <pre>Intent:
+Swap 300 USDC for ETH
+
+Policy:
+Maximum transaction = 500 USDC
+
+Actual transaction:
+3,000 USDC</pre>
+
+        <p>
+          PHORVA evaluates declared intent, policy, risk, transaction semantics,
+          parameters, authorization and allow/block.
+        </p>
+
+      </article>
+
+
+      <!-- 04 -->
+      <article class="doc" data-doc-page="what-phorva-is">
+
+        <div class="kicker">04</div>
+
+        <h2>What PHORVA Is</h2>
+
+        <p>
+          Execution-security and verification infrastructure.
+        </p>
+
+        <p>
+          Verifies agent identity, application/project identity, declared intent,
+          execution type, transaction parameters, protocol, target contract,
+          function selector, policy, risk, capability authorization,
+          transaction security, execution path, final state.
+        </p>
+
+        <p>
+          Can produce structured verification evidence.
+        </p>
+
+        <pre>Developer App
+      ↓
+PHORVA
+      ↓
+Identity
+Intent
+Policy
+Risk
+Authorization
+Execution Verification
+      ↓
+ALLOW / BLOCK
+      ↓
+Existing Execution System</pre>
+
+      </article>
+
+
+      <!-- 05 -->
+      <article class="doc" data-doc-page="what-phorva-is-not">
+
+        <div class="kicker">05</div>
+
+        <h2>What PHORVA Is Not</h2>
+
+        <ul>
+          <li>
+            <strong>Not an agent wallet.</strong>
+            Existing wallet/signer/custody remains.
+          </li>
+
+          <li>
+            <strong>Not an AI agent.</strong>
+            Agent decides objective, PHORVA verifies.
+          </li>
+
+          <li>
+            <strong>Not destination app.</strong>
+            Activity stays in original app
+            (prediction market, Uniswap etc.).
+          </li>
+
+          <li>
+            <strong>Not a prover network.</strong>
+            PHORVA defines semantics, external providers can provide
+            proving/verification infrastructure.
+          </li>
+        </ul>
+
+      </article>
+
+
+      <!-- 06 -->
+      <article class="doc" data-doc-page="security-model">
+
+        <div class="kicker">06</div>
+
+        <h2>Core Security Model</h2>
+
+        <pre>WHO → Identity
+
+WHAT → Intent
+
+UNDER WHAT CONDITIONS → Policy
+
+HOW RISKY → Risk
+
+IS IT PERMITTED → Authorization
+
+DID IT ACTUALLY HAPPEN CORRECTLY → Execution Verification
+
+CAN WE PROVE/AUDIT IT → Evidence</pre>
+
+        <p>
+          Four dimensions:
+          authority, conditions, execution, outcome.
+        </p>
+
+      </article>
+
+
+      <!-- 07 -->
+      <article class="doc" data-doc-page="identity">
+
+        <div class="kicker">07</div>
+
+        <h2>Identity Verification</h2>
+
+        <p>
+          Associates verification requests with authenticated project/application
+          and agent.
+        </p>
+
+        <p>
+          Project has API credentials, agents, policies, verification history, usage.
+        </p>
+
+        <pre>{
+  "id": "trading-agent-01",
+  "capabilities": ["swap"]
+}</pre>
+
+        <p>
+          Caller-supplied identity does not automatically become authority;
+          registered server-side project/agent state determines authorization.
+        </p>
+
+      </article>
+
+
+      <!-- 08 -->
+      <article class="doc" data-doc-page="capabilities">
+
+        <div class="kicker">08</div>
+
+        <h2>Agent Capabilities</h2>
+
+        <p>
+          Capabilities define action class allowed.
+        </p>
+
+        <p>
+          Example agent with swap capability.
+        </p>
+
+        <pre>{
+  "id": "trading-agent-01",
+  "capabilities": ["swap"]
+}</pre>
+
+        <p>
+          Transfer can fail capability boundary.
+        </p>
+
+        <p>
+          Caller cannot self-grant capabilities.
+        </p>
+
+      </article>
+
+
+      <!-- 09 -->
+      <article class="doc" data-doc-page="intent">
+
+        <div class="kicker">09</div>
+
+        <h2>Intent Verification</h2>
+
+        <p>
+          Intent describes agent’s desired action.
+        </p>
+
+        <p>
+          Example swap USDC 300 → ETH.
+        </p>
+
+        <pre>{
+  "action": "swap",
+  "amount": "300",
+  "token": "USDC",
+  "outputToken": "ETH"
+}</pre>
+
+        <p>
+          Actual 3000 USDC gives:
+        </p>
+
+        <pre>parameterMatched = false</pre>
+
+        <p>
+          and the authorization decision fails.
+        </p>
+
+      </article>
+
+
+      <!-- 10 -->
+      <article class="doc" data-doc-page="execution-type">
+
+        <div class="kicker">10</div>
+
+        <h2>Execution-Type Verification</h2>
+
+        <p>
+          Distinguishes categories such as swap, approval, send, transfer.
+        </p>
+
+        <p>
+          Declared swap vs actual ERC20 approval:
+        </p>
+
+        <pre>intentMatched = false
+executionTypeMatched = false</pre>
+
+        <p>
+          The execution therefore fails authorization.
+        </p>
+
+      </article>
+
+    </div>
+  </div>
+
+</section>
+
+
+<!-- FAUCET -->
+
+<section class="view" id="faucet">
+
+<div class="kicker">Testnet access</div>
+
+<h1 class="title">Faucet</h1>
+
+<p class="sub">
+Testnet preparation for the networks currently configured by the PHORVA backend.
+</p>
+
+<div class="card placeholder" style="margin-top:24px">
+
+<div>
+
+<h3>Testnet funding</h3>
+
+<p>
+Faucet contracts are not currently exposed by the existing PHORVA backend.
+This section remains available as the testnet access surface without pretending a claim service is active.
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- MORE PAGES -->
+
+<section class="view" id="dashboard">
+
+<div class="kicker">Operational overview</div>
+<h1 class="title">Dashboard</h1>
+<p class="sub">Live PHORVA backend status and execution-security infrastructure.</p>
+
+<div class="grid stats">
+
+<div class="card stat">
+<div class="label">Backend</div>
+<div class="value" id="dashBackend">—</div>
+</div>
+
+<div class="card stat">
+<div class="label">Chains</div>
+<div class="value" id="dashChains">—</div>
+</div>
+<div class="card stat">
+<div class="label">Chains</div>
+<div class="value" id="dashChains">—</div>
+</div>
+
+<div class="card stat">
+<div class="label">Analyzer</div>
+<div class="value" id="dashAnalyzer">—</div>
+</div>
+
+</div>
+
+</section>
+
+
+
+<section class="view" id="activity">
+
+<div class="kicker">Execution history</div>
+<h1 class="title">Activity</h1>
+<p class="sub">Authorization events generated during this session.</p>
+
+<div class="card" style="margin-top:24px">
+
+<div class="head">
+<strong>Recent authorization events</strong>
+<span class="badge">SESSION</span>
+</div>
+
+<div class="activity" id="activityList">
+
+<div class="row">
+<div class="row-icon">◇</div>
+<div>
+<strong>No authorization events yet</strong>
+<span>Evaluate an action from the Agent workspace.</span>
+</div>
+<div class="time">—</div>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<section class="view" id="policies">
+
+<div class="kicker">Control rules</div>
+<h1 class="title">Policies</h1>
+<p class="sub">Policy conditions used by the PHORVA authorization engine.</p>
+
+<div class="grid two" style="margin-top:24px">
+
+<div class="card pad">
+<div class="label">Maximum transaction</div>
+<div class="value">Configurable</div>
+<p class="sub">The authorization engine evaluates actual transaction value against the policy maximum.</p>
+</div>
+
+<div class="card pad">
+<div class="label">Protocol</div>
+<div class="value">Verified</div>
+<p class="sub">Execution is checked against the declared protocol.</p>
+</div>
+
+</div>
+
+</section>
+
+
+
+<section class="view" id="settings">
+
+<div class="kicker">Configuration</div>
+<h1 class="title">Settings</h1>
+<p class="sub">PHORVA interface preferences.</p>
+
+<div class="card pad" style="margin-top:24px">
+
+<div class="field">
+<small>Theme</small>
+<b>Use the theme control in the header.</b>
+</div>
+
+</div>
+
+</section>
+
+
+
+
+<section class="view" id="developer">
+  <div class="kicker">Developer platform</div>
+  <h1 class="title">Developer</h1>
+  <p class="sub">
+    Build and manage applications that use PHORVA's execution-security infrastructure.
+  </p>
+
+  <div class="grid two" style="margin-top:24px">
+
+    <div class="card pad">
+      <div class="kicker">Developer Console</div>
+      <h3>Manage your integration</h3>
+      <p class="sub">
+        Create projects, generate project credentials, register agents,
+        configure policies and inspect verification activity.
+      </p>
+      <button class="primary developer-open-console" type="button">
+        Open Developer Dashboard
+      </button>
+    </div>
+
+    <div class="card pad">
+      <div class="kicker">Integration</div>
+      <h3>Connect an application</h3>
+      <p class="sub">
+        Integrate PHORVA through the API or SDK. End users and agents
+        do not need PHORVA accounts.
+      </p>
+      <button class="secondary developer-open-docs" type="button">
+        View Developer Docs
+      </button>
+    </div>
+
+  </div>
+
+  <div class="grid three" style="margin-top:24px">
+
+    <div class="card pad">
+      <div class="kicker">Projects</div>
+      <h3>Project-scoped access</h3>
+      <p class="sub">
+        Separate test and live environments and credentials.
+      </p>
+    </div>
+
+    <div class="card pad">
+      <div class="kicker">Agents</div>
+      <h3>Execution identities</h3>
+      <p class="sub">
+        Associate autonomous agents with their execution context.
+      </p>
+    </div>
+
+    <div class="card pad">
+      <div class="kicker">Verification</div>
+      <h3>Security activity</h3>
+      <p class="sub">
+        Inspect authorization and verification activity generated by your integration.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+
+
+<nav class="bottom">
+
+<button class="nav active" data-view="home">
+<span class="ico">⌂</span>
+<small>Home</small>
+</button>
+
+<button class="nav" data-view="agent">
+<span class="ico">⇄</span>
+<small>Agent</small>
+</button>
+
+<button class="nav" data-view="guard">
+<span class="ico">◈</span>
+<small>Guard</small>
+</button>
+
+<button class="nav" data-view="verification">
+<span class="ico">✓</span>
+<small>Verify</small>
+</button>
+
+<button class="nav" id="more">
+<span class="ico">☰</span>
+<small>More</small>
+</button>
+
+</nav>
+
+
+
+<div class="sheet" id="sheet">
+
+<aside class="panel">
+
+<button class="close" id="close">×</button>
+
+<div class="more-title">More</div>
+
+<div class="menu">
+
+<button data-view="dashboard"><span class="mi">▦</span><b>Dashboard</b></button>
+<button data-view="agent"><span class="mi">⇄</span><b>Agent</b></button>
+<button data-view="activity"><span class="mi">◫</span><b>Activity</b></button>
+<button data-view="policies"><span class="mi">◇</span><b>Policies</b></button>
+<button data-view="verification"><span class="mi">✓</span><b>Verification</b></button>
+<button data-view="guard"><span class="mi">◈</span><b>Guard</b></button>
+<button data-view="docs"><span class="mi">▤</span><b>Docs</b></button>
+
+<button data-view="developer"><span class="mi">⌘</span><b>Developer</b></button>
+<button data-view="settings"><span class="mi">⚙</span><b>Settings</b></button>
+
+</div>
+
+<div class="divider"></div>
+
+<div class="menu-note">
+PHORVA is an execution-security and verification layer. Agent wallets and signing infrastructure remain external to PHORVA.
+</div>
+
+</aside>
+
+</div>
+
+
+<script src="/action-catalog.js"></script>
+<script>
+
+(() => {
+
+const views = [...document.querySelectorAll(".view")];
+
+const navigation = [...document.querySelectorAll("[data-view]")];
+
+const sheet = document.getElementById("sheet");
+
+const activityEvents = [];
+
+
+
+function show(id){
+
+ views.forEach(v => {
+   v.classList.toggle("active", v.id === id);
+ });
+
+ document.querySelectorAll(".nav[data-view]").forEach(n => {
+   n.classList.toggle("active", n.dataset.view === id);
+ });
+
+ sheet.classList.remove("open");
+
+ window.scrollTo({
+   top:0,
+   behavior:"smooth"
+ });
+
+}
+
+
+
+navigation.forEach(item => {
+
+ item.addEventListener("click", () => {
+
+   show(item.dataset.view);
+
+ });
+
+});
+
+
+
+document.getElementById("more").onclick = () => {
+
+ sheet.classList.add("open");
+
+};
+
+
+
+document.getElementById("close").onclick = () => {
+
+ sheet.classList.remove("open");
+
+};
+
+
+
+sheet.onclick = e => {
+
+ if(e.target === sheet){
+
+   sheet.classList.remove("open");
+
+ }
+
+};
+
+
+
+function theme(){
+
+ document.documentElement.classList.toggle("light");
+
+ localStorage.setItem(
+   "phorva-theme",
+   document.documentElement.classList.contains("light")
+   ? "light"
+   : "dark"
+ );
+
+}
+
+
+
+if(localStorage.getItem("phorva-theme") === "light"){
+
+ document.documentElement.classList.add("light");
+
+}
+
+
+
+document.getElementById("theme").onclick = theme;
+
+
+
+/* =========================================================
+   API
+   ========================================================= */
+
+async function api(url, options = {}){
+
+ const response = await fetch(url, {
+
+   headers:{
+     "Content-Type":"application/json",
+     ...(options.headers || {})
+   },
+
+   ...options
+
+ });
+ const data = await response.json().catch(() => ({}));
+
+ if(!response.ok){
+
+   throw new Error(data.error || `Request failed: ${response.status}`);
+
+ }
+
+ return data;
+
+}
+
+
+
+/* =========================================================
+   HEALTH
+   ========================================================= */
+
+async function loadHealth(){
+
+ try{
+
+   const data = await api("/health");
+
+   document.getElementById("healthStatus").textContent =
+     data.status === "running" ? "ONLINE" : "OFFLINE";
+
+   document.getElementById("analyzerStatus").textContent =
+     data.analyzer || "—";
+
+   document.getElementById("verificationEngine").textContent =
+     data.status === "running" ? "Operational" : "Unavailable";
+
+   document.getElementById("verificationMode").textContent =
+     data.mode || "—";
+
+   document.getElementById("healthService").textContent =
+     data.service || "—";
+
+   document.getElementById("healthState").textContent =
+     data.status || "—";
+
+   document.getElementById("healthAnalyzer").textContent =
+     data.analyzer || "—";
+
+   document.getElementById("healthMode").textContent =
+     data.mode || "—";
+
+   document.getElementById("dashBackend").textContent =
+     data.status === "running" ? "ONLINE" : "OFFLINE";
+
+   document.getElementById("dashAnalyzer").textContent =
+     data.analyzer || "—";
+
+ }catch(error){
+
+   document.getElementById("healthStatus").textContent = "ERROR";
+
+   document.getElementById("engineBadge").textContent = "ERROR";
+
+ }
+
+}
+
+
+
+/* =========================================================
+   CHAINS
+   ========================================================= */
+
+let chains = [];
+
+async function loadChains(){
+
+ try{
+
+   chains = await api("/api/chains");
+
+   const select = document.getElementById("agentChain");
+
+   select.innerHTML = "";
+
+   chains.forEach(chain => {
+
+     const option = document.createElement("option");
+
+     option.value = chain.key;
+
+     option.textContent =
+       `${chain.name} (${chain.chainId})`;
+
+     select.appendChild(option);
+
+   });
+
+   document.getElementById("networkCount").textContent =
+     chains.length;
+
+   document.getElementById("dashChains").textContent =
+     chains.length;
+
+ }catch(error){
+
+   document.getElementById("networkCount").textContent = "ERR";
+
+ }
+
+}
+
+
+
+/* =========================================================
+   PROTOCOLS
+   ========================================================= */
+
+let protocols = {};
+
+async function loadProtocols(){
+
+ try{
+
+   protocols = await api("/api/protocols");
+
+   updateProtocols();
+
+ }catch(error){
+
+   document.getElementById("agentProtocol").innerHTML =
+     "<option>Unavailable</option>";
+
+ }
+
+}
+
+
+};
+
+
+function renderAgentActionFields(){
+
+  const domain =
+    document.getElementById("agentDomain").value;
+
+  const action =
+    document.getElementById("agentAction").value;
+
+  const container =
+    document.getElementById("agentActionFields");
+
+  if(!container) return;
+
+  container.innerHTML = "";
+
+  const title =
+    document.createElement("div");
+
+  title.className = "muted";
+  title.textContent =
+    domain.replace(/-/g, " ") +
+    " → " +
+    action.replace(/-/g, " ");
+
+  container.appendChild(title);
+
+  const fields =
+    document.createElement("div");
+
+  fields.className = "fields";
+
+  const definitions =
+    AGENT_ACTION_FIELDS[domain]?.[action] || [];
+
+  definitions.forEach(
+    ([id,label,type,value]) => {
+
+      const field =
+        document.createElement("div");
+
+      field.className = "field";
+
+      const small =
+        document.createElement("small");
+
+      small.textContent = label;
+
+      let input;
+
+      if(type === "select"){
+
+        input =
+          document.createElement("select");
+
+        if(id === "destinationChain"){
+
+          [
+            ["", "Select destination chain"],
+            ["baseSepolia", "Base Sepolia"],
+            ["ethereumSepolia", "Ethereum Sepolia"],
+            ["arbitrumSepolia", "Arbitrum Sepolia"]
+          ].forEach(
+            ([optionValue,optionText]) => {
+
+              const option =
+                document.createElement("option");
+
+              option.value = optionValue;
+              option.textContent = optionText;
+
+              input.appendChild(option);
+            }
+          );
+
+        }else if(id === "vote"){
+
+          [
+            ["", "Select vote"],
+            ["for", "For"],
+            ["against", "Against"],
+            ["abstain", "Abstain"]
+          ].forEach(
+            ([optionValue,optionText]) => {
+
+              const option =
+                document.createElement("option");
+
+              option.value = optionValue;
+              option.textContent = optionText;
+
+              input.appendChild(option);
+            }
+          );
+        }
+
+      }else{
+
+        input =
+          document.createElement("input");
+
+        input.type = type;
+        input.value = value;
+      }
+
+      input.id =
+        "agentAction_" + id;
+
+      field.appendChild(small);
+      field.appendChild(input);
+      fields.appendChild(field);
+    }
+  );
+
+  container.appendChild(fields);
+
+  const policy =
+    document.createElement("div");
+
+  policy.className = "fields";
+
+  const policyField =
+    document.createElement("div");
+
+  policyField.className = "field";
+
+  const policyLabel =
+    document.createElement("small");
+
+  policyLabel.textContent =
+    "Policy Maximum";
+
+  const policyInput =
+    document.createElement("input");
+
+  policyInput.id = "policyMaximum";
+  policyInput.type = "number";
+  policyInput.value = "500";
+
+  policyField.appendChild(policyLabel);
+  policyField.appendChild(policyInput);
+  policy.appendChild(policyField);
+
+  container.appendChild(policy);
+}
+
+function updateAgentActions(){
+
+ const domain =
+   document.getElementById("agentDomain").value;
+
+ const select =
+   document.getElementById("agentAction");
+
+ const actions =
+   AGENT_ACTIONS[domain] || AGENT_ACTIONS.general;
+
+ select.innerHTML = "";
+
+ actions.forEach(([value, label]) => {
+
+   const option =
+     document.createElement("option");
+
+   option.value = value;
+   option.textContent = label;
+
+   select.appendChild(option);
+
+ });
+}
+
+
+document.getElementById("agentDomain")
+.addEventListener("change", () => {
+ updateAgentActions();
+ renderAgentActionFields();
+});
+
+document.getElementById("agentAction")
+.addEventListener("change", () => {
+ updateAgentContextFields();
+ renderAgentActionFields();
+});
+
+updateAgentActions();
+updateAgentContextFields();
+renderAgentActionFields();
+
+
+
+const AGENT_CONTEXT_RULES = {
+
+  defi: {
+    swap:{protocol:true,asset:"token"},
+    deposit:{protocol:true,asset:"any"},
+    withdraw:{protocol:true,asset:"any"},
+    supply:{protocol:true,asset:"token"},
+    redeem:{protocol:true,asset:"token"},
+    lend:{protocol:true,asset:"token"},
+    borrow:{protocol:true,asset:"token"},
+    repay:{protocol:true,asset:"token"},
+    stake:{protocol:true,asset:"token"},
+    unstake:{protocol:true,asset:"token"},
+    "lp-add":{protocol:true,asset:"token"},
+    "lp-remove":{protocol:true,asset:"token"},
+    claim:{protocol:true,asset:"token"},
+    approve:{protocol:false,asset:"token"},
+    permit:{protocol:false,asset:"token"},
+    bridge:{protocol:true,asset:"token"},
+    wrap:{protocol:false,asset:"native"},
+    unwrap:{protocol:false,asset:"token"},
+    mint:{protocol:true,asset:"none"},
+    burn:{protocol:true,asset:"token"},
+    liquidate:{protocol:true,asset:"token"},
+    rebalance:{protocol:true,asset:"token"},
+    "contract-call":{protocol:false,asset:"none"},
+    "custom-action":{protocol:false,asset:"none"}
+  },
+
+  "prediction-market":{
+    "buy-position":{protocol:true,asset:"token"},
+    "sell-position":{protocol:true,asset:"token"},
+    "add-position":{protocol:true,asset:"token"},
+    "reduce-position":{protocol:true,asset:"token"},
+    "close-position":{protocol:true,asset:"none"},
+    "deposit-collateral":{protocol:true,asset:"token"},
+    "withdraw-collateral":{protocol:true,asset:"token"},
+    "claim-winnings":{protocol:true,asset:"none"},
+    "redeem-position":{protocol:true,asset:"none"},
+    "split-position":{protocol:true,asset:"none"},
+    "merge-position":{protocol:true,asset:"none"},
+    trade:{protocol:true,asset:"token"},
+    approve:{protocol:false,asset:"token"},
+    "contract-call":{protocol:false,asset:"none"},
+    "custom-action":{protocol:false,asset:"none"}
+  },
+
+  gaming:{
+    purchase:{protocol:true,asset:"token"},
+    sell:{protocol:true,asset:"token"},
+    trade:{protocol:true,asset:"token"},
+    transfer:{protocol:true,asset:"token"},
+    mint:{protocol:true,asset:"none"},
+    burn:{protocol:true,asset:"token"},
+    claim:{protocol:true,asset:"none"},
+    upgrade:{protocol:true,asset:"none"},
+    craft:{protocol:true,asset:"none"},
+    equip:{protocol:true,asset:"none"},
+    unequip:{protocol:true,asset:"none"},
+    stake:{protocol:true,asset:"token"},
+    unstake:{protocol:true,asset:"token"},
+    deposit:{protocol:true,asset:"token"},
+    withdraw:{protocol:true,asset:"token"},
+    approve:{protocol:false,asset:"token"},
+    "marketplace-listing":{protocol:true,asset:"none"},
+    "marketplace-bid":{protocol:true,asset:"token"},
+    "marketplace-offer":{protocol:true,asset:"token"},
+    "contract-call":{protocol:false,asset:"none"},
+    "custom-action":{protocol:false,asset:"none"}
+  },
+
+  dao:{
+    transfer:{protocol:false,asset:"token"},
+    deposit:{protocol:true,asset:"token"},
+    withdraw:{protocol:true,asset:"token"},
+    approve:{protocol:false,asset:"token"},
+    delegate:{protocol:true,asset:"none"},
+    undelegate:{protocol:true,asset:"none"},
+    propose:{protocol:true,asset:"none"},
+    vote:{protocol:true,asset:"none"},
+    queue:{protocol:true,asset:"none"},
+    execute:{protocol:true,asset:"none"},
+    "cancel-proposal":{protocol:true,asset:"none"},
+    claim:{protocol:true,asset:"none"},
+    stream:{protocol:true,asset:"token"},
+    "create-grant":{protocol:true,asset:"token"},
+    "fund-grant":{protocol:true,asset:"token"},
+    "contract-call":{protocol:false,asset:"none"},
+    "custom-action":{protocol:false,asset:"none"}
+  },
+
+  "agent-payment":{
+    pay:{protocol:false,asset:"token"},
+    send:{protocol:false,asset:"token"},
+    transfer:{protocol:false,asset:"token"},
+    "request-payment":{protocol:false,asset:"token"},
+    "split-payment":{protocol:false,asset:"token"},
+    "recurring-payment":{protocol:false,asset:"token"},
+    deposit:{protocol:true,asset:"token"},
+    withdraw:{protocol:true,asset:"token"},
+    refund:{protocol:true,asset:"token"},
+    claim:{protocol:true,asset:"none"},
+    approve:{protocol:false,asset:"token"},
+    "contract-call":{protocol:false,asset:"none"},
+    "custom-action":{protocol:false,asset:"none"}
+  },
+
+  "virtual-card":{
+    purchase:{protocol:false,asset:"none"},
+    authorize:{protocol:false,asset:"none"},
+    capture:{protocol:false,asset:"none"},
+    void:{protocol:false,asset:"none"},
+    refund:{protocol:false,asset:"none"},
+    "partial-refund":{protocol:false,asset:"none"},
+    payment:{protocol:false,asset:"none"},
+    transfer:{protocol:false,asset:"none"},
+    deposit:{protocol:false,asset:"token"},
+    withdraw:{protocol:false,asset:"token"},
+    "fund-card":{protocol:false,asset:"token"},
+    "withdraw-card-balance":{protocol:false,asset:"token"},
+    approve:{protocol:false,asset:"none"},
+    "contract-call":{protocol:false,asset:"none"},
+    "custom-action":{protocol:false,asset:"none"}
+  },
+
+  general:{
+    send:{protocol:false,asset:"any"},
+    transfer:{protocol:false,asset:"any"},
+    approve:{protocol:false,asset:"token"},
+    permit:{protocol:false,asset:"token"},
+    "contract-call":{protocol:false,asset:"none"},
+    deploy:{protocol:false,asset:"none"},
+    upgrade:{protocol:false,asset:"none"},
+    mint:{protocol:false,asset:"none"},
+    burn:{protocol:false,asset:"token"},
+    claim:{protocol:false,asset:"none"},
+    deposit:{protocol:true,asset:"token"},
+    withdraw:{protocol:true,asset:"token"},
+    stake:{protocol:true,asset:"token"},
+    unstake:{protocol:true,asset:"token"},
+    bridge:{protocol:true,asset:"token"},
+    "custom-action":{protocol:false,asset:"none"}
+  }
+
+};
+
+function getAgentContextRule(){
+
+ const domain =
+   document.getElementById("agentDomain")?.value;
+
+ const action =
+   document.getElementById("agentAction")?.value;
+
+ return AGENT_CONTEXT_RULES[domain]?.[action] ||
+   {protocol:false,asset:"none"};
+}
+
+function updateAgentContextFields(){
+
+ const rule = getAgentContextRule();
+
+ const protocolField =
+   document.getElementById("agentProtocolField");
+
+ const assetField =
+   document.getElementById("agentAssetField");
+
+ if(protocolField)
+   protocolField.style.display =
+     rule.protocol ? "" : "none";
+
+ if(assetField)
+   assetField.style.display =
+     rule.asset !== "none" ? "" : "none";
+
+ const protocolSelect =
+   document.getElementById("agentProtocol");
+
+ const assetSelect =
+   document.getElementById("agentAsset");
+
+ if(protocolSelect)
+   protocolSelect.disabled = !rule.protocol;
+
+ if(assetSelect)
+   assetSelect.disabled = !rule.asset;
+
+ if(rule.protocol)
+   updateProtocols();
+
+ if(rule.asset)
+   updateAssets();
+
+}
+
+function updateProtocols(){
+
+ const chain =
+   document.getElementById("agentChain").value;
+
+ const select =
+   document.getElementById("agentProtocol");
+
+ select.innerHTML = "";
+
+ const list = protocols[chain] || [];
+
+ list.forEach(protocol => {
+
+   const option = document.createElement("option");
+
+   option.value = protocol;
+
+   option.textContent = protocol;
+
+   select.appendChild(option);
+
+ });
+
+ if(!list.length){
+
+   const option = document.createElement("option");
+
+   option.value = "";
+
+   option.textContent = "No registered protocol";
+
+   select.appendChild(option);
+
+ }
+
+}
+
+
+
+document.getElementById("agentChain")
+.addEventListener("change", updateAgentContextFields);
+
+
+
+/* =========================================================
+   ASSETS
+   ========================================================= */
+
+let assets = {};
+
+async function loadAssets(){
+
+ try{
+
+   assets = await api("/api/assets");
+
+   updateAssets();
+
+ }catch(error){
+
+   document.getElementById("agentAsset").innerHTML =
+     "<option>Unavailable</option>";
+
+ }
+
+}
+
+
+
+function syncAgentProtocolWithAsset(){
+
+ const chain =
+   document.getElementById("agentChain").value;
+
+ const domain =
+   document.getElementById("agentDomain")?.value;
+
+ const action =
+   document.getElementById("agentAction")?.value;
+
+ const assetValue =
+   document.getElementById("agentAsset").value;
+
+ const protocolSelect =
+   document.getElementById("agentProtocol");
+
+ if(!protocolSelect) return;
+
+ const rule =
+   AGENT_CONTEXT_RULES[domain]?.[action] ||
+   {protocol:false,asset:false};
+
+ if(!rule.protocol){
+
+   protocolSelect.disabled = true;
+   protocolSelect.innerHTML = "";
+
+   return;
+ }
+
+ protocolSelect.disabled = false;
+
+ /*
+  * Native is a protocol value only for a direct
+  * native-asset send. Other protocol-aware actions
+  * must keep their registered protocol context.
+  */
+ const isNativeSend =
+   domain === "general" &&
+   action === "send" &&
+   (!assetValue || assetValue === "null");
+
+ if(isNativeSend){
+
+   protocolSelect.innerHTML = "";
+
+   const option =
+     document.createElement("option");
+
+   option.value = "Native";
+   option.textContent = "Native";
+
+   protocolSelect.appendChild(option);
+   protocolSelect.value = "Native";
+
+   return;
+ }
+
+ const selectedAsset =
+   (assets[chain] || []).find(
+     item =>
+       String(item.address) === String(assetValue)
+   );
+
+ const registeredProtocol =
+   selectedAsset?.protocol || null;
+
+ const list =
+   protocols[chain] || [];
+
+ const contextualList =
+   registeredProtocol
+     ? list.filter(
+         protocol =>
+           protocol === registeredProtocol
+       )
+     : list;
+
+ protocolSelect.innerHTML = "";
+
+ contextualList.forEach(protocol => {
+
+   const option =
+     document.createElement("option");
+
+   option.value = protocol;
+   option.textContent = protocol;
+
+   protocolSelect.appendChild(option);
+
+ });
+
+ if(!contextualList.length){
+
+   const option =
+     document.createElement("option");
+
+   option.value = "";
+   option.textContent =
+     "No registered protocol";
+
+   protocolSelect.appendChild(option);
+
+ }
+
+}
+
+
+function updateAssets(){
+
+ const chain =
+   document.getElementById("agentChain").value;
+
+ const select =
+   document.getElementById("agentAsset");
+
+ if(!select) return;
+
+ const rule =
+   getAgentContextRule();
+
+ select.innerHTML = "";
+
+ const mode =
+   rule.asset || "none";
+
+ if(mode === "none"){
+
+   select.disabled = true;
+
+   syncAgentProtocolWithAsset();
+
+   return;
+ }
+
+ select.disabled = false;
+
+ const list =
+   assets[chain] || [];
+
+ const filtered =
+   mode === "native"
+     ? list.filter(
+         asset => asset.type === "native"
+       )
+     : mode === "token"
+       ? list.filter(
+           asset => asset.type === "erc20"
+         )
+       : list;
+
+ filtered.forEach(asset => {
+
+   const option =
+     document.createElement("option");
+
+   option.value =
+     asset.address === null
+       ? "null"
+       : asset.address;
+
+   option.textContent =
+     `${asset.symbol || asset.name} — ${asset.name || ""}`;
+
+   option.dataset.assetType =
+     asset.type || "";
+
+   select.appendChild(option);
+
+ });
+
+ if(!filtered.length){
+
+   const option =
+     document.createElement("option");
+
+   option.value = "";
+
+   option.textContent =
+     mode === "native"
+       ? "No registered native asset"
+       : mode === "token"
+         ? "No registered token"
+         : "No registered asset";
+
+   select.appendChild(option);
+
+ }
+
+ syncAgentProtocolWithAsset();
+}
+
+
+/* =========================================================
+   CHAIN STATUS
+   ========================================================= */
+
+async function loadChainStatus(){
+
+ try{
+
+   const data = await api("/chain-status");
+
+   const list =
+     document.getElementById("chainStatusList");
+
+   list.innerHTML = "";
+
+   let connected = 0;
+
+   Object.entries(data.chains || {}).forEach(([key, chain]) => {
+
+     if(chain.connected && chain.chainMatches){
+
+       connected++;
+
+     }
+
+     const row = document.createElement("div");
+
+     row.className = "row";
+
+     row.innerHTML = `
+
+       <div class="row-icon">
+         ${chain.connected && chain.chainMatches ? "✓" : "!"}
+       </div>
+
+       <div>
+         <strong>${escapeHtml(chain.name || key)}</strong>
+         <span>
+           Expected ${escapeHtml(String(chain.expectedChainId))}
+           · Actual ${escapeHtml(String(chain.actualChainId || "—"))}
+         </span>
+       </div>
+
+       <div class="time">
+         ${chain.connected && chain.chainMatches ? "READY" : "ERROR"}
+       </div>
+
+     `;
+
+     list.appendChild(row);
+
+   });
+
+   document.getElementById("verificationChains").textContent =
+     `${connected}/${Object.keys(data.chains || {}).length} connected`;
+
+   document.getElementById("chainBadge").textContent =
+     `${connected}/${Object.keys(data.chains || {}).length} READY`;
+
+   document.getElementById("networkStatus").textContent =
+     connected === Object.keys(data.chains || {}).length
+     ? "◈ Networks Ready"
+     : "◈ Network Issue";
+
+ }catch(error){
+
+   document.getElementById("verificationChains").textContent =
+     "Unavailable";
+
+   document.getElementById("chainBadge").textContent =
+     "ERROR";
+
+ }
+
+}
+
+
+
+/* =========================================================
+   AUTHORIZATION
+   ========================================================= */
+
+function getAgentSemanticFields(){
+  const domain =
+    document.getElementById("agentDomain")?.value || "";
+
+  const action =
+    document.getElementById("agentAction")?.value || "";
+
+  const schema =
+    AGENT_ACTION_FIELDS[domain]?.[action] || [];
+
+  const fields = {};
+
+  schema.forEach(([key]) => {
+    const element =
+      document.getElementById(`agentAction_${key}`);
+
+    if(!element) return;
+
+    fields[key] =
+      element.value === undefined
+        ? ""
+        : String(element.value).trim();
+  });
+
+  return fields;
+}
+
+function buildAuthorizationRequest(){
+
+  const get = id => {
+    const element = document.getElementById(id);
+    return element ? element.value.trim() : "";
+  };
+
+  const number = id => {
+    const value = Number(get(id));
+    return Number.isFinite(value) ? value : 0;
+  };
+
+  const agent = get("agentName");
+  const wallet = get("agentWallet");
+  const chainKey = get("agentChain");
+  const domain = get("agentDomain");
+  const action = get("agentAction");
+  const protocol = get("agentProtocol");
+  const asset = get("agentAsset");
+
+  const selectedChain =
+    chains.find(chain => chain.key === chainKey);
+
+  const semantic =
+    getAgentSemanticFields();
+
+  const semanticText = key =>
+    semantic[key] !== undefined
+      ? String(semantic[key]).trim()
+      : "";
+
+  const semanticNumber = key => {
+    const value =
+      Number(semanticText(key));
+
+    return Number.isFinite(value)
+      ? value
+      : 0;
+  };
+
+  const amountKeys = [
+    "amount",
+    "allowance"
+  ];
+
+  const amountKey =
+    amountKeys.find(
+      key => semanticText(key) !== ""
+    );
+
+  const amount =
+    amountKey
+      ? semanticNumber(amountKey)
+      : 0;
+
+  const maximum =
+    number("policyMaximum");
+
+  const recipient =
+    semanticText("recipient");
+
+  const spender =
+    semanticText("spender");
+
+  const target =
+    semanticText("target") ||
+    semanticText("contract");
+
+  const tokenIn =
+    semanticText("tokenIn");
+
+  const tokenOut =
+    semanticText("tokenOut");
+
+  const minimumAmountOut =
+    semanticNumber("amountOutMin");
+
+  const destinationChain =
+    semanticText("destinationChain");
+
+  const bridge =
+    semanticText("bridge");
+
+  const functionName =
+    semanticText("function");
+
+  const selector =
+    semanticText("selector");
+
+  const parameters =
+    semanticText("parameters");
+
+  const normalizedAction =
+    action === "approve"
+      ? "approval"
+      : action;
+
+  const selectedAsset =
+    (assets[chainKey] || []).find(
+      item => String(item.address) === String(asset)
+    ) ||
+    (assets[chainKey] || []).find(
+      item =>
+        item.type === "native" &&
+        (!asset || asset === "")
+    );
+
+  const isNativeAsset =
+    selectedAsset?.type === "native" ||
+    selectedAsset?.address === null;
+
+  const isNativeSend =
+    action === "send" &&
+    isNativeAsset;
+
+  const normalizedAsset =
+    isNativeAsset
+      ? ""
+      : asset;
+
+  const intent = {
+    type: normalizedAction,
+    domain,
+    action,
+    protocol,
+    asset: normalizedAsset,
+    assetAddress:
+      isNativeAsset
+        ? undefined
+        : (asset || undefined),
+    amount,
+    chain: chainKey,
+    chainId:
+      selectedChain
+        ? selectedChain.chainId
+        : undefined,
+    recipient:
+      recipient || undefined,
+    spender:
+      spender || undefined,
+    target:
+      target || undefined,
+    tokenIn:
+      tokenIn || undefined,
+    tokenOut:
+      tokenOut || undefined,
+    amountOutMin:
+      action === "swap"
+        ? minimumAmountOut
+        : undefined,
+    destinationChain:
+      destinationChain || undefined,
+    bridge:
+      bridge || undefined,
+    function:
+      functionName || undefined,
+    selector:
+      selector || undefined,
+    parameters:
+      parameters || undefined,
+
+    actionFields:
+      semantic,
+    nativeValue:
+      isNativeSend
+        ? String(amount)
+        : "0"
+  };
+
+  const transaction = {
+    chain: chainKey,
+    chainId:
+      selectedChain
+        ? selectedChain.chainId
+        : undefined,
+    expectedChainId:
+      selectedChain
+        ? selectedChain.chainId
+        : undefined,
+    from: wallet,
+    to:
+      isNativeSend
+        ? recipient
+        : (target || undefined),
+    value:
+      isNativeSend
+        ? String(amount)
+        : "0",
+    calldata:
+      isNativeSend
+        ? "0x"
+        : (selector || "0x"),
+    actionFields:
+      semantic,
+    destinationAllowed: true
+  };
+
+  return {
+    agent: {
+      id: agent,
+      name: agent,
+      wallet,
+      address: wallet
+    },
+
+    action: {
+      type: normalizedAction,
+      name: functionName || action,
+      domain,
+      chain: chainKey,
+      chainId:
+        selectedChain
+          ? selectedChain.chainId
+          : undefined,
+      protocol,
+      asset: normalizedAsset,
+      actionFields:
+        semantic
+    },
+
+    intent,
+
+    policy: {
+      maxTransactionAmount: maximum,
+      maxTransaction: maximum,
+      allowedProtocols:
+        protocol
+          ? [protocol]
+          : [],
+      allowedChains: [chainKey]
+    },
+
+    transaction
+  };
+}
+
+document.getElementById("evaluate")
+.addEventListener("click", async () => {
+
+ const button =
+   document.getElementById("evaluate");
+
+ const result =
+   document.getElementById("authorizationResult");
+
+ button.disabled = true;
+
+ button.textContent = "Evaluating...";
+
+ result.classList.remove("show");
+
+ try{
+
+   const payload =
+     buildAuthorizationRequest();
+
+   const data =
+     await api("/authorize",{
+       method:"POST",
+       body:JSON.stringify(payload)
+     });
+
+
+
+   result.classList.add("show");
+
+
+   document.getElementById("resultTitle").textContent =
+     data.authorized
+     ? "AUTHORIZED"
+     : "BLOCKED";
+
+   document.getElementById("resultTitle").className =
+     "result-title " + (data.authorized ? "ok" : "bad");
+
+
+
+   document.getElementById("resultReason").textContent =
+     data.reason || "";
+
+
+
+   setVerdict(
+     "vPolicy",
+     data.verdict?.policy
+   );
+
+   setVerdict(
+     "vIntent",
+     data.verdict?.intent
+   );
+
+   setVerdict(
+     "vParameters",
+     data.verdict?.parameters
+   );
+
+   setVerdict(
+     "vProtocol",
+     data.verdict?.protocol
+   );
+
+   setVerdict(
+     "vContract",
+     data.verdict?.contract
+   );
+
+   setVerdict(
+     "vSecurity",
+     data.verdict?.transactionSecurity
+   );
+
+
+
+   document.getElementById("proofOutput").textContent =
+     JSON.stringify({
+       authorized:data.authorized,
+       risk:data.risk,
+       actualTransactionAmount:data.actualTransactionAmount,
+       declaredIntentAmount:data.declaredIntentAmount,
+       policyMaximum:data.policyMaximum,
+       commitment:data.proof?.commitment,
+       algorithm:data.proof?.algorithm,
+       claim:data.proof?.claim
+     },null,2);
+
+
+
+   addActivity(data);
+
+ }catch(error){
+
+   result.classList.add("show");
+
+   document.getElementById("resultTitle").textContent =
+     "Authorization request failed";
+
+   document.getElementById("resultTitle").className =
+     "result-title bad";
+
+   document.getElementById("resultReason").textContent =
+     error.message;
+
+   document.getElementById("proofOutput").textContent = "";
+
+ }finally{
+
+   button.disabled = false;
+
+   button.textContent = "Evaluate Action";
+
+ }
+
+});
+
+
+
+function setVerdict(id,value){
+
+ const el =
+   document.getElementById(id);
+
+ el.textContent =
+   value || "—";
+
+ el.className =
+   /FAILED|MISMATCH|UNKNOWN|THREAT|BLOCKED/i.test(value || "")
+   ? "bad"
+   : "ok";
+
+}
+
+
+
+function addActivity(data){
+
+ activityEvents.unshift({
+   time:new Date().toLocaleTimeString(),
+   authorized:data.authorized,
+   risk:data.risk,
+   reason:data.reason
+ });
+
+ const list =
+   document.getElementById("activityList");
+
+ list.innerHTML = "";
+
+ activityEvents.slice(0,10).forEach(event => {
+
+   const row =
+     document.createElement("div");
+
+   row.className = "row";
+
+   row.innerHTML = `
+
+     <div class="row-icon">
+       ${event.authorized ? "✓" : "!"}
+     </div>
+
+     <div>
+       <strong>
+         ${event.authorized ? "Execution authorized" : "Execution blocked"}
+       </strong>
+
+       <span>
+         Risk ${escapeHtml(event.risk || "UNKNOWN")}
+         · ${escapeHtml(event.reason || "")}
+       </span>
+     </div>
+
+     <div class="time">
+       ${escapeHtml(event.time)}
+     </div>
+
+   `;
+
+   list.appendChild(row);
+
+ });
+
+}
+
+
+
+function escapeHtml(value){
+
+ return String(value)
+   .replaceAll("&","&amp;")
+   .replaceAll("<","&lt;")
+   .replaceAll(">","&gt;")
+   .replaceAll('"',"&quot;")
+   .replaceAll("'","&#039;");
+
+}
+
+
+
+/* =========================================================
+   ASK AGENT GUARD
+   ========================================================= */
+
+document.getElementById("askButton")
+.addEventListener("click",askAgentGuard);
+
+
+
+document.getElementById("askInput")
+.addEventListener("keydown",event => {
+
+ if(event.key === "Enter"){
+
+   askAgentGuard();
+
+ }
+
+});
+
+
+
+async function askAgentGuard(){
+
+ const input =
+   document.getElementById("askInput");
+
+ const answer =
+   document.getElementById("askAnswer");
+
+ const question =
+   input.value.trim().toLowerCase();
+
+ if(!question){
+
+   answer.textContent =
+     "Ask a question about PHORVA.";
+
+   answer.classList.add("show");
+
+   return;
+
+ }
+
+
+
+ let response =
+   "PHORVA is an execution-security and verification layer for autonomous agents. It evaluates declared intent, policy conditions, transaction parameters, protocol targeting and transaction-security checks before authorization.";
+
+
+
+ if(question.includes("wallet")){
+
+   response =
+     "PHORVA is not a wallet and does not custody agent assets. The agent's wallet or signer remains external. PHORVA evaluates whether an intended execution is authorized before the agent proceeds to signing and blockchain execution.";
+
+ }else if(question.includes("proof") || question.includes("verification")){
+
+   response =
+     "PHORVA's backend can generate authorization proof specifications, claims and commitments. It also exposes execution verification, verification traces and proof verification routes.";
+
+ }else if(question.includes("policy")){
+
+   response =
+     "PHORVA policies can enforce transaction limits and execution conditions. During authorization, the backend evaluates the actual transaction against the supplied policy and returns the policy decision.";
+
+ }else if(question.includes("intent")){
+
+   response =
+     "PHORVA compares an agent's declared intent with the actual blockchain execution, including action type, transaction parameters, native value, asset and protocol conditions.";
+
+ }else if(question.includes("integrat")){
+   response =
+     "Agents integrate with PHORVA through its API or SDK layer. The integration sends execution context to PHORVA for verification and authorization while the agent's own wallet or signer remains external.";
+
+ }else if(question.includes("zk") || question.includes("prover")){
+
+   response =
+     "PHORVA does not position itself as another prover network. PHORVA defines verification semantics and can use external proving or verification infrastructure where appropriate.";
+
+ }else if(question.includes("security")){
+
+   response =
+     "PHORVA evaluates transaction-security conditions alongside policy, intent, parameter, protocol and execution checks. A transaction-security failure can cause authorization to be blocked.";
+
+ }
+
+
+
+ answer.textContent = response;
+
+ answer.classList.add("show");
+
+}
+
+
+
+/* =========================================================
+   DOCS
+   ========================================================= */
+
+const docs = {
+
+ overview:{
+
+  title:"What is PHORVA?",
+
+  html:`
+  <h2>What is PHORVA?</h2>
+
+  <p>
+  PHORVA provides verifiable execution control for autonomous agents.
+  It sits between agent intent and blockchain execution.
+  </p>
+
+  <h3>Core principle</h3>
+
+  <p>
+  An agent can request an action, but the requested action should not automatically become an authorized blockchain execution.
+  PHORVA evaluates the execution context first.
+  </p>
+
+  <div class="code">Agent
+  ↓
+PHORVA API / SDK
+  ↓
+Identity → Intent → Policy → Risk → Transaction Analysis
+  ↓
+Authorization
+  ↓
+Agent Wallet / Signer
+  ↓
+Blockchain</div>
+
+  <h3>Product boundary</h3>
+
+  <ul>
+  <li>PHORVA is not an agent wallet.</li>
+  <li>PHORVA does not custody private keys.</li>
+  <li>PHORVA is not a prover marketplace.</li>
+  <li>PHORVA defines execution verification semantics.</li>
+  </ul>
+  `
+
+ },
+
+
+
+ architecture:{
+
+  title:"Architecture",
+
+  html:`
+  <h2>Architecture</h2>
+
+  <p>
+  PHORVA is designed as a provider- and protocol-agnostic execution control plane.
+  </p>
+
+  <h3>Execution path</h3>
+
+  <div class="code">Autonomous Agent
+       ↓
+   PHORVA API / SDK
+       ↓
+ Agent Identity
+       ↓
+ Declared Intent
+       ↓
+ Policy
+       ↓
+ Risk Analysis
+       ↓
+ Transaction Analysis
+       ↓
+ Authorization
+       ↓
+ Agent Wallet / Signer
+       ↓
+ Blockchain</div>
+
+  <h3>Infrastructure providers</h3>
+
+  <p>
+  PHORVA defines verification semantics while proving or verification providers can supply the underlying proving and verification machinery.
+  </p>
+  `
+
+ },
+
+
+
+ authorization:{
+
+  title:"Authorization",
+
+  html:`
+  <h2>Authorization</h2>
+
+  <p>
+  The authorization engine evaluates an execution against the supplied agent, action, intent, policy and transaction context.
+  </p>
+
+  <h3>Checks</h3>
+
+  <ul>
+  <li>Policy limits</li>
+  <li>Intent matching</li>
+  <li>Parameter matching</li>
+  <li>Execution type matching</li>
+  <li>Native value matching</li>
+  <li>Asset address matching</li>
+  <li>Protocol matching</li>
+  <li>Transaction-security analysis</li>
+  </ul>
+
+  <p>
+  The resulting decision is returned as an authorization verdict together with verification evidence.
+  </p>
+  `
+
+ },
+
+
+
+ "verification-doc":{
+
+  title:"Verification",
+
+  html:`
+  <h2>Verification</h2>
+
+  <p>
+  PHORVA exposes verification primitives for execution graphs, verification traces, proof statements and execution evidence.
+  </p>
+
+  <h3>Proof statement</h3>
+
+  <p>
+  The proof-statement path independently constructs and validates execution context rather than blindly trusting caller-supplied authorization claims.
+  </p>
+
+  <h3>Commitments</h3>
+
+  <p>
+  PHORVA can produce authoritative commitments over verified execution information.
+  </p>
+  `
+
+ },
+
+
+
+ api:{
+
+  title:"API",
+
+  html:`
+  <h2>API</h2>
+
+  <p>
+  PHORVA exposes HTTP interfaces for authorization, verification and infrastructure inspection.
+  </p>
+
+  <h3>Authorization</h3>
+
+  <div class="code">POST /authorize</div>
+
+  <h3>Verification</h3>
+
+  <div class="code">POST /proof-statement
+POST /verify-proof
+POST /verify-execution
+POST /execution-graph
+POST /verification-trace</div>
+
+  <h3>Infrastructure</h3>
+
+  <div class="code">GET /health
+GET /api/chains
+GET /api/protocols
+GET /api/assets
+GET /chain-status
+GET /provider-status</div>
+  `
+
+ },
+
+
+
+ sdk:{
+
+  title:"SDK integration",
+
+  html:`
+  <h2>SDK integration</h2>
+
+  <p>
+  The SDK layer should allow agent developers to submit execution context to PHORVA without moving custody or signing responsibility into PHORVA.
+  </p>
+
+  <h3>Conceptual integration</h3>
+
+  <div class="code">agent
+  ↓
+phorva.verify(...)
+  ↓
+authorized?
+  ↓
+wallet/signer
+  ↓
+blockchain</div>
+  `
+ },
+
+
+
+ security:{
+
+  title:"Security model",
+
+  html:`
+  <h2>Security model</h2>
+
+  <p>
+  PHORVA treats authorization as a verification problem rather than simply trusting the agent's declared action.
+  </p>
+
+  <h3>Important principle</h3>
+
+  <p>
+  Caller-provided authorization claims are not treated as authoritative proof of authorization. PHORVA's verification logic recomputes the relevant execution conditions.
+  </p>
+  `
+
+ },
+
+
+
+ usecases:{
+
+  title:"Use cases",
+
+  html:`
+  <h2>Use cases</h2>
+
+  <ul>
+  <li>Agent wallet security</li>
+  <li>DeFi execution</li>
+  <li>Prediction markets</li>
+  <li>Autonomous trading</li>
+  <li>Agent payments</li>
+  <li>Gaming</li>
+  <li>DAOs and treasuries</li>
+  <li>On-chain automation</li>
+  </ul>
+
+  <p>
+  The common requirement is the same: autonomous execution should be evaluated against explicit verification semantics before it proceeds.
+  </p>
+  `
+
+ }
+
+};
+
+
+
+document.querySelectorAll("[data-doc]").forEach(button => {
+
+ button.addEventListener("click",() => {
+
+   document.querySelectorAll("[data-doc]").forEach(x =>
+     x.classList.remove("active")
+   );
+
+   button.classList.add("active");
+
+   const doc =
+     docs[button.dataset.doc];
+
+   if(doc){
+
+     document.getElementById("docsContent").innerHTML =
+       doc.html;
+
+   }
+
+   if(button.dataset.doc === "ask"){
+
+     show("ask");
+
+   }
+
+ });
+
+});
+
+
+
+/* =========================================================
+   STARTUP
+   ========================================================= */
+
+async function init(){
+
+ await Promise.allSettled([
+
+   loadHealth(),
+
+   loadChains(),
+
+   loadProtocols(),
+
+   loadAssets(),
+
+   loadChainStatus()
+
+ ]);
+
+}
+
+
+
+init();
+
+
+
+})();
+
+</script>
+
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  async function api(path, options = {}) {
+    const response = await fetch(path, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      }
+    });
+
+    let data;
+    try {
+      data = await response.json();
+    } catch {
+      data = { error: await response.text() };
+    }
+
+    if (!response.ok) {
+      throw new Error(data.error || `Request failed: ${response.status}`);
+    }
+
+    return data;
+  }
+
+  function setText(id, value) {
+    const el = $(id);
+    if (el) el.textContent = value ?? "—";
+  }
+
+  function parseJSON(id) {
+    const value = $(id).value.trim();
+    if (!value) return {};
+    return JSON.parse(value);
+  }
+
+  async function loadExecutionContext() {
+    try {
+      const [chains, protocols, assets] = await Promise.all([
+        api("/api/chains"),
+        api("/api/protocols"),
+        api("/api/assets")
+      ]);
+
+      const chainSelect = $("executionChain");
+      chainSelect.innerHTML = "";
+
+      for (const chain of chains) {
+        const option = document.createElement("option");
+        option.value = chain.key;
+        option.textContent = `${chain.name} (${chain.chainId})`;
+        chainSelect.appendChild(option);
+      }
+
+      function loadProtocols() {
+        const chain = chainSelect.value;
+        const select = $("executionProtocol");
+
+        select.innerHTML =
+          '<option value="">No protocol / direct execution</option>';
+
+        for (const protocol of (protocols[chain] || [])) {
+          const option = document.createElement("option");
+          option.value = protocol;
+          option.textContent = protocol;
+          select.appendChild(option);
+        }
+      }
+
+      function loadAssets() {
+        const chain = chainSelect.value;
+        const select = $("executionAsset");
+
+        select.innerHTML =
+          '<option value="">Select asset</option>';
+
+        for (const asset of (assets[chain] || [])) {
+          const option = document.createElement("option");
+          option.value = asset.address || "";
+          option.textContent =
+            `${asset.symbol || asset.name || "Asset"} — ${asset.name || asset.address || ""}`;
+          option.dataset.symbol = asset.symbol || "";
+          option.dataset.name = asset.name || "";
+          select.appendChild(option);
+        }
+      }
+
+      chainSelect.addEventListener("change", () => {
+        loadProtocols();
+        loadAssets();
+        syncJSON();
+      });
+
+      $("executionType").addEventListener("change", syncJSON);
+      $("executionProtocol").addEventListener("change", syncJSON);
+      $("executionAsset").addEventListener("change", syncJSON);
+
+      loadProtocols();
+      loadAssets();
+      syncJSON();
+
+    } catch (error) {
+      console.error("PHORVA context load failed:", error);
+    }
+  }
+
+  function syncJSON() {
+    const chain = $("executionChain")?.value || "";
+    const type = $("executionType")?.value || "";
+    const protocol = $("executionProtocol")?.value || "";
+    const asset = $("executionAsset")?.value || "";
+
+    let intent = {};
+    try {
+      intent = JSON.parse($("intentJson").value || "{}");
+    } catch {}
+
+    intent.executionType = type;
+    intent.chain = chain;
+
+    if (protocol) intent.protocol = protocol;
+    if (asset) intent.assetAddress = asset;
+
+    $("intentJson").value = JSON.stringify(intent, null, 2);
+
+    let transaction = {};
+    try {
+      transaction = JSON.parse($("transactionJson").value || "{}");
+    } catch {}
+
+    transaction.chain = chain;
+
+    if (!("value" in transaction)) transaction.value = "0";
+    if (!("data" in transaction)) transaction.data = "0x";
+
+    $("transactionJson").value =
+      JSON.stringify(transaction, null, 2);
+  }
+
+  async function evaluateExecution() {
+    const button = $("evaluateExecution");
+    button.disabled = true;
+    button.textContent = "Evaluating…";
+
+    try {
+      const agent = {
+        id: $("agentId").value.trim(),
+        walletAddress: $("agentWallet").value.trim()
+      };
+
+      const action = {
+        executionType: $("executionType").value
+      };
+
+      const intent = parseJSON("intentJson");
+      const policy = parseJSON("policyJson");
+      const transaction = parseJSON("transactionJson");
+
+      const result = await api("/authorize", {
+        method: "POST",
+        body: JSON.stringify({
+          agent,
+          action,
+          intent,
+          policy,
+          transaction
+        })
+      });
+
+      renderAuthorization(result);
+
+    } catch (error) {
+      renderAuthorizationError(error);
+    } finally {
+      button.disabled = false;
+      button.textContent = "Evaluate Execution";
+    }
+  }
+
+  function renderAuthorization(result) {
+    const authorized = result.authorized === true;
+
+    setText(
+      "verdictTitle",
+      authorized ? "Execution authorized" : "Execution blocked"
+    );
+
+    const badge = $("verdictBadge");
+    badge.textContent = authorized ? "AUTHORIZED" : "BLOCKED";
+    badge.className =
+      "status-badge " + (authorized ? "success" : "danger");
+
+    setText(
+      "vPolicy",
+      result.policyPassed ? "PASSED" : "FAILED"
+    );
+
+    setText(
+      "vIntent",
+      result.intentMatched ? "MATCHED" : "MISMATCH"
+    );
+
+    setText(
+      "vParameters",
+      result.parameterMatched ? "MATCHED" : "MISMATCH"
+    );
+
+    setText(
+      "vExecutionType",
+      result.executionTypeMatched ? "MATCHED" : "MISMATCH"
+    );
+
+    setText(
+      "vProtocol",
+      result.protocolMatched ? "MATCHED" : "MISMATCH"
+    );
+
+    setText(
+      "vSecurity",
+      result.transactionSecuritySafe ? "SAFE" : "THREAT"
+    );
+
+    setText("resultRisk", result.risk || "—");
+    setText(
+      "resultAuthorized",
+      result.authorized ? "YES" : "NO"
+    );
+
+    setText(
+      "proofAlgorithm",
+      result.proof?.algorithm || "—"
+    );
+
+    setText(
+      "proofCommitment",
+      result.proof?.commitment || "—"
+    );
+
+    setText(
+      "authorizationReason",
+      result.reason || "No authorization reason returned."
+    );
+
+    $("rawAuthorization").textContent =
+      JSON.stringify(result, null, 2);
+  }
+
+  function renderAuthorizationError(error) {
+    setText("verdictTitle", "Authorization request failed");
+
+    const badge = $("verdictBadge");
+    badge.textContent = "ERROR";
+    badge.className = "status-badge danger";
+
+    setText("authorizationReason", error.message);
+
+    [
+      "vPolicy",
+      "vIntent",
+      "vParameters",
+      "vExecutionType",
+      "vProtocol",
+      "vSecurity",
+      "resultRisk",
+      "resultAuthorized",
+      "proofAlgorithm",
+      "proofCommitment"
+    ].forEach(id => setText(id, "—"));
+
+    $("rawAuthorization").textContent =
+      JSON.stringify({ error: error.message }, null, 2);
+  }
+
+  $("evaluateExecution")?.addEventListener(
+    "click",
+    evaluateExecution
+  );
+
+  $("resetExecution")?.addEventListener(
+    "click",
+    () => window.location.reload()
+  );
+
+  loadExecutionContext();
+})();
+</script>
+
+
+<script id="phorva-docs-nav">
+(function(){
+  const content = document.getElementById("docsContent");
+  if (!content) return;
+
+  const pages = {
+    overview: {
+      title: "PHORVA Overview",
+      body: `
+        <p>PHORVA is verification infrastructure for autonomous economic activity.</p>
+        <h3>Core question</h3>
+        <p>Was this autonomous action actually authorized, consistent with intent, and correctly executed?</p>
+        <div class="code">Agent → Intent → PHORVA → Verification → Proof → Execution</div>
+      `
+    },
+
+    architecture: {
+      title: "Architecture",
+      body: `
+        <p>PHORVA operates as a control and verification layer between autonomous agents and execution systems.</p>
+        <div class="code">Agent
+  ↓
+PHORVA API / SDK
+  ↓
+Identity → Intent → Policy → Risk → Transaction Analysis
+  ↓
+Authorization
+  ↓
+External Agent Wallet / Signer
+  ↓
+Blockchain / Execution Rail
+  ↓
+Verification + Evidence</div>
+        <h3>Trust boundary</h3>
+        <p>PHORVA does not require custody of the agent's private keys. The external signer remains responsible for signing.</p>
+      `
+    },
+
+    authorization: {
+      title: "Authorization",
+      body: `
+        <p>Authorization determines whether a proposed execution satisfies the applicable policy, intent and security conditions.</p>
+        <h3>Evaluation</h3>
+        <div class="code">Intent
+Policy
+Execution Type
+Parameters
+Protocol / Target
+Native Value
+Transaction Security
+        ↓
+Authorization Decision</div>
+        <p>The authorization result can be allowed or blocked with supporting reasons and verification evidence.</p>
+      `
+    },
+
+    "verification-doc": {
+      title: "Verification",
+      body: `
+        <p>Verification checks whether the actual execution matched what was authorized.</p>
+        <h3>Verification evidence</h3>
+        <div class="code">Execution
+   ↓
+Execution Graph
+   ↓
+Verification Trace
+   ↓
+Proof Statement
+   ↓
+Canonical Commitment</div>
+        <p>This allows autonomous actions to carry verifiable execution evidence.</p>
+      `
+    },
+
+    api: {
+      title: "API",
+      body: `
+        <p>Applications integrate with PHORVA through API endpoints for authorization, execution verification and proof workflows.</p>
+        <h3>Core endpoint</h3>
+        <div class="code">POST /authorize</div>
+        <p>The authorization response contains the decision, verification checks, transaction analysis, risk information and proof-related evidence.</p>
+      `
+    },
+
+    sdk: {
+      title: "SDK Integration",
+      body: `
+        <p>The SDK layer is intended to make PHORVA integration straightforward for autonomous-agent developers and execution infrastructure.</p>
+        <h3>Integration model</h3>
+        <div class="code">Agent
+  ↓
+PHORVA SDK
+  ↓
+Intent + Policy + Execution Context
+  ↓
+PHORVA Verification
+  ↓
+External Wallet / Signer</div>
+      `
+    },
+
+    security: {
+      title: "Security Model",
+      body: `
+        <p>PHORVA is designed around explicit verification rather than trusting an agent's declared claims.</p>
+        <h3>Security principles</h3>
+        <ul>
+          <li>Verify execution independently.</li>
+          <li>Do not treat caller-supplied authorization claims as authoritative.</li>
+          <li>Compare declared intent with actual execution.</li>
+          <li>Analyze transaction parameters and security conditions.</li>
+          <li>Produce traceable verification evidence.</li>
+        </ul>
+      `
+    },
+
+    usecases: {
+      title: "Use Cases",
+      body: `
+        <p>PHORVA is designed to operate across different execution environments rather than being tied to one protocol or action type.</p>
+        <div class="docs-grid">
+          <div class="docs-card"><b>Agent Wallets</b><p>Verify autonomous wallet actions.</p></div>
+          <div class="docs-card"><b>DeFi</b><p>Verify protocol interactions and execution parameters.</p></div>
+          <div class="docs-card"><b>Prediction Markets</b><p>Verify autonomous market actions.</p></div>
+          <div class="docs-card"><b>Gaming</b><p>Verify autonomous on-chain game actions.</p></div>
+          <div class="docs-card"><b>Agent Payments</b><p>Verify machine-to-machine economic actions.</p></div>
+          <div class="docs-card"><b>DAOs & Treasuries</b><p>Add verification controls to autonomous treasury activity.</p></div>
+        </div>
+      `
+    },
+
+    ask: {
+      title: "Ask Agent Guard",
+      body: `
+        <p>Ask Agent Guard is PHORVA's documentation and product assistant for questions about architecture, authorization, verification, security and integrations.</p>
+      `
+    }
+  };
+
+  document.querySelectorAll("[data-doc]").forEach(btn => {
+    btn.addEventListener("click", function(){
+      const page = pages[this.dataset.doc];
+      if (!page) return;
+
+      document.querySelectorAll("[data-doc]").forEach(b => b.classList.remove("active"));
+      this.classList.add("active");
+
+      content.innerHTML =
+        "<h2>" + page.title + "</h2>" +
+        page.body;
+    });
+  });
+})();
+</script>
+
+
+<!-- PERSISTENT ACTIONS -->
+
+
+
+<div class="persistent-actions" aria-label="PHORVA persistent controls">
+  <button class="persistent-ask" data-view="ask" type="button">
+    <span>?</span>
+    <b>Ask Agent Guard</b>
+  </button>
+
+  <button class="persistent-feedback" type="button">
+    <span>◐</span>
+    <b>Feedback</b>
+  </button>
+</div>
+
+
+<script id="phorva-functional-core">
+(() => {
+  "use strict";
+
+  /*
+   * PHORVA frontend API foundation.
+   *
+   * This layer talks to the existing PHORVA backend.
+   * It does NOT replace or modify the security engine.
+   */
+
+  const PhorvaAPI = {
+    async request(path, options = {}) {
+      const response = await fetch(path, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers || {})
+        }
+      });
+
+      let data = null;
+
+      try {
+        data = await response.json();
+      } catch (_) {
+        data = null;
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error ||
+          data?.message ||
+          `PHORVA request failed (${response.status})`
+        );
+      }
+
+      return data;
+    },
+
+    health() {
+      return this.request("/health");
+    },
+
+    chains() {
+      return this.request("/api/chains");
+    },
+
+    chainStatus() {
+      return this.request("/chain-status");
+    },
+
+    providerStatus() {
+      return this.request("/provider-status");
+    },
+
+    authorize(payload) {
+      return this.request("/authorize", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    },
+
+    transaction(chain, hash) {
+      return this.request(
+        `/transaction/${encodeURIComponent(chain)}/${encodeURIComponent(hash)}`
+      );
+    },
+
+    decodeTransaction(chain, hash) {
+      return this.request(
+        `/decode-transaction/${encodeURIComponent(chain)}/${encodeURIComponent(hash)}`
+      );
+    }
+  };
+
+  window.PhorvaAPI = PhorvaAPI;
+
+  /*
+   * Developer dashboard
+   *
+   * The Developer area is an entry point into the existing
+   * public/developer application. We keep the developer console
+   * separate from the end-user PHORVA execution UI.
+   */
+  function openDeveloperDashboard() {
+    window.location.href = "/developer/";
+  }
+
+  document.addEventListener("click", (event) => {
+    const consoleButton = event.target.closest(".developer-open-console");
+    if (consoleButton) {
+      event.preventDefault();
+      openDeveloperDashboard();
+      return;
+    }
+
+    const docsButton = event.target.closest(".developer-open-docs");
+    if (docsButton) {
+      event.preventDefault();
+
+      const docsButtonTarget =
+        document.querySelector('[data-view="docs"]');
+
+      if (docsButtonTarget) {
+        docsButtonTarget.click();
+      }
+    }
+  });
+
+  /*
+   * Home live-status helper.
+   * This only updates elements when the corresponding IDs exist,
+   * so it is safe with the current UI.
+   */
+  async function refreshPhorvaStatus() {
+    const engine = document.getElementById("phorvaEngineStatus");
+    const chains = document.getElementById("phorvaChainStatus");
+    const mode = document.getElementById("phorvaModeStatus");
+
+    if (!engine && !chains && !mode) return;
+
+    try {
+      const [health, chainStatus] = await Promise.all([
+        PhorvaAPI.health(),
+        PhorvaAPI.chainStatus()
+      ]);
+
+      if (engine) {
+        engine.textContent =
+          health?.status === "running" ? "Online" : "Unavailable";
+      }
+
+      if (mode) {
+        mode.textContent =
+          health?.mode || "Connected";
+      }
+
+      if (chains) {
+        const values = Object.values(chainStatus?.chains || {});
+        const connected = values.filter(c => c.connected).length;
+
+        chains.textContent =
+          `${connected}/${values.length || 0} connected`;
+      }
+    } catch (error) {
+      if (engine) engine.textContent = "Unavailable";
+      if (chains) chains.textContent = "Unavailable";
+      if (mode) mode.textContent = "Backend unavailable";
+
+      console.warn("PHORVA status check failed:", error);
+    }
+  }
+
+  window.refreshPhorvaStatus = refreshPhorvaStatus;
+
+  /*
+   * Refresh once on load and whenever the Home view becomes active.
+   */
+  refreshPhorvaStatus();
+
+  document.addEventListener("click", (event) => {
+    const homeButton = event.target.closest('[data-view="home"]');
+
+    if (homeButton) {
+      setTimeout(refreshPhorvaStatus, 50);
+    }
+  });
+})();
+</script>
+
+
+
+<script id="phorva-navigation-fix-v2">
+(() => {
+  "use strict";
+
+  function phorvaNavigate(id) {
+    const target = document.getElementById(id);
+    if (!target || !target.classList.contains("view")) return false;
+
+    document.querySelectorAll(".view").forEach(view => {
+      view.classList.toggle("active", view.id === id);
+    });
+
+    document.querySelectorAll(".nav[data-view]").forEach(nav => {
+      nav.classList.toggle("active", nav.dataset.view === id);
+    });
+
+    const sheet = document.getElementById("sheet");
+    if (sheet) sheet.classList.remove("open");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+    if (id === "home" && typeof window.refreshPhorvaStatus === "function") {
+      setTimeout(window.refreshPhorvaStatus, 50);
+    }
+
+    return true;
+  }
+
+  document.addEventListener("click", event => {
+    const more = event.target.closest("#more");
+
+    if (more) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      const sheet = document.getElementById("sheet");
+      if (sheet) sheet.classList.add("open");
+
+      return;
+    }
+
+    const button = event.target.closest("[data-view]");
+
+    if (!button) return;
+
+    const id = button.dataset.view;
+
+    if (!id || id === "ask") return;
+
+    if (document.getElementById(id)?.classList.contains("view")) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      phorvaNavigate(id);
+    }
+  }, true);
+
+  window.PhorvaNavigate = phorvaNavigate;
+})();
+</script>
+
+<script id="phorva-live-wiring-v2">
+(() => {
+  "use strict";
+
+  const state = {
+    verified: Number(localStorage.getItem("phorva_verified_count") || 0),
+    blocked: Number(localStorage.getItem("phorva_blocked_count") || 0),
+    events: JSON.parse(localStorage.getItem("phorva_events") || "[]")
+  };
+
+  const chainIds = {
+    baseSepolia: 84532,
+    ethereumSepolia: 11155111,
+    arbitrumSepolia: 421614
+  };
+
+  const routers = {
+    baseSepolia:
+      "0x492e6456d9528771018deb9e87ef7750ef184104",
+    ethereumSepolia:
+      "0x3a9d48ab9751398bbfa63ad67599bb04e4bdf98b",
+    arbitrumSepolia:
+      "0xefd1d4bd4cf1e86da286bb4cb1b8bced9c10ba47"
+  };
+
+  const token =
+    "0x5555555555555555555555555555555555555555";
+
+  function el(id) {
+    return document.getElementById(id);
+  }
+
+  function set(id, value) {
+    const node = el(id);
+    if (node) node.textContent = value;
+  }
+
+  function word(value) {
+    const n = BigInt(
+      Math.max(0, Math.floor(Number(value) || 0))
+    );
+
+    return n.toString(16).padStart(64, "0");
+  }
+
+  function address(value) {
+    return String(value || "")
+      .replace(/^0x/i, "")
+      .padStart(64, "0")
+      .slice(-64);
+  }
+
+  function save() {
+    localStorage.setItem(
+      "phorva_verified_count",
+      String(state.verified)
+    );
+
+    localStorage.setItem(
+      "phorva_blocked_count",
+      String(state.blocked)
+    );
+
+    localStorage.setItem(
+      "phorva_events",
+      JSON.stringify(state.events.slice(0, 20))
+    );
+  }
+
+  function record(data, payload) {
+    const event = {
+      timestamp: Date.now(),
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      }),
+      agent: payload.agent,
+      action: payload.action?.type || "execution",
+      chain: payload.action?.chain || "",
+      authorized: Boolean(data.authorized),
+      risk: data.risk || "",
+      reason: data.reason || ""
+    };
+
+    if (event.authorized) {
+      state.verified++;
+    } else {
+      state.blocked++;
+    }
+
+    state.events.unshift(event);
+    state.events = state.events.slice(0, 20);
+
+    save();
+    renderHome();
+  }
+
+  function renderHome() {
+    /*
+     * Existing home statistics.
+     * Only update them when their IDs exist.
+     */
+    set(
+      "homeAgentsProtected",
+      String(
+        new Set(
+          state.events
+            .map(x => x.agent)
+            .filter(Boolean)
+        ).size
+      )
+    );
+
+    set(
+      "homeExecutionsVerified",
+      String(state.verified)
+    );
+
+    set(
+      "homeThreatsBlocked",
+      String(state.blocked)
+    );
+
+    /*
+     * Existing Recent Activity area.
+     */
+    const activity = el("homeActivity");
+
+    if (activity && state.events.length) {
+      const rows = state.events.slice(0, 5).map(event => {
+        const title = event.authorized
+          ? "Execution authorized"
+          : "Execution blocked";
+
+        const detail =
+          `${event.agent || "Agent"} · ` +
+          `${event.action} · ` +
+          `${event.chain}`;
+
+        return `
+          <div class="row">
+            <div class="row-icon">
+              ${event.authorized ? "✓" : "!"}
+            </div>
+            <div>
+              <strong>${escapeHTML(title)}</strong>
+              <span>${escapeHTML(detail)}</span>
+            </div>
+            <div class="time">
+              ${escapeHTML(event.time)}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      activity.innerHTML = rows;
+    }
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  /*
+   * Keep the existing chain/protocol/asset selectors supplied
+   * by the backend.
+   */
+  async function loadAgentMetadata() {
+    try {
+      const [chains, protocols, assets] =
+        await Promise.all([
+          window.PhorvaAPI.chains(),
+          window.PhorvaAPI.request("/api/protocols"),
+          window.PhorvaAPI.request("/api/assets")
+        ]);
+
+      const chainSelect = el("agentChain");
+
+      if (chainSelect && Array.isArray(chains)) {
+        const current = chainSelect.value;
+
+        chainSelect.innerHTML = chains
+          .map(chain => `
+            <option value="${escapeHTML(chain.key)}">
+              ${escapeHTML(chain.name)}
+            </option>
+          `)
+          .join("");
+
+        if (
+          current &&
+          chains.some(c => c.key === current)
+        ) {
+          chainSelect.value = current;
+        }
+      }
+
+      updateProtocolAndAssetSelectors(
+        protocols,
+        assets
+      );
+
+    } catch (error) {
+      console.warn(
+        "PHORVA metadata refresh failed:",
+        error
+      );
+    }
+  }
+
+  function updateProtocolAndAssetSelectors(
+    protocols,
+    assets
+  ) {
+    const chain =
+      el("agentChain")?.value ||
+      "baseSepolia";
+
+    const protocolSelect =
+      el("agentProtocol");
+
+    if (protocolSelect) {
+      const values =
+        protocols?.[chain] || [];
+
+      protocolSelect.innerHTML =
+        values.length
+          ? values.map(protocol => `
+              <option value="${escapeHTML(protocol)}">
+                ${escapeHTML(protocol)}
+              </option>
+            `).join("")
+          : `<option value="">No registered protocols</option>`;
+    }
+
+    const assetSelect =
+      el("agentAsset");
+
+    if (assetSelect) {
+      const values =
+        assets?.[chain] || [];
+
+      assetSelect.innerHTML =
+        values.map(asset => `
+          <option
+            value="${escapeHTML(asset.address || "")}">
+            ${escapeHTML(
+              asset.symbol ||
+              asset.name ||
+              asset.address ||
+              "Asset"
+            )}
+          </option>
+        `).join("");
+
+      if (!values.length) {
+        assetSelect.innerHTML =
+          `<option value="">No registered assets</option>`;
+      }
+    }
+  }
+
+  function buildPayload() {
+    const chain =
+      el("agentChain")?.value ||
+      "baseSepolia";
+
+    const action =
+      el("agentAction")?.value ||
+      "swap";
+
+    const agent =
+      el("agentName")?.value.trim() ||
+      "TradingAgent-01";
+
+    const walletInput =
+      el("agentWallet")?.value.trim();
+
+    const wallet =
+      /^0x[a-fA-F0-9]{40}$/.test(walletInput || "")
+        ? walletInput
+        : "0x1111111111111111111111111111111111111111";
+
+    const protocol =
+      el("agentProtocol")?.value ||
+      "Uniswap";
+
+    const assetValue =
+      el("agentAsset")?.value || token;
+
+    const amount =
+      Number(el("intentAmount")?.value || 0);
+
+    const maximum =
+      Number(el("policyMaximum")?.value || 0);
+
+    const functionName =
+      el("functionName")?.value ||
+      "swapExactTokensForTokens";
+
+    const selector =
+      el("selector")?.value ||
+      "0x38ed1739";
+
+    let to;
+    let calldata;
+
+    if (
+      action === "transfer" ||
+      action === "send"
+    ) {
+      to = token;
+
+      calldata =
+        "0xa9059cbb" +
+        address(
+          "0x3333333333333333333333333333333333333333"
+        ) +
+        word(amount);
+
+    } else if (
+      action === "approve"
+    ) {
+      to = routers[chain];
+
+      calldata =
+        "0x095ea7b3" +
+        address(routers[chain]) +
+        word(amount);
+
+    } else {
+      /*
+       * Preserve the existing PHORVA selector/function
+       * model for the current demo verification path.
+       */
+      to = routers[chain];
+
+      calldata =
+        selector +
+        word(amount) +
+        word(Math.max(1, amount - 10)) +
+        word(160) +
+        address(
+          "0x3333333333333333333333333333333333333333"
+        ) +
+        word(
+          Math.floor(Date.now() / 1000) + 3600
+        ) +
+        word(2) +
+        address(token) +
+        address(
+          "0x2222222222222222222222222222222222222222"
+        );
+    }
+
+    return {
+      agent,
+
+      action: {
+        type: action,
+        chain,
+        protocol,
+        asset: assetValue,
+        amount
+      },
+
+      policy: {
+        maxTransactionAmount: maximum,
+        dailyLimit: 2000
+      },
+
+      intent: {
+        type: action,
+        chain,
+        protocol,
+        asset: assetValue,
+        amount
+      },
+
+      transaction: {
+        from: wallet,
+        to,
+        chainId: chainIds[chain],
+        expectedChainId: chainIds[chain],
+        value: "0",
+        calldata,
+        amount
+      }
+    };
+  }
+
+  async function evaluate() {
+    const button = el("evaluate");
+
+    if (!button) return;
+
+    button.disabled = true;
+    button.textContent = "Checking…";
+
+    set(
+      "resultTitle",
+      "PHORVA verification in progress"
+    );
+
+    set(
+      "resultReason",
+      "Checking policy, intent, parameters, protocol and transaction security…"
+    );
+
+    try {
+      const payload = buildPayload();
+
+      const data =
+        await window.PhorvaAPI.authorize(payload);
+
+      /*
+       * Existing Agent result UI.
+       */
+      set(
+        "resultTitle",
+        data.authorized
+          ? "Authorization approved"
+          : "Authorization blocked"
+      );
+
+      set(
+        "resultReason",
+        data.reason || ""
+      );
+
+      set(
+        "vPolicy",
+        data.policyPassed
+          ? "PASSED"
+          : "FAILED"
+      );
+
+      set(
+        "vIntent",
+        data.intentMatched
+          ? "MATCHED"
+          : "MISMATCH"
+      );
+
+      set(
+        "vParameters",
+        data.parameterMatched
+          ? "MATCHED"
+          : "MISMATCH"
+      );
+
+      set(
+        "vProtocol",
+        data.protocolMatched
+          ? "MATCHED"
+          : "MISMATCH"
+      );
+
+      set(
+        "vContract",
+        data.verdict?.contract ||
+        "UNKNOWN"
+      );
+
+      set(
+        "vSecurity",
+        data.transactionSecuritySafe
+          ? "SAFE"
+          : "THREAT DETECTED"
+      );
+
+      const proof =
+        el("proofOutput");
+
+      if (proof) {
+        proof.textContent =
+          JSON.stringify(
+            data.proof || {},
+            null,
+            2
+          );
+      }
+
+      /*
+       * This is the bridge from Agent -> Home.
+       */
+      record(data, payload);
+
+      /*
+       * Refresh live backend state after verification.
+       */
+      if (
+        typeof window.refreshPhorvaStatus ===
+        "function"
+      ) {
+        window.refreshPhorvaStatus();
+      }
+
+    } catch (error) {
+      console.error(
+        "PHORVA authorization error:",
+        error
+      );
+
+      set(
+        "resultTitle",
+        "Authorization request failed"
+      );
+
+      set(
+        "resultReason",
+        error.message ||
+        "PHORVA backend unavailable."
+      );
+
+    } finally {
+      button.disabled = false;
+      button.textContent = "Evaluate Action";
+    }
+  }
+
+  /*
+   * Capture the click before any legacy UI-only handler.
+   * This prevents duplicate /authorize calls if an older
+   * handler is still present elsewhere in the file.
+   */
+  document.addEventListener(
+    "click",
+    event => {
+      const button =
+        event.target.closest("#evaluate");
+
+      if (!button) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      evaluate();
+    },
+    true
+  );
+
+  /*
+   * Keep Agent metadata live when its chain changes.
+   */
+  document.addEventListener("change", event => {
+    if (
+      event.target?.id === "agentChain"
+    ) {
+      window.PhorvaLiveAgent?.loadMetadata();
+    }
+  });
+
+  /*
+   * Initial state.
+   */
+  renderHome();
+  loadAgentMetadata();
+
+  window.PhorvaLiveAgent = {
+    loadMetadata: loadAgentMetadata,
+    evaluate,
+    buildPayload
+  };
+
+})();
+</script>
+
+</body>
+</html>
