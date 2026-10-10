@@ -16,3 +16,8 @@ phorva-signup-headers.txt
 *.bak
 *.bak-*
 *.before-*
+
+data/phorva.json
+.env*
+
+.env.production.local
