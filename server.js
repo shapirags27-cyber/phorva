@@ -108,6 +108,9 @@ app.use(
   })
 );
 
+// Durable, transaction-locked PostgreSQL state for production requests.
+app.use(db.middleware());
+
 
 app.use(express.static(path.join(__dirname, "public")));
 
